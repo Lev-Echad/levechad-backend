@@ -48,8 +48,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/templates/server/volunteer_table.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="229">
-              <caret line="54" column="68" lean-forward="true" selection-start-line="54" selection-start-column="68" selection-end-line="54" selection-end-column="68" />
+            <state relative-caret-position="518">
+              <caret line="71" selection-start-line="50" selection-end-line="71" />
             </state>
           </provider>
         </entry>
@@ -172,7 +172,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11195000" />
+    <option name="totallyTimeSpent" value="11451000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1448" y="177" width="1456" height="876" extended-state="6" />
@@ -296,8 +296,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server/templates/server/volunteer_table.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="229">
-          <caret line="54" column="68" lean-forward="true" selection-start-line="54" selection-start-column="68" selection-end-line="54" selection-end-column="68" />
+        <state relative-caret-position="518">
+          <caret line="71" selection-start-line="50" selection-end-line="71" />
         </state>
       </provider>
     </entry>
