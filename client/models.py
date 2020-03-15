@@ -79,4 +79,4 @@ class HelpRequest(models.Model):
     address = models.CharField(max_length=200)
     notes = models.CharField(max_length=200)
     type = models.CharField(max_length=20, choices=TYPES)
-    type_text = models.CharField(max_length=50000)
+    type_text = models.CharField(max_length=5000)
