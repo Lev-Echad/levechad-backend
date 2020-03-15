@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="34e62ebf-7bc1-485c-ad17-4d2fbb071147" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/levechad/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/levechad/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/models.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,8 +21,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/levechad/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="508">
-              <caret line="117" lean-forward="true" selection-start-line="117" selection-end-line="117" />
+            <state relative-caret-position="238">
+              <caret line="14" selection-start-line="14" selection-end-line="14" />
               <folding>
                 <element signature="e#309#318#0" expanded="true" />
               </folding>
@@ -30,8 +31,21 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/client/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="593">
+              <caret line="65" lean-forward="true" selection-start-line="65" selection-end-line="65" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/levechad/wsgi.py">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="3" selection-start-column="3" selection-end-column="3" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -54,6 +68,7 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/levechad/settings.py" />
+        <option value="$PROJECT_DIR$/client/models.py" />
       </list>
     </option>
   </component>
@@ -75,11 +90,6 @@
               <item name="LevEchad" type="b2602c69:ProjectViewProjectNode" />
               <item name="LevEchad" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="LevEchad" type="b2602c69:ProjectViewProjectNode" />
-              <item name="LevEchad" type="462c0819:PsiDirectoryNode" />
-              <item name="levechad" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -89,7 +99,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../ilan_site" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
   </component>
@@ -141,12 +151,12 @@
       <option name="presentableId" value="Default" />
       <updated>1584267437694</updated>
       <workItem from="1584267439175" duration="571000" />
-      <workItem from="1584270277593" duration="261000" />
+      <workItem from="1584270277593" duration="2368000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="832000" />
+    <option name="totallyTimeSpent" value="2939000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1448" y="177" width="1456" height="876" extended-state="6" />
@@ -182,16 +192,6 @@
     <entry file="file://$PROJECT_DIR$/manage.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/levechad/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="508">
-          <caret line="117" lean-forward="true" selection-start-line="117" selection-end-line="117" />
-          <folding>
-            <element signature="e#309#318#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/levechad/asgi.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -202,7 +202,28 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/levechad/wsgi.py">
-      <provider selected="true" editor-type-id="text-editor" />
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="3" selection-start-column="3" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/levechad/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+          <folding>
+            <element signature="e#309#318#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="593">
+          <caret line="65" lean-forward="true" selection-start-line="65" selection-end-line="65" />
+        </state>
+      </provider>
     </entry>
   </component>
 </project>

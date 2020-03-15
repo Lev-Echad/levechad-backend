@@ -9,13 +9,21 @@ AREAS = (
     ("DARO", "דרום")
 )
 
+
 class Language(models.Model):
     name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
 
 class City(models.Model):
     name = models.CharField(max_length=200)
     x = models.FloatField()
     y = models.FloatField()
+
+    def __str__(self):
+        return self.name
+
 
 class VolunteerSchedule(models.Model):
     end_date = models.DateField()
@@ -26,6 +34,7 @@ class VolunteerSchedule(models.Model):
     thursday = models.CharField(max_length=3)
     friday = models.CharField(max_length=3)
     saturday = models.CharField(max_length=3)
+
 
 class Volunteer(models.Model):
     MOVING_WAYS = (
@@ -54,6 +63,7 @@ class Volunteer(models.Model):
     hearing_way = models.CharField(max_length=20, choices=HEARING_WAYS)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE)
     creation_date = models.DateTimeField()
+
 
 class HelpRequest(models.Model):
     TYPES = (
