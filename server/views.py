@@ -7,19 +7,25 @@ def show_all_volunteers(request):
     qs = Volunteer.objects.all()
     print(request.POST)
     areas = request.POST.getlist('area')
-    languages = request.POST.getlist('language')
+    lans = request.POST.getlist('language')
+    print("areas: "+str(areas))
+    print("languages: " + str(lans))
     if areas is not None:
-        qs = qs.filter(area__in = areas)
-    elif languages is not None:
-        qs = qs.filter(languages__in=languages)
+        print("area")
+        temp_qs = qs.filter(area__in = areas)
+        # check there were matches
+        if len(temp_qs) != 0:
+            qs = temp_qs
+        print(qs)
+    if lans is not None:
+        print("lan")
+        print(lans)
+        # check there were matches
+        temp_qs = qs.filter(languages__name__in=lans)
+        if len(temp_qs) != 0:
+            qs = temp_qs
+        print(qs)
 
-    if len(qs)==0:
-        qs =Volunteer.objects.all()
-
-    # for person in qs:
-    #     per_lans= person.languages
-    #     for lan in per_lans:
-    #         print(lan)
 
     context = {'volunteer_data': qs}
     return render(request, 'server/volunteer_table.html', context)
