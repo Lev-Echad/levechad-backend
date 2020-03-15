@@ -11,8 +11,8 @@ AREAS = (
 )
 
 class Timestampable(models.Model):
-    created_date = models.DateTimeField(null=True)
-    updated_date = models.DateTimeField(null=True)
+    created_date = models.DateTimeField(null=True, editable=False)
+    updated_date = models.DateTimeField(null=True, editable=False)
 
     class Meta:
         abstract = True
@@ -22,7 +22,7 @@ class Timestampable(models.Model):
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
-        return super(User, self).save(*args, **kwargs)
+        return super(Timestampable, self).save(*args, **kwargs)
 
 class Language(models.Model):
     name = models.CharField(max_length=200)
