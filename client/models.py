@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 AREAS = (
@@ -8,6 +9,20 @@ AREAS = (
     ("YEHU", "יהודה ושומרון"),
     ("DARO", "דרום")
 )
+
+class Timestampable(models.Model):
+    created_date = models.DateTimeField(null=True, editable=False)
+    updated_date = models.DateTimeField(null=True, editable=False)
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(Timestampable, self).save(*args, **kwargs)
 
 class Language(models.Model):
     name = models.CharField(max_length=200)
@@ -24,7 +39,7 @@ class City(models.Model):
         return self.name
 
 
-class VolunteerSchedule(models.Model):
+class VolunteerSchedule(Timestampable):
     end_date = models.DateField()
     sunday = models.CharField(max_length=3)
     monday = models.CharField(max_length=3)
@@ -35,7 +50,7 @@ class VolunteerSchedule(models.Model):
     saturday = models.CharField(max_length=3)
 
 
-class Volunteer(models.Model):
+class Volunteer(Timestampable):
     MOVING_WAYS = (
         ("CAR", "רכב"),
         ("PUBL", 'תחב"צ'),
@@ -60,17 +75,23 @@ class Volunteer(models.Model):
     notes = models.CharField(max_length=200)
     moving_way = models.CharField(max_length=20, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=20, choices=HEARING_WAYS)
-    schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE)
-    creation_date = models.DateTimeField()
+    schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, null=True)
 
 
-class HelpRequest(models.Model):
+class HelpRequest(Timestampable):
     TYPES = (
         ('BUYIN', 'קניות\\איסוף'),
         ('MEDICI', 'תרופות'),
         ('HOME_HEL', 'עזרה בבית'),
         ('PHONE_HEL', 'תמיכה טלפונית'),
         ('OTHER', 'אחר')
+    )
+
+    STATUSES = (
+        ('WAITING', 'התקבלה'),
+        ('IN_CARE', 'בטיפול'),
+        ('TO_VOLUNTER', 'הועבר למתנדב'),
+        ('DONE', 'טופל')
     )
 
     full_name = models.CharField(max_length=200)
@@ -80,3 +101,4 @@ class HelpRequest(models.Model):
     notes = models.CharField(max_length=200)
     type = models.CharField(max_length=20, choices=TYPES)
     type_text = models.CharField(max_length=5000)
+    status = models.CharField(max_length=25, choices=STATUSES, blank=True)

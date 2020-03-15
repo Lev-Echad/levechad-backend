@@ -1,0 +1,14 @@
+{% extends "template.html" %}
+
+{% block title %}לב אחד - עזרה בקניות{% endblock %}
+
+
+{% block body %}
+<form action="other" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}
+
+
