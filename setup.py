@@ -20,7 +20,7 @@ if Language.objects.filter(name="עברית").first() == None:
     Language(name="ערבית").save()
     Language(name="אחר").save()
 
-with open('cities.json', encoding="utf8") as json_file:
+with open('cities.json', encoding="utf-8") as json_file:
     data = json.load(json_file)
     cities = list()
     for p in data:
