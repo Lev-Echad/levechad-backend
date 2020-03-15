@@ -1,5 +1,6 @@
 from django import forms
 import json
+
 # Create your models here.
 AREAS = (
     ("TZAF", "צפון"),
@@ -9,11 +10,16 @@ AREAS = (
     ("DARO", "דרום")
 )
 
-json_file = open('city.json')
+json_file = open('./client/city.json')
 data = json.load(json_file)
 onlyNames = [a["name"] for a in data]
-CITIES = {i: onlyNames[i] for i in range(0, len(onlyNames))}
+CITIES = tuple({i: onlyNames[i] for i in range(0, len(onlyNames))}.items())
 json_file.close()
+
+
+class NameForm(forms.Form):
+    your_name = forms.CharField(label='Your name', max_length=100)
+
 
 
 class VolunteerForm(forms.Form):
@@ -39,16 +45,16 @@ class VolunteerForm(forms.Form):
 
 
     full_name = forms.CharField(max_length=200)
-    age = forms.IntegerField()
-    area = forms.MultipleChoiceField(choices = AREAS)
-    languages = forms.MultipleChoiceField(choices = LANG_CHOICES)
-    phone_number = forms.CharField(max_length=200)
-    city = forms.ChoiceField(choices = CITIES)
-    address = forms.CharField(max_length=200)
-    available_on_saturday = forms.BooleanField()
-    notes = forms.CharField(max_length=200)
-    moving_way = forms.ChoiceField(choices=MOVING_WAYS)
-    hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS)
+    # age = forms.IntegerField()
+    # area = forms.MultipleChoiceField(choices = AREAS)
+    # languages = forms.MultipleChoiceField(choices = LANG_CHOICES)
+    # phone_number = forms.CharField(max_length=200)
+    # city = forms.ChoiceField(choices = CITIES)
+    # address = forms.CharField(max_length=200)
+    # available_on_saturday = forms.BooleanField()
+    # notes = forms.CharField(max_length=200)
+    # transportation = forms.ChoiceField(choices=MOVING_WAYS)
+    # hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS)
 
 
 class ScheduleForm(forms.Form):

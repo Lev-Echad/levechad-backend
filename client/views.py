@@ -1,7 +1,8 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from .forms import VolunteerForm, ScheduleForm, HelpForm, BuyInForm, MediciForm, HomeHelpForm, OtherForm
+from .forms import NameForm, VolunteerForm, ScheduleForm, HelpForm, BuyInForm, MediciForm, HomeHelpForm, OtherForm
+
 
 def volunteer(request):
     # if this is a POST request we need to process the form data
@@ -12,14 +13,15 @@ def volunteer(request):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # ...
-            # redirect to a new URL:
-            return HttpResponseRedirect('/schedule/')
+            # redirect to a new URL:y
+            return HttpResponseRedirect('/client/thanks')
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = VolunteerForm()
 
     return render(request, 'volunteer.html', {'form': form})
+
 
 def schedule(request):
     # if this is a POST request we need to process the form data
@@ -31,7 +33,7 @@ def schedule(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/client/thanks')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -39,7 +41,8 @@ def schedule(request):
 
     return render(request, 'schedule.html', {'form': form})
 
-def firstHelp(request):
+
+def first_help(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -51,15 +54,15 @@ def firstHelp(request):
             # redirect to a new URL:
             type = form.cleaned_data['type']
             if(type == 'BUYIN'):
-                return HttpResponseRedirect('/buyin/')
+                return HttpResponseRedirect('/client/buy_in')
             elif(type == "MEDICI"):
-                return HttpResponseRedirect('/medic/')
+                return HttpResponseRedirect('/client/medic')
             elif(type == "HOME_HEL"):
-                return HttpResponseRedirect('/homehelp/')
+                return HttpResponseRedirect('/client/homehelp')
             elif(type == "PHONE_HEL"):
-                return HttpResponseRedirect('/phonehelp/')
+                return HttpResponseRedirect('/client/phonehelp')
             elif(type == "OTHER"):
-                return HttpResponseRedirect('/otherhelp/')
+                return HttpResponseRedirect('/client/otherhelp')
 
 
     # if a GET (or any other method) we'll create a blank form
@@ -68,7 +71,8 @@ def firstHelp(request):
 
     return render(request, 'help.html', {'form': form})
 
-def BuyIn(request):
+
+def buy_in(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -78,7 +82,7 @@ def BuyIn(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/client/thanks')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -86,7 +90,8 @@ def BuyIn(request):
 
     return render(request, 'buyin.html', {'form': form})
 
-def Medic(request):
+
+def medic(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -96,7 +101,7 @@ def Medic(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/client/thanks')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -104,7 +109,8 @@ def Medic(request):
 
     return render(request, 'medici.html', {'form': form})
 
-def HomeHelp(request):
+
+def home_help(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -114,7 +120,7 @@ def HomeHelp(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/client/thanks')
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -122,20 +128,28 @@ def HomeHelp(request):
 
     return render(request, 'homehelp.html', {'form': form})
 
-def Medic(request):
+
+def get_name(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = OtherForm(request.POST)
+        form = BuyInForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/client/thanks')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = OtherForm()
+        form = BuyInForm()
 
-    return render(request, 'otherHelp.html', {'form': form})
+    return render(request, 'volunteer.html', {'form': form})
+
+
+def thanks(request):
+    return render(request, 'thanks.html', {})
+
+def homepage(request):
+    return render(request, 'index.html', {})
