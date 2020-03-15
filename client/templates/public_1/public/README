@@ -1,0 +1,17 @@
+Index page: index.html
+
+Routes to implement:
+
+Help form routes:
+GET /help/shopping
+    /help/commute
+    /help/meds
+    /help/phone_support
+    /help/home
+    /help/other
+Each of these routes should render the help.html template, while passing a different form object as a paramter.
+
+Registration routes:
+POST /register_volunteer
+     /register_help
+both routes receive the respective form data in the request body.
