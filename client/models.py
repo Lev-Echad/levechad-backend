@@ -11,8 +11,8 @@ AREAS = (
 )
 
 class Timestampable(models.Model):
-    created_date = models.DateTimeField(null=True)
-    updated_date = models.DateTimeField(null=True)
+    created_date = models.DateTimeField(null=True, editable=False)
+    updated_date = models.DateTimeField(null=True, editable=False)
 
     class Meta:
         abstract = True
