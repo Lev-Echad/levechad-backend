@@ -9,7 +9,6 @@ AREAS = (
     ("DARO", "דרום")
 )
 
-
 class Language(models.Model):
     name = models.CharField(max_length=200)
 
@@ -55,7 +54,7 @@ class Volunteer(models.Model):
     area = models.CharField(max_length=10, choices=AREAS)
     languages = models.ManyToManyField(Language)
     phone_number = models.CharField(max_length=200)
-    city = models.OneToOneField(City, on_delete=models.CASCADE)
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=200)
     available_saturday = models.BooleanField()
     notes = models.CharField(max_length=200)
@@ -76,7 +75,7 @@ class HelpRequest(models.Model):
 
     full_name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=200)
-    city = models.OneToOneField(City, on_delete=models.CASCADE)
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=200)
     notes = models.CharField(max_length=200)
     type = models.CharField(max_length=20, choices=TYPES)
