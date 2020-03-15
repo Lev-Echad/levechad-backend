@@ -4,9 +4,14 @@ from django.views.decorators.http import require_POST
 from client.models import Volunteer, HelpRequest
 
 def show_all_volunteers(request):
-    print(request.POST)
-    all_volunteer_data = Volunteer.objects.all()
-    context = {'volunteer_data': all_volunteer_data}
+    qs = Volunteer.objects.all()
+    test = request.POST.get('test')
+    print("test= " + str(test))
+    if test is not None:
+        qs = qs.filter(age=12)
+    else:
+        qs = qs.order_by('-full_name')
+    context = {'volunteer_data': qs}
     return render(request, 'server/volunteer_table.html', context)
 
 def order_by_name(request):

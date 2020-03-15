@@ -5,25 +5,24 @@ from .forms import *
 
 
 
-def schedule(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = ScheduleForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            return HttpResponseRedirect('/client/thanks')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = ScheduleForm()
-
-    return render(request, 'schedule.html', {'form': form})
-
-
+# def schedule(request):
+#     # if this is a POST request we need to process the form data
+#     if request.method == 'POST':
+#         # create a form instance and populate it with data from the request:
+#         form = ScheduleForm(request.POST)
+#         # check whether it's valid:
+#         if form.is_valid():
+#             # process the data in form.cleaned_data as required
+#             # ...
+#             # redirect to a new URL:
+#             return HttpResponseRedirect('/client/thanks')
+#
+#     # if a GET (or any other method) we'll create a blank form
+#     else:
+#         form = ScheduleForm()
+#
+#     return render(request, 'schedule.html', {'form': form})
+#
 # def first_help(request):
 #     # if this is a POST request we need to process the form data
 #     if request.method == 'POST':
@@ -138,13 +137,32 @@ def send_help(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks')
+            return HttpResponseRedirect('/client/schedule')
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = VolunteerForm()
 
     return render(request, 'send_help.html', {'form': form})
+
+
+def schedule(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ScheduleForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            return HttpResponseRedirect('/client/thanks')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = ScheduleForm()
+
+    return render(request, 'schedule.html', {'form': form})
 
 
 def shopping_help(request):
@@ -180,7 +198,7 @@ def medic_help(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = ShoppingForm()
+        form = MedicForm()
 
     return render(request, 'help_pages/medic.html', {'form': form})
 
@@ -203,11 +221,12 @@ def other_help(request):
 
     return render(request, 'help_pages/other.html', {'form': form})
 
+
 def home_help(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = ShoppingForm(request.POST)
+        form = HomeForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -217,7 +236,7 @@ def home_help(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = ShoppingForm()
+        form = HomeForm()
 
     return render(request, 'help_pages/home.html', {'form': form})
 
@@ -236,7 +255,7 @@ def travel_help(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = ShoppingForm()
+        form = TravelForm()
 
     return render(request, 'help_pages/travel.html', {'form': form})
 
@@ -257,5 +276,5 @@ def phone_help(request):
     else:
         form = BaseHelpForm()
 
-    return render(request, 'help_pages/shopping.html', {'form': form})
+    return render(request, 'help_pages/phone.html', {'form': form})
 
