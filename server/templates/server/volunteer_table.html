@@ -22,7 +22,7 @@
 </head>
 
 <body dir="rtl">
-<p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת רכבים</p>
+<p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת מתנדבים</p>
 <table class="table table-hover table-bordered text-center">
     <thead>
         <tr>
@@ -36,7 +36,7 @@
 
         </tr>
     </thead>
-    <tbody>ת
+    <tbody>
         {% for volunteer in volunteer_data %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
@@ -44,7 +44,7 @@
                 <td>{{ volunteer.age }}</td>
                 <td>{{ volunteer.area }}</td>
                 <td>{{ volunteer.phone_number }}</td>
-                <td>{{ volunteer.בןאט }}</td>
+                <td>{{ volunteer.city }}</td>
             </tr>
         {% endfor %}
     </tbody>
