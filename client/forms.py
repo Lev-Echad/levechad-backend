@@ -10,7 +10,7 @@ AREAS = (
     ("DARO", "דרום")
 )
 
-json_file = open('./client/city.json')
+json_file = open('./client/city.json', encoding="utf8")
 data = json.load(json_file)
 onlyNames = [a["name"] for a in data]
 CITIES = tuple({i: onlyNames[i] for i in range(0, len(onlyNames))}.items())
