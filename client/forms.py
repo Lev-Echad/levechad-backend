@@ -85,10 +85,15 @@ class HelpForm(forms.Form):
     #type_text = forms.CharField(max_length=5000)
 
 class BuyInForm(forms.Form):
-    full_name = forms.CharField(max_length=200)
-    phone_number = forms.CharField(max_length=200)
-    city = forms.ChoiceField(choices = CITIES)
-    address = forms.CharField(max_length=200)
-    notes = forms.CharField(max_length=200)
-    type = forms.ChoiceField(choices=TYPES)
-    #type_text = forms.CharField(max_length=5000)
+    to_buy = forms.CharField(max_length=5000)
+
+class MediciForm(forms.Form):
+    need_prescription = forms.BooleanField()
+    medic_name = forms.CharField(max_length=200)
+
+class HomeHelpForm(forms.Form):
+    need_text = forms.CharField(max_length=5000)
+
+class OtherForm(forms.Form):
+    other_need = forms.CharField(max_length=5000)
+
