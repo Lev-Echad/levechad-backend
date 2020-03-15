@@ -1,3 +1,5 @@
 from django.contrib import admin
 
-# Register your models here.
+from client.models import Volunteer
+
+admin.site.register(Volunteer)
