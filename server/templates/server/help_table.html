@@ -18,14 +18,7 @@
   <link rel="stylesheet" href="{% static 'server/css/mdb.min.css' %}">
   <link rel="stylesheet" href="{% static 'server/css/bootstrap-rtl.css' %}">
 
-{# full_name = models.CharField(max_length=200)#}
-{#    phone_number = models.CharField(max_length=200)#}
-{#    city = models.ForeignKey(City, on_delete=models.CASCADE)#}
-{#    address = models.CharField(max_length=200)#}
-{#    notes = models.CharField(max_length=200)#}
-{#    type = models.CharField(max_length=20, choices=TYPES)#}
-{#    type_text = models.CharField(max_length=5000)#}
-{#    status = models.CharField(max_length=25, choices=STATUSES, blank=True)#}
+
 </head>
 
 <body dir="rtl">
@@ -42,11 +35,23 @@
             <th scope="col">סוג</th>
             <th scope="col">פירוט סוג</th>
             <th scope="col">סטאטוס</th>
+            <th scope="col">בצע פעולות</th>
         </tr>
     </thead>
     <tbody>
         {% for help_request in help_requests %}
-            <tr>
+            {% if help_request.get_status_display == "התקבלה" %}
+                <tr bgcolor="green">
+            {% endif %}
+            {% if help_request.get_status_display == "טופל" %}
+                <tr bgcolor="yellow">
+            {% endif %}
+            {% if help_request.get_status_display == "בטיפול" %}
+                <tr bgcolor="red">
+            {% endif %}
+            {% if help_request.get_status_display == "הועבר למתנדב" %}
+                <tr bgcolor="#5f9ea0">
+            {% endif %}
                 <th scope="row">{{ help_request.id }}</th>
                 <td>{{ help_request.full_name }}</td>
                 <td>{{ help_request.phone_number }}</td>
@@ -56,6 +61,17 @@
                 <td>{{ help_request.get_type_display }}</td>
                 <td>{{ help_request.type_text }}</td>
                 <td>{{ help_request.get_status_display }}</td>
+                <td><button class="btn btn-outline-default waves-effect m-0" type="button" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">שנה סטאטוס</button>
+
+                    <div dir="rtl" class="dropdown-menu">
+                        <a class="dropdown-item text-right" href="#">התקבלה</a>
+                        <a class="dropdown-item text-right" href="#">בטיפול</a>
+                        <a class="dropdown-item text-right" href="#">הועבר למתנדב</a>
+                        <a class="dropdown-item text-right" href="#">טופל</a>
+                    </div>
+
+                </td>
             </tr>
         {% endfor %}
     </tbody>
@@ -96,6 +112,49 @@
                                     </div>
 
                                 </div>
+
+
+
+                                  <div>
+                                    <p class="text-right h5"><u>בחר סוג עזרה</u></p>
+
+
+                                    <div>
+                                        <label for="type">קניות</label>
+                                        <input type="checkbox" name="type" id="type" value='SHOPPING'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">איסוף</label>
+                                        <input type="checkbox" name="type" id="type" value='COLLECTING'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">תרופות</label>
+                                        <input type="checkbox" name="type" id="type" value='MEDICINE'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">עזרה בבית</label>
+                                        <input type="checkbox" name="type" id="type" value='HELP_IN_HOME'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">תמיכה טלפונית</label>
+                                        <input type="checkbox" name="type" id="type" value='PHONE_HELP'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">אחר</label>
+                                        <input type="checkbox" name="type" id="type" value='ELSE'>
+                                    </div>
+
+                                </div>
+
+
+
+
+
                               </div>
                               <div class="modal-footer d-flex justify-content-center">
                                 <button type="submit" class="btn btn-default">בצע פילטר</button>
