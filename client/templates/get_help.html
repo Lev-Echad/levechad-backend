@@ -1,0 +1,23 @@
+{% extends "template.html" %}
+
+{% block title %}לב אחד - קבל עזרה{% endblock %}
+
+
+{% block body %}
+<div class="container box">
+    <div class="card">
+        <div class="card-body choice-box container-fluid">
+
+            <h2 class="card-title alert alert-secondary" style="direction: rtl;">עזרה ב:</h2>
+            <div class="list-group scroll">
+                <a class="list-group-item" href="help/home"><h4>עזרה בבית</h4></a>
+                <a class="list-group-item" href="help/medic"><h4>תרופות</h4></a>
+                <a class="list-group-item" href="help/other"><h4>עזרה כללית</h4></a>
+                <a class="list-group-item" href="help/shopping"><h4>קניות/איסוף</h4></a>
+                <a class="list-group-item" href="help/commute"><h4>הסעות</h4></a>
+                <a class="list-group-item" href="help/phone_support"><h4>תמיכה טלפונית</h4></a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
