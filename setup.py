@@ -8,8 +8,8 @@ django.setup()
 # your imports, e.g. Django models
 from client.models import City, Language
 
-Language.objects.all().delete()
-City.objects.all().delete()
+# Language.objects.all().delete()
+# City.objects.all().delete()
 
 # From now onwards start your script..
 if Language.objects.filter(name="עברית").first() == None:
