@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-# Create your models here.
+
 AREAS = (
     ("TZAF", "צפון"),
     ("JERU", "ירושלים והסביבה"),

@@ -5,8 +5,8 @@ from client.models import Volunteer, HelpRequest
 
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
+    print(request.POST)
     test = request.POST.get('test')
-    print("test= " + str(test))
     if test is not None:
         qs = qs.filter(age=12)
     else:
