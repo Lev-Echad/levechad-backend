@@ -10,11 +10,18 @@ AREAS = (
 )
 
 class Timestampable(models.Model):
-    created_date = models.DateTimeField()
-    updated_date = models.DateTimeField()
+    created_date = models.DateTimeField(null=True)
+    updated_date = models.DateTimeField(null=True)
 
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(User, self).save(*args, **kwargs)
 
 class Language(models.Model):
     name = models.CharField(max_length=200)
@@ -31,7 +38,7 @@ class City(models.Model):
         return self.name
 
 
-class VolunteerSchedule(models.Model):
+class VolunteerSchedule(Timestampable):
     end_date = models.DateField()
     sunday = models.CharField(max_length=3)
     monday = models.CharField(max_length=3)
@@ -42,7 +49,7 @@ class VolunteerSchedule(models.Model):
     saturday = models.CharField(max_length=3)
 
 
-class Volunteer(models.Model):
+class Volunteer(Timestampable):
     MOVING_WAYS = (
         ("CAR", "רכב"),
         ("PUBL", 'תחב"צ'),
@@ -71,7 +78,7 @@ class Volunteer(models.Model):
     creation_date = models.DateTimeField()
 
 
-class HelpRequest(models.Model):
+class HelpRequest(Timestampable):
     TYPES = (
         ('BUYIN', 'קניות\\איסוף'),
         ('MEDICI', 'תרופות'),
