@@ -1,4 +1,5 @@
 {% extends "template.html" %}
+{% load bootstrap %}
 
 {% block title %}לב אחד - התנדב{% endblock %}
 
@@ -6,7 +7,7 @@
 {% block body %}
 <form action="send_help" method="post">
     {% csrf_token %}
-    {{ form }}
+    {{ form|bootstrap }}
     <input type="submit" value="Submit">
 </form>
 {% endblock %}
