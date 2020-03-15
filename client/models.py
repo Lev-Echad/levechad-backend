@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 AREAS = (
@@ -75,7 +76,6 @@ class Volunteer(Timestampable):
     moving_way = models.CharField(max_length=20, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=20, choices=HEARING_WAYS)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, null=True)
-    creation_date = models.DateTimeField()
 
 
 class HelpRequest(Timestampable):
