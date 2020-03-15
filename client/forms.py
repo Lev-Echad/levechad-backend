@@ -22,7 +22,7 @@ class NameForm(forms.Form):
 
 
 
-class VolunteerForm(forms.Form):
+class BaseForm(forms.Form):
     LANG_CHOICES = (
         ("1", "ערבית"),
         ("2", "רוסית"),
@@ -51,13 +51,13 @@ class VolunteerForm(forms.Form):
     # phone_number = forms.CharField(max_length=200)
     # city = forms.ChoiceField(choices = CITIES)
     # address = forms.CharField(max_length=200)
-    # available_on_saturday = forms.BooleanField()
+    # available_on_saturday = forms.BooleanField(required=false)
     # notes = forms.CharField(max_length=200)
     # transportation = forms.ChoiceField(choices=MOVING_WAYS)
     # hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS)
 
 
-class ScheduleForm(forms.Form):
+class ScheduleForm(BaseForm):
     TIMES = (
         ("MORNING", "בוקר"),
         ("NOON", 'צהריים'),
@@ -73,33 +73,54 @@ class ScheduleForm(forms.Form):
     end_date = forms.DateField()
 
 
-class HelpForm(forms.Form):
-    TYPES = (
-        ('BUYIN', 'קניות\\איסוף'),
-        ('MEDICI', 'תרופות'),
-        ('HOME_HEL', 'עזרה בבית'),
-        ('PHONE_HEL', 'תמיכה טלפונית'),
-        ('OTHER', 'אחר')
-    )
+# class HelpForm(forms.Form):
+#     TYPES = (
+#         ('BUYIN', 'קניות\\איסוף'),
+#         ('MEDICI', 'תרופות'),
+#         ('HOME_HEL', 'עזרה בבית'),
+#         ('PHONE_HEL', 'תמיכה טלפונית'),
+#         ('OTHER', 'אחר')
+#     )
+#
+#     full_name = forms.CharField(max_length=200)
+#     phone_number = forms.CharField(max_length=200)
+#     city = forms.ChoiceField(choices = CITIES)
+#     address = forms.CharField(max_length=200)
+#     notes = forms.CharField(max_length=200)
+#     type = forms.ChoiceField(choices=TYPES)
+#     #type_text = forms.CharField(max_length=5000)
 
-    full_name = forms.CharField(max_length=200)
-    phone_number = forms.CharField(max_length=200)
-    city = forms.ChoiceField(choices = CITIES)
-    address = forms.CharField(max_length=200)
-    notes = forms.CharField(max_length=200)
-    type = forms.ChoiceField(choices=TYPES)
-    #type_text = forms.CharField(max_length=5000)
-
-class BuyInForm(forms.Form):
-    to_buy = forms.CharField(max_length=5000)
-
-class MediciForm(forms.Form):
-    need_prescription = forms.BooleanField()
-    medic_name = forms.CharField(max_length=200)
-
-class HomeHelpForm(forms.Form):
+class HomeForm(BaseForm):
     need_text = forms.CharField(max_length=5000)
 
-class OtherForm(forms.Form):
+
+class MedicForm(BaseForm):
+    need_prescription = forms.BooleanField(required=False)
+    medic_name = forms.CharField(max_length=200)
+
+
+class OtherForm(BaseForm):
     other_need = forms.CharField(max_length=5000)
+
+
+class ShoppingForm(BaseForm):
+    to_buy = forms.CharField(max_length=5000)
+
+
+class TravelForm(BaseForm):
+    travel_need = forms.CharField(max_length=5000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
