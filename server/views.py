@@ -16,10 +16,10 @@ def show_all_volunteers(request):
     if len(qs)==0:
         qs =Volunteer.objects.all()
 
-    for person in qs:
-        per_lans= person.languages
-        for lan in per_lans:
-            print(lan)
+    # for person in qs:
+    #     per_lans= person.languages
+    #     for lan in per_lans:
+    #         print(lan)
 
     context = {'volunteer_data': qs}
     return render(request, 'server/volunteer_table.html', context)
