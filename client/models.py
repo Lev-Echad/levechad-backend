@@ -9,6 +9,13 @@ AREAS = (
     ("DARO", "דרום")
 )
 
+class Timestampable(models.Model):
+    created_date = models.DateTimeField()
+    updated_date = models.DateTimeField()
+
+    class Meta:
+        abstract = True
+
 class Language(models.Model):
     name = models.CharField(max_length=200)
 
@@ -60,7 +67,7 @@ class Volunteer(models.Model):
     notes = models.CharField(max_length=200)
     moving_way = models.CharField(max_length=20, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=20, choices=HEARING_WAYS)
-    schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE)
+    schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, null=True)
     creation_date = models.DateTimeField()
 
 
@@ -73,6 +80,13 @@ class HelpRequest(models.Model):
         ('OTHER', 'אחר')
     )
 
+    STATUSES = (
+        ('WAITING', 'התקבלה'),
+        ('IN_CARE', 'בטיפול'),
+        ('TO_VOLUNTER', 'הועבר למתנדב'),
+        ('DONE', 'טופל')
+    )
+
     full_name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=200)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
@@ -80,3 +94,4 @@ class HelpRequest(models.Model):
     notes = models.CharField(max_length=200)
     type = models.CharField(max_length=20, choices=TYPES)
     type_text = models.CharField(max_length=5000)
+    status = models.CharField(max_length=25, choices=STATUSES, blank=True)
