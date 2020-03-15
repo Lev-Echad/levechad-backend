@@ -80,7 +80,8 @@ class Volunteer(Timestampable):
 
 class HelpRequest(Timestampable):
     TYPES = (
-        ('BUYIN', 'קניות\\איסוף'),
+        ('BUYIN', 'קניות'),
+        ('TRAVEL', 'איסוף'),
         ('MEDICI', 'תרופות'),
         ('HOME_HEL', 'עזרה בבית'),
         ('PHONE_HEL', 'תמיכה טלפונית'),

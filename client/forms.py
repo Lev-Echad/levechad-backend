@@ -80,20 +80,20 @@ class ScheduleForm(forms.Form):
 # -------------------------------------------------------------------------------------------------------
 
 class BaseHelpForm(forms.Form):
-    TYPES = (
+    """TYPES = (
         ('BUYIN', 'קניות\\איסוף'),
         ('MEDICI', 'תרופות'),
         ('HOME_HEL', 'עזרה בבית'),
         ('PHONE_HEL', 'תמיכה טלפונית'),
         ('OTHER', 'אחר')
-    )
+    )"""
 
     full_name = forms.CharField(max_length=200)
     phone_number = forms.CharField(max_length=200)
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=200)
     notes = forms.CharField(max_length=200)
-    type = forms.ChoiceField(choices=TYPES)
+    #type = forms.ChoiceField(choices=TYPES)
     #type_text = forms.CharField(max_length=5000)
 
 
