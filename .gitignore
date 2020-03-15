@@ -2,6 +2,7 @@ client/__pycache__
 levechad/__pycache__
 __pycache__
 db.sqlite3
+
 .idea
 .idea/workspace.xml
 client/migrations
