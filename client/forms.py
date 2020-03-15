@@ -16,13 +16,16 @@ onlyNames = [a["name"] for a in data]
 CITIES = tuple({i: onlyNames[i] for i in range(0, len(onlyNames))}.items())
 json_file.close()
 
-
-class NameForm(forms.Form):
-    your_name = forms.CharField(label='Your name', max_length=100)
-
+# class NameForm(forms.Form):
+#     your_name = forms.CharField(label='Your name', max_length=100)
 
 
-class BaseForm(forms.Form):
+
+
+# SEND HELP FORM
+# -------------------------------------------------------------------------------------------------------
+
+class VolunteerForm(forms.Form):
     LANG_CHOICES = (
         ("1", "ערבית"),
         ("2", "רוסית"),
@@ -45,19 +48,19 @@ class BaseForm(forms.Form):
 
 
     full_name = forms.CharField(max_length=200)
-    # age = forms.IntegerField()
-    # area = forms.MultipleChoiceField(choices = AREAS)
-    # languages = forms.MultipleChoiceField(choices = LANG_CHOICES)
-    # phone_number = forms.CharField(max_length=200)
-    # city = forms.ChoiceField(choices = CITIES)
-    # address = forms.CharField(max_length=200)
-    # available_on_saturday = forms.BooleanField(required=false)
-    # notes = forms.CharField(max_length=200)
-    # transportation = forms.ChoiceField(choices=MOVING_WAYS)
-    # hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS)
+    age = forms.IntegerField()
+    area = forms.MultipleChoiceField(choices = AREAS)
+    languages = forms.MultipleChoiceField(choices = LANG_CHOICES)
+    phone_number = forms.CharField(max_length=200)
+    city = forms.ChoiceField(choices = CITIES)
+    address = forms.CharField(max_length=200)
+    available_on_saturday = forms.BooleanField(required=False)
+    notes = forms.CharField(max_length=200)
+    transportation = forms.ChoiceField(choices=MOVING_WAYS)
+    hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS)
 
 
-class ScheduleForm(BaseForm):
+class ScheduleForm(forms.Form):
     TIMES = (
         ("MORNING", "בוקר"),
         ("NOON", 'צהריים'),
@@ -73,41 +76,45 @@ class ScheduleForm(BaseForm):
     end_date = forms.DateField()
 
 
-# class HelpForm(forms.Form):
-#     TYPES = (
-#         ('BUYIN', 'קניות\\איסוף'),
-#         ('MEDICI', 'תרופות'),
-#         ('HOME_HEL', 'עזרה בבית'),
-#         ('PHONE_HEL', 'תמיכה טלפונית'),
-#         ('OTHER', 'אחר')
-#     )
-#
-#     full_name = forms.CharField(max_length=200)
-#     phone_number = forms.CharField(max_length=200)
-#     city = forms.ChoiceField(choices = CITIES)
-#     address = forms.CharField(max_length=200)
-#     notes = forms.CharField(max_length=200)
-#     type = forms.ChoiceField(choices=TYPES)
-#     #type_text = forms.CharField(max_length=5000)
+# GET HELP FORM
+# -------------------------------------------------------------------------------------------------------
 
-class HomeForm(BaseForm):
+class BaseHelpForm(forms.Form):
+    TYPES = (
+        ('BUYIN', 'קניות\\איסוף'),
+        ('MEDICI', 'תרופות'),
+        ('HOME_HEL', 'עזרה בבית'),
+        ('PHONE_HEL', 'תמיכה טלפונית'),
+        ('OTHER', 'אחר')
+    )
+
+    full_name = forms.CharField(max_length=200)
+    phone_number = forms.CharField(max_length=200)
+    city = forms.ChoiceField(choices = CITIES)
+    address = forms.CharField(max_length=200)
+    notes = forms.CharField(max_length=200)
+    type = forms.ChoiceField(choices=TYPES)
+    #type_text = forms.CharField(max_length=5000)
+
+
+class HomeForm(BaseHelpForm):
     need_text = forms.CharField(max_length=5000)
 
 
-class MedicForm(BaseForm):
+class MedicForm(BaseHelpForm):
     need_prescription = forms.BooleanField(required=False)
     medic_name = forms.CharField(max_length=200)
 
 
-class OtherForm(BaseForm):
+class OtherForm(BaseHelpForm):
     other_need = forms.CharField(max_length=5000)
 
 
-class ShoppingForm(BaseForm):
+class ShoppingForm(BaseHelpForm):
     to_buy = forms.CharField(max_length=5000)
 
 
-class TravelForm(BaseForm):
+class TravelForm(BaseHelpForm):
     travel_need = forms.CharField(max_length=5000)
 
 
