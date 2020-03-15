@@ -1,5 +1,5 @@
-from django.db import models
-
+from django import forms
+import json
 # Create your models here.
 AREAS = (
     ("TZAF", "צפון"),
@@ -9,25 +9,21 @@ AREAS = (
     ("DARO", "דרום")
 )
 
-class Language(models.Model):
-    name = models.CharField(max_length=200)
+json_file = open('city.json')
+data = json.load(json_file)
+onlyNames = [a["name"] for a in data]
+CITIES = {i: onlyNames[i] for i in range(0, len(onlyNames))}
+json_file.close()
 
-class City(models.Model):
-    name = models.CharField(max_length=200)
-    x = models.FloatField()
-    y = models.FloatField()
 
-class VolunteerSchedule(models.Model):
-    end_date = models.DateField()
-    sunday = models.CharField(max_length=3)
-    monday = models.CharField(max_length=3)
-    tuesday = models.CharField(max_length=3)
-    wednesday = models.CharField(max_length=3)
-    thursday = models.CharField(max_length=3)
-    friday = models.CharField(max_length=3)
-    saturday = models.CharField(max_length=3)
+class VolunteerForm(forms.Form):
+    LANG_CHOICES = (
+        ("1", "ערבית"),
+        ("2", "רוסית"),
+        ("3", "צרפתית"),
+        ("4", "אנגלית"),
+    )
 
-class Volunteer(models.Model):
     MOVING_WAYS = (
         ("CAR", "רכב"),
         ("PUBL", 'תחב"צ'),
@@ -41,21 +37,37 @@ class Volunteer(models.Model):
         ("OTHR", "אחר")
     )
 
-    full_name = models.CharField(max_length=200)
-    age = models.IntegerField()
-    area = models.CharField(max_length=10, choices=AREAS)
-    languages = models.ManyToManyField(Language)
-    phone_number = models.CharField(max_length=200)
-    city = models.OneToOneField(City, on_delete=models.CASCADE)
-    address = models.CharField(max_length=200)
-    available_saturday = models.BooleanField()
-    notes = models.CharField(max_length=200)
-    moving_way = models.CharField(max_length=20, choices=MOVING_WAYS)
-    hearing_way = models.CharField(max_length=20, choices=HEARING_WAYS)
-    schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE)
-    creation_date = models.DateTimeField()
 
-class HelpRequest(models.Model):
+    full_name = forms.CharField(max_length=200)
+    age = forms.IntegerField()
+    area = forms.MultipleChoiceField(choices = AREAS)
+    languages = forms.MultipleChoiceField(choices = LANG_CHOICES)
+    phone_number = forms.CharField(max_length=200)
+    city = forms.ChoiceField(choices = CITIES)
+    address = forms.CharField(max_length=200)
+    available_on_saturday = forms.BooleanField()
+    notes = forms.CharField(max_length=200)
+    moving_way = forms.ChoiceField(choices=MOVING_WAYS)
+    hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS)
+
+
+class ScheduleForm(forms.Form):
+    TIMES = (
+        ("MORNING", "בוקר"),
+        ("NOON", 'צהריים'),
+        ("EVENING", 'ערב')
+    )
+    sunday = forms.MultipleChoiceField(choices=TIMES)
+    monday = forms.MultipleChoiceField(choices=TIMES)
+    tuesday = forms.MultipleChoiceField(choices=TIMES)
+    wednesday = forms.MultipleChoiceField(choices=TIMES)
+    thursday = forms.MultipleChoiceField(choices=TIMES)
+    friday = forms.MultipleChoiceField(choices=TIMES)
+    saturday = forms.MultipleChoiceField(choices=TIMES)
+    end_date = forms.DateField()
+
+
+class HelpForm(forms.Form):
     TYPES = (
         ('BUYIN', 'קניות\\איסוף'),
         ('MEDICI', 'תרופות'),
@@ -64,10 +76,19 @@ class HelpRequest(models.Model):
         ('OTHER', 'אחר')
     )
 
-    full_name = models.CharField(max_length=200)
-    phone_number = models.CharField(max_length=200)
-    city = models.OneToOneField(City, on_delete=models.CASCADE)
-    address = models.CharField(max_length=200)
-    notes = models.CharField(max_length=200)
-    type = models.CharField(max_length=20, choices=TYPES)
-    type_text = models.CharField(max_length=5000)
+    full_name = forms.CharField(max_length=200)
+    phone_number = forms.CharField(max_length=200)
+    city = forms.ChoiceField(choices = CITIES)
+    address = forms.CharField(max_length=200)
+    notes = forms.CharField(max_length=200)
+    type = forms.ChoiceField(choices=TYPES)
+    #type_text = forms.CharField(max_length=5000)
+
+class BuyInForm(forms.Form):
+    full_name = forms.CharField(max_length=200)
+    phone_number = forms.CharField(max_length=200)
+    city = forms.ChoiceField(choices = CITIES)
+    address = forms.CharField(max_length=200)
+    notes = forms.CharField(max_length=200)
+    type = forms.ChoiceField(choices=TYPES)
+    #type_text = forms.CharField(max_length=5000)
