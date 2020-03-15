@@ -6,11 +6,21 @@ from client.models import Volunteer, HelpRequest
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
     print(request.POST)
-    test = request.POST.get('test')
-    if test is not None:
-        qs = qs.filter(age=12)
-    else:
-        qs = qs.order_by('-full_name')
+    areas = request.POST.getlist('area')
+    languages = request.POST.getlist('language')
+    if areas is not None:
+        qs = qs.filter(area__in = areas)
+    elif languages is not None:
+        qs = qs.filter(languages__in=languages)
+
+    if len(qs)==0:
+        qs =Volunteer.objects.all()
+
+    for person in qs:
+        per_lans= person.languages
+        for lan in per_lans:
+            print(lan)
+
     context = {'volunteer_data': qs}
     return render(request, 'server/volunteer_table.html', context)
 
