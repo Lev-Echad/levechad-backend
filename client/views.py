@@ -2,6 +2,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from .forms import *
+from .models import Volunteer, City, Language, VolunteerSchedule, HelpRequest
 
 
 
@@ -130,15 +131,22 @@ def get_help(request):
 def send_help(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
         form = VolunteerForm(request.POST)
-        # check whether it's valid:
         if form.is_valid():
+            answer = form.cleaned_data
+            volunter_new = Volunteer(full_name=answer["full_name"], age=answer["age"], area=answer["area"],
+                                     languages=Language.objects.get(name=answer["languages"]),
+                                     phone_number=answer["phone_number"],
+                                     city=City.objects.get(name=answer["city"]), address=answer["address"],
+                                     available_saturday=answer["available_on_saturday"],
+                                     notes=answer["notes"], transportation=answer["transportation"],
+                                     hearing_way=answer["hearing_way"])
+            volunter_new.save()
+
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/schedule')
-
+            return HttpResponseRedirect('/client/schedule?vol_id=' + volunter_new.pk)
     # if a GET (or any other method) we'll create a blank form
     else:
         form = VolunteerForm()
@@ -147,15 +155,24 @@ def send_help(request):
 
 
 def schedule(request):
-    # if this is a POST request we need to process the form data
+
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
         form = ScheduleForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
+            answer = form.cleaned_data
+            new_schedule = VolunteerSchedule(sunday="".join(answer["sunday"]), monday="".join(answer["monday"]),
+                                             tuesday="".join(answer["tuesday"]), wednesday="".join(answer["wednesday"]),
+                                             thursday="".join(answer["thursday"]), friday="".join(answer["friday"]),
+                                             saturday="".join(answer["saturday"]), end_date=answer["end_date"])
+            volunteerSchedule = Volunteer.objects.get(id=request.GET.get('vol_id', ''))
+            new_schedule.save()
+            volunteerSchedule.schedule = new_schedule
+            volunteerSchedule.save()
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
+
             return HttpResponseRedirect('/client/thanks')
 
     # if a GET (or any other method) we'll create a blank form
@@ -172,6 +189,10 @@ def shopping_help(request):
         form = ShoppingForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
+            answer = form.cleaned_data
+            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
+                                      address = answer["address"], notes = answer["notes"], type = "BUYIN", type_text = answer["to_buy"])
+            new_request.save()
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
@@ -191,6 +212,14 @@ def medic_help(request):
         form = MedicForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
+            answer = form.cleaned_data
+            type_text = ""
+            if(answer["need_prescription"]):
+                type_text = "\nתרופת מרשם"
+            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
+                                      address = answer["address"], notes = answer["notes"], type = "MEDICI", type_text = type_text + answer["medic_name"])
+            new_request.save()
+
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
@@ -210,9 +239,10 @@ def other_help(request):
         form = OtherForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:y
+            answer = form.cleaned_data
+            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
+                                      address = answer["address"], notes = answer["notes"], type = "OTHER", type_text = answer["other_need"])
+            new_request.save()
             return HttpResponseRedirect('/client/thanks')
 
     # if a GET (or any other method) we'll create a blank form
@@ -229,6 +259,11 @@ def home_help(request):
         form = HomeForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
+            answer = form.cleaned_data
+            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
+                                      address = answer["address"], notes = answer["notes"], type = "HOME_HEL", type_text = answer["need_text"])
+            new_request.save()
+
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
@@ -248,6 +283,11 @@ def travel_help(request):
         form = TravelForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
+            answer = form.cleaned_data
+            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
+                                      address = answer["address"], notes = answer["notes"], type = "TRAVEL", type_text = answer["travel_need"])
+            new_request.save()
+
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
@@ -267,6 +307,11 @@ def phone_help(request):
         form = BaseHelpForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
+            answer = form.cleaned_data
+            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
+                                      address = answer["address"], notes = answer["notes"], type = "PHONE_HEL", type_text = "")
+            new_request.save()
+
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
