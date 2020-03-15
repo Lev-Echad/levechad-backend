@@ -32,8 +32,8 @@
             <th scope="col">אזור</th>
         </tr>
     </thead>
-    <tbody>
-        {% for volunteer in all_volunteer_data %}
+    <tbody>ת
+        {% for volunteer in volunteer_data %}
             <tr>
                 <th scope="row">{{ row.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
@@ -43,7 +43,6 @@
         {% endfor %}
     </tbody>
 </table>
-
 
   <!-- jQuery -->
   <script type="text/javascript" src="{% static 'tasks/js/jquery.min.js' %}"></script>
