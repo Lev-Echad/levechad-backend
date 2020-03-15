@@ -11,6 +11,10 @@ urlpatterns = [
     path('send_help', views.send_help, name='show_all'),
     path('thanks', views.thanks, name='show_all'),
 
+    path('help/home', views.home_help, name='show_all'),
+    path('help/medic', views.medic_help, name='show_all'),
+    path('help/other', views.other_help, name='show_all'),
+    path('help/phone', views.phone_help, name='show_all'),
     path('help/shopping', views.shopping_help, name='show_all'),
-
+    path('help/travel', views.travel_help, name='show_all'),
 ]
