@@ -18,7 +18,14 @@
   <link rel="stylesheet" href="{% static 'server/css/mdb.min.css' %}">
   <link rel="stylesheet" href="{% static 'server/css/bootstrap-rtl.css' %}">
 
-
+{# full_name = models.CharField(max_length=200)#}
+{#    phone_number = models.CharField(max_length=200)#}
+{#    city = models.ForeignKey(City, on_delete=models.CASCADE)#}
+{#    address = models.CharField(max_length=200)#}
+{#    notes = models.CharField(max_length=200)#}
+{#    type = models.CharField(max_length=20, choices=TYPES)#}
+{#    type_text = models.CharField(max_length=5000)#}
+{#    status = models.CharField(max_length=25, choices=STATUSES, blank=True)#}
 </head>
 
 <body dir="rtl">
@@ -30,6 +37,11 @@
             <th scope="col">שם מלא</th>
             <th scope="col">מספר טלפון</th>
             <th scope="col">עיר</th>
+            <th scope="col">כתובת</th>
+            <th scope="col">הערות</th>
+            <th scope="col">סוג</th>
+            <th scope="col">פירוט סוג</th>
+            <th scope="col">סטאטוס</th>
         </tr>
     </thead>
     <tbody>
@@ -39,10 +51,56 @@
                 <td>{{ help_request.full_name }}</td>
                 <td>{{ help_request.phone_number }}</td>
                 <td>{{ help_request.city }}</td>
+                <td>{{ help_request.address }}</td>
+                <td>{{ help_request.notes }}</td>
+                <td>{{ help_request.get_type_display }}</td>
+                <td>{{ help_request.type_text }}</td>
+                <td>{{ help_request.get_status_display }}</td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
+
+
+
+    <form method="post" action="{% url 'show_all_volunteers' %}">
+                              {% csrf_token %}
+                              <div class="modal-header text-center">
+                                <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
+                              </div>
+                              <div class="modal-body mx-3">
+
+{#                               increas?#}
+                                <div>
+                                    <p class="text-right h5"><u>בחר סטטוסים להצגה</u></p>
+
+
+                                    <div>
+                                        <label for="status">התקבלה</label>
+                                        <input type="checkbox" name="status" id="status" value='ACCEPT'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">בטיפול</label>
+                                        <input type="checkbox" name="status" id="status" value='IN_POGRESS'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">הועבר לטיפול</label>
+                                        <input type="checkbox" name="status" id="status" value='PASS_TO_VAL'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">טופל</label>
+                                        <input type="checkbox" name="status" id="status" value='TOPAL'>
+                                    </div>
+
+                                </div>
+                              </div>
+                              <div class="modal-footer d-flex justify-content-center">
+                                <button type="submit" class="btn btn-default">בצע פילטר</button>
+                              </div>
+                          </form>
 
   <!-- jQuery -->
   <script type="text/javascript" src="{% static 'tasks/js/jquery.min.js' %}"></script>
