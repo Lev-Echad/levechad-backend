@@ -1,10 +1,57 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Material Design for Bootstrap</title>
+  <!-- MDB icon -->
+  <link rel="icon" href="img/mdb-favicon.ico" type="image/x-icon">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+  <!-- Google Fonts Roboto -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{% static 'server/css/bootstrap.min.css' %}">
+  <!-- Material Design Bootstrap -->
+  <link rel="stylesheet" href="{% static 'server/css/mdb.min.css' %}">
+  <link rel="stylesheet" href="{% static 'server/css/bootstrap-rtl.css' %}">
+
+
 </head>
-<body>
+
+<body dir="rtl">
+<p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת בקשות עזרה</p>
+<table class="table table-hover table-bordered text-center">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">שם מלא</th>
+            <th scope="col">מספר טלפון</th>
+            <th scope="col">עיר</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for help_request in help_requests %}
+            <tr>
+                <th scope="row">{{ help_request.id }}</th>
+                <td>{{ help_request.full_name }}</td>
+                <td>{{ help_request.phone_number }}</td>
+                <td>{{ help_request.city }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+  <!-- jQuery -->
+  <script type="text/javascript" src="{% static 'tasks/js/jquery.min.js' %}"></script>
+  <!-- Bootstrap tooltips -->
+  <script type="text/javascript" src="{% static 'tasks/js/popper.min.js' %}"></script>
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript" src="{% static 'tasks/js/bootstrap.min.js' %}"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="{% static 'tasks/js/mdb.min.js' %}"></script>
 
 </body>
 </html>
