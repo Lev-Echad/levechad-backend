@@ -18,3 +18,11 @@ To add admin user and see the databases:
     python manage.py createsuperuser
 
 And then log into the <http://localhost:8000/admin> and you will be able to see the databases.
+
+How to update models
+------------
+To update the models, run ```git pull``` and then run the following:
+
+    python manage.py makemigrations client
+    python manage.py migrate --fake-initial
+

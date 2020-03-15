@@ -32,10 +32,10 @@
             <th scope="col">אזור</th>
         </tr>
     </thead>
-    <tbody>
-        {% for volunteer in all_volunteer_data %}
+    <tbody>ת
+        {% for volunteer in volunteer_data %}
             <tr>
-                <th scope="row">{{ row.id }}</th>
+                <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
                 <td>{{ volunteer.age }}</td>
                 <td>{{ volunteer.area }}</td>
@@ -43,7 +43,34 @@
         {% endfor %}
     </tbody>
 </table>
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm">בצע פילטר</a>
 
+                    <div class="modal fade" id="modalLoginForm{{ row.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+
+                          <form method="post" action="{% url 'show_all_volunteers' %}">
+                              {% csrf_token %}
+                              <div class="modal-header text-center">
+                                <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
+                              </div>
+                              <div class="modal-body mx-3">
+
+{#                               increas?#}
+                                <div class="md-form mb-5">
+                                    <p class="text-right h5"><u>האם למיין לפי סדר עולה?</u></p>
+                                  <input type="checkbox" name="test" class="form-control valid" value='1'>
+                                </div>
+
+                              </div>
+                              <div class="modal-footer d-flex justify-content-center">
+                                <button type="submit" class="btn btn-default">בצע פילטר</button>
+                              </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
 
   <!-- jQuery -->
   <script type="text/javascript" src="{% static 'tasks/js/jquery.min.js' %}"></script>
