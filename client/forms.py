@@ -49,15 +49,15 @@ class VolunteerForm(forms.Form):
 
     full_name = forms.CharField(max_length=200)
     age = forms.IntegerField()
-    area = forms.MultipleChoiceField(choices = AREAS)
-    languages = forms.MultipleChoiceField(choices = LANG_CHOICES)
+    area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
+    languages = forms.MultipleChoiceField(choices = LANG_CHOICES, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=200)
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=200)
     available_on_saturday = forms.BooleanField(required=False)
     notes = forms.CharField(max_length=200)
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
-    hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS)
+    hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS, widget=forms.CheckboxSelectMultiple())
 
 
 class ScheduleForm(forms.Form):
