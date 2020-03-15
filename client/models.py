@@ -9,7 +9,6 @@ AREAS = (
     ("DARO", "דרום")
 )
 
-
 class Language(models.Model):
     name = models.CharField(max_length=200)
 
