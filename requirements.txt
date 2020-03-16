@@ -4,4 +4,3 @@ django_heroku
 gunicorn
 whitenoise==5.0.1
 django-bootstrap-form
-mathfilters
