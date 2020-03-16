@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Material Design for Bootstrap</title>
+  <!-- MDB icon -->
+  <link rel="icon" href="img/mdb-favicon.ico" type="image/x-icon">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+  <!-- Google Fonts Roboto -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{% static 'server/css/bootstrap.min.css' %}">
+  <!-- Material Design Bootstrap -->
+  <link rel="stylesheet" href="{% static 'server/css/mdb.min.css' %}">
+  <link rel="stylesheet" href="{% static 'server/css/bootstrap-rtl.css' %}">
+
+
+</head>
+
+<body dir="rtl">
+
+
+
+<div class="container my-5">
+
+
+  <!-- Section: Block Content -->
+  <section class="dark-grey-text text-center">
+
+    <h3 class="font-weight-bold mb-4 pb-2">ברוכים הבאים לחמל של עמותת לב אחד</h3>
+    <p class="text-muted w-responsive mx-auto mb-5">שלום לך מתנדב יקר! כעת תוכל לבחור מה ברצונך לראות?</p>
+
+    <!-- Grid row -->
+    <div class="row">
+
+      <!-- Grid column -->
+      <div class="col-md-6 mb-4">
+
+        <div class="px-3 pt-3 mx-1 mt-1 pb-0">
+          <h4 class="font-weight-bold mb-3">רשימת מתנדבים</h4>
+          <a class="btn btn-success btn-rounded btn-md" href="{% url 'show_all_volunteers' %}">עבור</a>
+        </div>
+
+      </div>
+      <!-- Grid column -->
+
+      <!-- Grid column -->
+      <div class="col-md-6 mb-4">
+
+
+        <div class="px-3 pt-3 mx-1 mt-1 pb-0">
+          <h4 class="font-weight-bold mb-3">בקשות עזרה</h4>
+          <a class="btn btn-success btn-rounded btn-md" href="{% url 'show_all_help_request' %}">עבור</a>
+        </div>
+
+      </div>
+      <!-- Grid column -->
+
+    </div>
+    <!-- Grid row -->
+
+  </section>
+  <!-- Section: Block Content -->
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!-- jQuery -->
+  <script type="text/javascript" src="{% static 'server/js/jquery.min.js' %}"></script>
+  <!-- Bootstrap tooltips -->
+  <script type="text/javascript" src="{% static 'server/js/popper.min.js' %}"></script>
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript" src="{% static 'server/js/bootstrap.min.js' %}"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="{% static 'server/js/mdb.min.js' %}"></script>
+
+</body>
+</html>

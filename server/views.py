@@ -3,6 +3,12 @@ from django.views.decorators.http import require_POST
 
 from client.models import Volunteer, HelpRequest
 
+
+def index(request):
+    context = {}
+    return render(request, 'server/server_index.html', context)
+
+
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
     print(request.POST)
@@ -51,13 +57,22 @@ def show_all_help_request(request):
 
 def help_edit_stat(request, pk):
     # get user objects
-    print(request.POST)
     to_edit = HelpRequest.objects.get(id=pk)
-    print(to_edit.status)
 
     if request.POST.get('status') is not None:
         to_edit.status = request.POST.get('status')
 
-    print(to_edit.status)
+    if request.POST.get('user_name') is not None:
+        to_edit.status_updater = request.POST.get('user_name')
+
     to_edit.save()
     return redirect('show_all_help_request')
+
+
+def find_closes_persons(request, pk):
+    request_person = HelpRequest.objects.get(id=pk)
+
+    closes_volunteer = Volunteer.objects.all()
+
+    context = {'closes_volunteer': closes_volunteer}
+    return render(request, 'server/closes_volunteer.html', context)

@@ -32,9 +32,11 @@
             <th scope="col">שם מלא</th>
             <th scope="col">גיל</th>
             <th scope="col">אזור</th>
+            <th scope="col">שפה</th>
             <th scope="col">מספר טלפון</th>
             <th scope="col">עיר</th>
-
+            <th scope="col">כתובת</th>
+            <th scope="col">דרכי התניידות</th>
 
         </tr>
     </thead>
@@ -45,8 +47,16 @@
                 <td>{{ volunteer.full_name }}</td>
                 <td>{{ volunteer.age }}</td>
                 <td>{{ volunteer.get_area_display }}</td>
+                <td>
+                    {% for lanu in volunteer.languages.all %}
+                        {{ lanu.name }}
+                    {% endfor %}
+                </td>
                 <td>{{ volunteer.phone_number }}</td>
                 <td>{{ volunteer.city }}</td>
+                <td>{{ volunteer.address }}</td>
+                <td>{{ volunteer.get_moving_way_display }}</td>
+
             </tr>
         {% endfor %}
     </tbody>
