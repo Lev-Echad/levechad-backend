@@ -6,7 +6,8 @@
 
 {% block body %}
 <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת בקשות עזרה
-<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">בצע פילטרים</a></p>
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">בצע פילטרים</a>
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#sortModel">בצע מיון</a></p>
 
 <table class="table table-hover table-bordered text-center">
     <thead>
@@ -27,16 +28,19 @@
     <tbody>
         {% for help_request in help_requests %}
             {% if help_request.get_status_display == "התקבלה" %}
-                <tr bgcolor="green">
+                <tr bgcolor="white">
             {% endif %}
             {% if help_request.get_status_display == "טופל" %}
                 <tr bgcolor="yellow">
             {% endif %}
             {% if help_request.get_status_display == "בטיפול" %}
-                <tr bgcolor="red">
+                <tr bgcolor="green">
             {% endif %}
             {% if help_request.get_status_display == "הועבר למתנדב" %}
-                <tr bgcolor="#5f9ea0">
+                <tr bgcolor="blue">
+            {% endif %}
+            {% if help_request.get_status_display == "לא טופל" %}
+                <tr bgcolor="red">
             {% endif %}
                 <th scope="row">{{ help_request.id }}</th>
                 <td>{{ help_request.full_name }}</td>
@@ -50,7 +54,7 @@
                 <td>{{ help_request.status_updater }}</td>
                 <td>
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#change_status{{ help_request.id }}">שנה סטאטוס</a>
-                    <a href="{% url 'find_closes_persons' help_request.id %}" class="btn btn-outline-dark waves-effect m-0">מצא התאמה</a>
+                    <a href="{% url 'find_closes_persons' help_request.id %}" class="btn btn-outline-dark waves-effect m-2">  מצא התאמה</a>
                 </td>
 
 {#                    change status#}
@@ -69,7 +73,7 @@
 
 {#                               increas?#}
                                 <div class="right">
-                                    <p class="text-right h5"><u>המצב הנוכחי הוא:</u></p>
+                                    <p class="h5"><u>המצב הנוכחי הוא:</u></p>
 
 
                                     <div>
@@ -91,10 +95,15 @@
                                         <label for="status">טופל</label>
                                         <input type="radio" name="status" id="status" value='DONE'>
                                     </div>
+
+                                    <div>
+                                        <label for="status">לא טופל</label>
+                                        <input type="radio" name="status" id="status" value='NOT_DONE'>
+                                    </div>
                                 </div>
 
                                   <div class="right">
-                                    <p class="text-right h5"><u>שינוי זהות</u></p>
+                                    <p class="h5"><u>שינוי זהות</u></p>
 
 
                                     <div>
@@ -134,7 +143,7 @@
                               <div class="modal-body mx-3">
 
                                 <div>
-                                    <p class="text-right h5"><u>בחר סטטוסים להצגה</u></p>
+                                    <p class="h5"><u>בחר סטטוסים להצגה</u></p>
 
 
                                     <div>
@@ -157,12 +166,17 @@
                                         <input type="checkbox" name="status" id="status" value='DONE'>
                                     </div>
 
+                                    <div>
+                                        <label for="status">לא טופל</label>
+                                        <input type="checkbox" name="status" id="status" value='NOT_DONE'>
+                                    </div>
+
                                 </div>
 
 
 
                                   <div>
-                                    <p class="text-right h5"><u>בחר סוג עזרה</u></p>
+                                    <p class="h5"><u>בחר סוג עזרה</u></p>
 
 
                                     <div>
@@ -209,4 +223,129 @@
                         </div>
                       </div>
                     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <div class="modal fade" id="sortModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+
+
+                         <form method="post" action="{% url 'show_all_help_request' %}">
+                              {% csrf_token %}
+                              <div class="modal-header text-center">
+                                <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
+                              </div>
+                              <div class="modal-body mx-3">
+
+                                <div>
+                                    <p class="h5"><u>בחר סטטוסים להצגה</u></p>
+
+
+                                    <div>
+                                        <label for="status">התקבלה</label>
+                                        <input type="checkbox" name="status" id="status" value='WAITING'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">בטיפול</label>
+                                        <input type="checkbox" name="status" id="status" value='IN_CARE'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">הועבר לטיפול</label>
+                                        <input type="checkbox" name="status" id="status" value='TO_VOLUNTER'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">טופל</label>
+                                        <input type="checkbox" name="status" id="status" value='DONE'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">לא טופל</label>
+                                        <input type="checkbox" name="status" id="status" value='NOT_DONE'>
+                                    </div>
+
+                                </div>
+
+
+
+                                  <div>
+                                    <p class="h5"><u>בחר סוג עזרה</u></p>
+
+
+                                    <div>
+                                        <label for="type">קניות</label>
+                                        <input type="checkbox" name="type" id="type" value='BUYIN'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">איסוף</label>
+                                        <input type="checkbox" name="type" id="type" value='TRAVEL'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">תרופות</label>
+                                        <input type="checkbox" name="type" id="type" value='MEDICI'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">עזרה בבית</label>
+                                        <input type="checkbox" name="type" id="type" value='HOME_HEL'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">תמיכה טלפונית</label>
+                                        <input type="checkbox" name="type" id="type" value='PHONE_HEL'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">אחר</label>
+                                        <input type="checkbox" name="type" id="type" value='OTHER'>
+                                    </div>
+
+                                </div>
+
+
+
+
+
+                              </div>
+                              <div class="modal-footer d-flex justify-content-center">
+                                <button type="submit" class="btn btn-default">בצע פילטר</button>
+                              </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+
 {% endblock %}
