@@ -47,3 +47,8 @@ def show_all_help_request(request):
     all_help_requests = HelpRequest.objects.all()
     context = {'help_requests': all_help_requests}
     return render(request, 'server/help_table.html', context)
+
+
+def help_edit_stat(request, pk, new_stat):
+    # get user objects
+    to_edit = HelpRequest.objects.get(id=pk)

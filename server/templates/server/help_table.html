@@ -23,6 +23,8 @@
 
 <body dir="rtl">
 <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת בקשות עזרה</p>
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">ערוך</a>
+
 <table class="table table-hover table-bordered text-center">
     <thead>
         <tr>
@@ -78,8 +80,13 @@
 </table>
 
 
+                    <div class="modal fade" id="modalLoginForm1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
 
-    <form method="post" action="{% url 'show_all_help_request' %}">
+
+                         <form method="post" action="{% url 'show_all_help_request' %}">
                               {% csrf_token %}
                               <div class="modal-header text-center">
                                 <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
@@ -160,15 +167,18 @@
                                 <button type="submit" class="btn btn-default">בצע פילטר</button>
                               </div>
                           </form>
+                        </div>
+                      </div>
+                    </div>
 
   <!-- jQuery -->
-  <script type="text/javascript" src="{% static 'tasks/js/jquery.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/jquery.min.js' %}"></script>
   <!-- Bootstrap tooltips -->
-  <script type="text/javascript" src="{% static 'tasks/js/popper.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/popper.min.js' %}"></script>
   <!-- Bootstrap core JavaScript -->
-  <script type="text/javascript" src="{% static 'tasks/js/bootstrap.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/bootstrap.min.js' %}"></script>
   <!-- MDB core JavaScript -->
-  <script type="text/javascript" src="{% static 'tasks/js/mdb.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/mdb.min.js' %}"></script>
 
 </body>
 </html>
