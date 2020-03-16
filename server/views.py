@@ -58,27 +58,37 @@ def show_all_volunteers(request):
     yesterday_day = yesterday.strftime("%A")
     #
 
-    if len(availability) != 0:
-        # check option 1
-        if is_time_between(time(7, 00), time(15, 00)):
-            filter = "schedule__" + now_day
-            availability_qs = qs.filter(**{filter:1})
 
-        # check option 2
-        elif is_time_between(time(15, 00), time(23, 00)):
-            filter = "schedule__" + now_day
-            availability_qs = qs.filter(**{filter:2})
+    # check option 1
+    if is_time_between(time(7, 00), time(15, 00)):
+        filter = "schedule__" + now_day
+        availability_qs = qs.filter(**{filter:1})
+
+    # check option 2
+    elif is_time_between(time(15, 00), time(23, 00)):
+        filter = "schedule__" + now_day
+        availability_qs = qs.filter(**{filter:2})
 
 
-        # check option 3 before midnight
-        elif is_time_between(time(23, 00), time(00, 00)):
-            filter = "schedule__" + now_day
-            availability_qs = qs.filter(**{filter:3})
+    # check option 3 before midnight
+    elif is_time_between(time(23, 00), time(00, 00)):
+        filter = "schedule__" + now_day
+        availability_qs = qs.filter(**{filter:3})
 
-        # check option 3 after midnight
-        elif is_time_between(time(00, 00), time(7, 00)):
-            filter = "schedule__" + yesterday_day
-            availability_qs = qs.filter(**{filter: 3})
+    # check option 3 after midnight
+    elif is_time_between(time(00, 00), time(7, 00)):
+        filter = "schedule__" + yesterday_day
+        availability_qs = qs.filter(**{filter: 3})
+
+    print(availability_qs)
+    availability_now_id = []
+    for volu in availability_qs:
+        availability_now_id.append(volu.id)
+
+
+    if len(availability) == 0:
+        availability_qs = Volunteer.objects.all().all()
+
 
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
@@ -94,14 +104,12 @@ def show_all_volunteers(request):
         print(availability_qs)
         match_qs = availability_qs
 
-    # # ----- orders -----
-    # if 'field' in request.POST:
-    #     field = request.POST.get('field')
-    #     match_qs = match_qs.order_by(field)
+    # ----- orders -----
+    if 'field' in request.POST:
+        field = request.POST.get('field')
+        match_qs = match_qs.order_by(field)
 
-
-
-    context = {'volunteer_data': match_qs}
+    context = {'volunteer_data': match_qs, 'availability_now_id': availability_now_id}
     return render(request, 'server/volunteer_table.html', context)
 
 """
