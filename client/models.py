@@ -1,15 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-
-AREAS = (
-    ("TZAF", "צפון"),
-    ("JERU", "ירושלים והסביבה"),
-    ("MERK", "מרכז"),
-    ("YEHU", "יהודה ושומרון"),
-    ("DARO", "דרום")
-)
-
 class Timestampable(models.Model):
     created_date = models.DateTimeField(null=True, editable=False)
     updated_date = models.DateTimeField(null=True, editable=False)
@@ -24,14 +15,20 @@ class Timestampable(models.Model):
         self.modified = timezone.now()
         return super(Timestampable, self).save(*args, **kwargs)
 
+class Area(models.Model):
+    name = models.CharField(max_length=20, primary_key=True)
+
+    def __str__(self):
+        return self.name
+
 class Language(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, primary_key=True)
 
     def __str__(self):
         return self.name
 
 class City(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, primary_key=True)
     x = models.FloatField()
     y = models.FloatField()
 
@@ -66,7 +63,7 @@ class Volunteer(Timestampable):
 
     full_name = models.CharField(max_length=200)
     age = models.IntegerField()
-    area = models.CharField(max_length=10, choices=AREAS)
+    areas = models.ManyToManyField(Area)
     languages = models.ManyToManyField(Language)
     phone_number = models.CharField(max_length=200)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
