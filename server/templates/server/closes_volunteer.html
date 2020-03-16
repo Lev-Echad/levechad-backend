@@ -141,7 +141,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for volunteer in closes_volunteer %}
+        {% for volunteer, distance in closes_volunteer %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
@@ -156,9 +156,18 @@
                 <td>{{ volunteer.city }}</td>
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
-                <td></td>
+                <td>{{ distance }}</td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
+
+    <div class="fixed-action-btn " style="position:fixed; bottom: 10px; left: 12px;">
+      <a href="{% url 'show_all_help_request' %}" class="btn-floating btn-lg red btn btn-outline-dark">
+        חזרה רשימת הבקשות
+      </a>
+    </div>
 {% endblock %}
+
+
+
