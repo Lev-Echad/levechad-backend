@@ -124,6 +124,10 @@ def homepage(request):
     return render(request, 'index.html', {})
 
 
+def donation(request):
+    return render(request, 'donation.html', {})
+
+
 def get_help(request):
     return render(request, 'get_help.html', {})
 
