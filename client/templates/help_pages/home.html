@@ -5,7 +5,7 @@
 
 
 {% block body %}
-<form action="home" method="post">
+<form action="/client/help/home" method="post">
     {% csrf_token %}
     {{ form|bootstrap }}
     <input type="submit" value="Submit">
