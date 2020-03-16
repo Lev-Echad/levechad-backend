@@ -3,6 +3,12 @@ from django.views.decorators.http import require_POST
 
 from client.models import Volunteer, HelpRequest
 
+
+def index(request):
+    context = {}
+    return render(request, 'server/server_index.html', context)
+
+
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
     print(request.POST)
