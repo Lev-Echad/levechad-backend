@@ -1,27 +1,10 @@
+{% extends "template.html" %}
+{% load bootstrap %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="he">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>Material Design for Bootstrap</title>
-  <!-- MDB icon -->
-  <link rel="icon" href="img/mdb-favicon.ico" type="image/x-icon">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
-  <!-- Google Fonts Roboto -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="{% static 'server/css/bootstrap.min.css' %}">
-  <!-- Material Design Bootstrap -->
-  <link rel="stylesheet" href="{% static 'server/css/mdb.min.css' %}">
-  <link rel="stylesheet" href="{% static 'server/css/bootstrap-rtl.css' %}">
 
+{% block title %}לב אחד - מתנדבים קרובים לבקשה{% endblock %}
 
-</head>
-
-<body dir="rtl">
+{% block body %}
 <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת מתנדבים
 <a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm">ערוך</a></p>
 
@@ -146,15 +129,4 @@
                         </div>
                       </div>
                     </div>
-
-  <!-- jQuery -->
-  <script type="text/javascript" src="{% static 'server/js/jquery.min.js' %}"></script>
-  <!-- Bootstrap tooltips -->
-  <script type="text/javascript" src="{% static 'server/js/popper.min.js' %}"></script>
-  <!-- Bootstrap core JavaScript -->
-  <script type="text/javascript" src="{% static 'server/js/bootstrap.min.js' %}"></script>
-  <!-- MDB core JavaScript -->
-  <script type="text/javascript" src="{% static 'server/js/mdb.min.js' %}"></script>
-
-</body>
-</html>
+{% endblock %}

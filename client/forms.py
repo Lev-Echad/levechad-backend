@@ -116,18 +116,3 @@ class ShoppingForm(BaseHelpForm):
 
 class TravelForm(BaseHelpForm):
     travel_need = forms.CharField(max_length=5000)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
