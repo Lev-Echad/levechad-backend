@@ -25,12 +25,15 @@ def show_all_volunteers(request):
     qs = Volunteer.objects.all()
 
 
-
+    print("post: ")
+    print(request)
     # ------- filters -------
     areas = request.POST.getlist('area')
     lans = request.POST.getlist('language')
     availability = request.POST.getlist('availability')
 
+    print(areas)
+    print(lans)
 
     something_mark = False
 
@@ -38,12 +41,14 @@ def show_all_volunteers(request):
     language_qs =  Volunteer.objects.all().none()
     availability_qs =  Volunteer.objects.all().all()
 
-    if len(areas) != 0:
+    if len(areas) != 0 and not '' in areas:
+
         something_mark = True
         area_qs = qs.filter(areas__name__in=areas)
 
 
-    if len(lans) != 0 :
+    if len(lans) != 0 and not '' in lans:
+
         something_mark = True
         language_qs = qs.filter(languages__name__in=lans)
 
@@ -96,7 +101,9 @@ def show_all_volunteers(request):
 
     print("match", match_qs)
     # if there were no matches display all and there are people available
-    if len(match_qs) == 0 or not something_mark:
+    print(something_mark)
+    if len(match_qs) == 0 and (not something_mark):
+        print("in")
         match_qs = Volunteer.objects.all()
 
 
