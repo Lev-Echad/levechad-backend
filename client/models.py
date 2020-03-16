@@ -11,8 +11,8 @@ class Timestampable(models.Model):
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
         if not self.id:
-            self.created = timezone.now()
-        self.modified = timezone.now()
+            self.created_date = timezone.now()
+        self.updated_date = timezone.now()
         return super(Timestampable, self).save(*args, **kwargs)
 
 class Area(models.Model):
