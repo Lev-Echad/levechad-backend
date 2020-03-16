@@ -74,5 +74,5 @@ def find_closes_persons(request, pk):
 
     closes_volunteer = Volunteer.objects.all()
 
-    context = {'closes_volunteer': closes_volunteer}
+    context = {'help_request': request_person, 'closes_volunteer': closes_volunteer}
     return render(request, 'server/closes_volunteer.html', context)
