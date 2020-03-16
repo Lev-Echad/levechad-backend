@@ -80,10 +80,11 @@ def show_all_volunteers(request):
         filter = "schedule__" + yesterday_day
         availability_qs = qs.filter(**{filter: 3})
 
-    print(availability_qs)
+
     availability_now_id = []
-    for volu in availability_qs:
-        availability_now_id.append(volu.id)
+    if availability_qs != []:
+        for volu in availability_qs:
+            availability_now_id.append(volu.id)
 
 
     if len(availability) == 0:
