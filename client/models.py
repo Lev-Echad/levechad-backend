@@ -38,13 +38,13 @@ class City(models.Model):
 
 class VolunteerSchedule(Timestampable):
     end_date = models.DateField(blank=True)
-    sunday = models.CharField(max_length=3)
-    monday = models.CharField(max_length=3)
-    tuesday = models.CharField(max_length=3)
-    wednesday = models.CharField(max_length=3)
-    thursday = models.CharField(max_length=3)
-    friday = models.CharField(max_length=3)
-    saturday = models.CharField(max_length=3)
+    Sunday = models.CharField(max_length=3)
+    Monday = models.CharField(max_length=3)
+    Tuesday = models.CharField(max_length=3)
+    Wednesday = models.CharField(max_length=3)
+    Thursday = models.CharField(max_length=3)
+    Friday = models.CharField(max_length=3)
+    Saturday = models.CharField(max_length=3)
 
 
 class Volunteer(Timestampable):
