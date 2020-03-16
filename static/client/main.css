@@ -6,18 +6,15 @@
 
 body{
     font-family: "Alef Hebrew",
-    “Helvetica Neue”,
+    "Helvetica Neue",
     Helvetica,
     Arial,
     sans-serif;
-    height: 100vh;
-    overflow-y: hidden;
 }
 
 body * {
     max-width: 100%;
     direction: rtl;
-    max-height: 100%;
 }
 
 .box * {

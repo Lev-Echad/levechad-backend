@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,14 +19,13 @@
       href="https://cdn.rtlcss.com/bootstrap/v4.2.1/css/bootstrap.min.css"
       integrity="sha384-vus3nQHTD+5mpDiZ4rkEPlnkcyTP+49BhJ4wJeJunw06ZAp+wzzeBPUXr42fi8If"
       crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'client/main.css' %}">
     <title>{% block title %}{% endblock %}</title>
-    {% load static %}
 </head>
 <body dir="rtl">
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
     <a class="navbar-brand" href="">
-        {% load static %}
         <img src="{% static 'client/logo.png' %}" alt="My image">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
