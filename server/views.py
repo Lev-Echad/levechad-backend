@@ -64,6 +64,9 @@ def help_edit_stat(request, pk):
     if request.POST.get('status') is not None:
         to_edit.status = request.POST.get('status')
 
+    if request.POST.get('user_name') is not None:
+        to_edit.status_updater = request.POST.get('user_name')
+
     print(to_edit.status)
     to_edit.save()
     return redirect('show_all_help_request')
