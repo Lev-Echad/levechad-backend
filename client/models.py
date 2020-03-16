@@ -69,6 +69,7 @@ class Volunteer(Timestampable):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=200)
     available_saturday = models.BooleanField()
+    guiding = models.BooleanField()
     notes = models.CharField(max_length=200)
     moving_way = models.CharField(max_length=20, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=20, choices=HEARING_WAYS)
