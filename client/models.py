@@ -40,7 +40,7 @@ class City(models.Model):
 
 
 class VolunteerSchedule(Timestampable):
-    end_date = models.DateField()
+    end_date = models.DateField(blank=True)
     sunday = models.CharField(max_length=3)
     monday = models.CharField(max_length=3)
     tuesday = models.CharField(max_length=3)
