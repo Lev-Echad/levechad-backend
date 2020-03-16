@@ -64,11 +64,10 @@ def show_all_help_request(request):
     if len(match_qs) ==0:
         match_qs = qs
 
+
     # ----- orders -----
-    field = request.POST.get('field')
-    print(request.POST['field'])
-    print("the fiels is: ", field)
-    if len(field) != 0:
+    if 'field' in request.POST:
+        field = request.POST.get('field')
         match_qs = match_qs.order_by(field)
 
 
