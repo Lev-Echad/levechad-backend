@@ -27,34 +27,32 @@ def show_all_volunteers(request):
 
 
     # ------- filters -------
-    print("post: ")
-    print(request.POST)
     areas = request.POST.getlist('area')
     lans = request.POST.getlist('language')
     availability = request.POST.getlist('availability')
-    print("areas: "+str(areas))
-    print("languages: " + str(lans))
-    print("availability: " + str(availability))
+
+
+    something_mark = False
 
     area_qs =  Volunteer.objects.all().none()
     language_qs =  Volunteer.objects.all().none()
     availability_qs =  Volunteer.objects.all().all()
 
-    if len(areas) != 0 :
-
+    if len(areas) != 0:
+        something_mark = True
         area_qs = qs.filter(areas__name__in=areas)
-        print(area_qs)
+
 
     if len(lans) != 0 :
+        something_mark = True
         language_qs = qs.filter(languages__name__in=lans)
-        print(language_qs)
 
 
-    # --------- check time now
+    # --------- check time now --------
     now = datetime.datetime.now()
     now_day = now.strftime("%A")
 
-    yesterday = datetime.datetime.today() + datetime.timedelta(days=-1)
+    yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
     yesterday_day = yesterday.strftime("%A")
     #
 
@@ -91,19 +89,26 @@ def show_all_volunteers(request):
         availability_qs = Volunteer.objects.all().all()
 
 
+    print("bedore match area", area_qs)
+    print("bedore match len", language_qs)
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
+
+    print("match", match_qs)
+    # if there were no matches display all and there are people available
+    if len(match_qs) == 0 or not something_mark:
+        match_qs = Volunteer.objects.all()
+
+
+
     print("before date")
     print(match_qs)
+    print("asgffffffffffffffffffffff", availability_qs)
     match_qs = match_qs.intersection(availability_qs)
     print("after intersection")
     print(match_qs)
 
-    # if there were no matches display all and there are people available
-    if len(match_qs) == 0 and len(availability_qs) !=0:
-        print("no match")
-        print(availability_qs)
-        match_qs = availability_qs
+
 
     # ----- orders -----
     if 'field' in request.POST:
