@@ -90,6 +90,6 @@ def find_closes_persons(request, pk):
     req_y = req_city.y
 
     closes_volunteer = Volunteer.objects.all()
-    closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
+    # closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
     context = {'help_request': request_person, 'closes_volunteer': closes_volunteer}
     return render(request, 'server/closes_volunteer.html', context)

@@ -24,16 +24,19 @@
     </thead>
     <tbody>
             {% if help_request.get_status_display == "התקבלה" %}
-                <tr bgcolor="green">
+                <tr bgcolor="white">
             {% endif %}
             {% if help_request.get_status_display == "טופל" %}
                 <tr bgcolor="yellow">
             {% endif %}
             {% if help_request.get_status_display == "בטיפול" %}
-                <tr bgcolor="red">
+                <tr bgcolor="green">
             {% endif %}
             {% if help_request.get_status_display == "הועבר למתנדב" %}
-                <tr bgcolor="#5f9ea0">
+                <tr bgcolor="blue">
+            {% endif %}
+            {% if help_request.get_status_display == "לא טופל" %}
+                <tr bgcolor="red">
             {% endif %}
                 <th scope="row">{{ help_request.id }}</th>
                 <td>{{ help_request.full_name }}</td>
@@ -86,6 +89,11 @@
                                     <div>
                                         <label for="status">טופל</label>
                                         <input type="radio" name="status" id="status" value='DONE'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">לא טופל</label>
+                                        <input type="radio" name="status" id="status" value='NOT_DONE'>
                                     </div>
                                 </div>
 
@@ -148,16 +156,7 @@
                 <td>{{ volunteer.city }}</td>
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
-                <td>
-                    {%  with temp_x=volunteer.city.x|sub:help_request.city.x temp_y=volunteer.city.y|sub:help_request.city.y %}
-                        {% with total_x=temp_x|mul:temp_x total_y=temp_y|mul:temp_y %}
-                            {% with total_dis=total_x|add:total_y %}
-                                {{ total_dis }}
-                            {% endwith %}
-                        {% endwith %}
-                    {% endwith %}
-
-                </td>
+                <td></td>
             </tr>
         {% endfor %}
     </tbody>

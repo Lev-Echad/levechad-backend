@@ -92,7 +92,8 @@ class HelpRequest(Timestampable):
         ('WAITING', 'התקבלה'),
         ('IN_CARE', 'בטיפול'),
         ('TO_VOLUNTER', 'הועבר למתנדב'),
-        ('DONE', 'טופל')
+        ('DONE', 'טופל'),
+        ('NOT_DONE', 'לא טופל')
     )
 
     full_name = models.CharField(max_length=200)
