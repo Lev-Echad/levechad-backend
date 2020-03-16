@@ -1,6 +1,7 @@
 dj-database-url==0.5.0
 Django==3.0.4
+django_heroku
 gunicorn
 whitenoise==5.0.1
 django-bootstrap-form
-django-mathfilters
+mathfilters
