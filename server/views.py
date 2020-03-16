@@ -1,9 +1,5 @@
 from django.shortcuts import render, redirect
-from django.views.decorators.http import require_POST
-from django.db.models.functions import Sqrt
-from django.db.models.functions import Power
 from client.models import Volunteer, HelpRequest
-import numpy as np
 from django.db.models import F
 
 def index(request):
@@ -98,7 +94,7 @@ def find_closes_persons(request, pk):
     for volunteer in closes_volunteer:
         tot_x = (volunteer.city.x - request_person.city.x) ** 2
         tot_y = (volunteer.city.y - request_person.city.y) ** 2
-        tot_value = (tot_x + tot_y) ** 0.5
+        tot_value = int(((tot_x + tot_y) ** 0.5) / 100)
         final_data.append((volunteer, tot_value))
 
     context = {'help_request': request_person, 'closes_volunteer': final_data}
