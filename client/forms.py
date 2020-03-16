@@ -65,6 +65,8 @@ class VolunteerForm(forms.Form):
     notes = forms.CharField(max_length=200)
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
     hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS, widget=forms.CheckboxSelectMultiple())
+    want_guide = forms.BooleanField(required=False)
+    no_corona = forms.BooleanField()
 
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
@@ -79,7 +81,8 @@ class VolunteerForm(forms.Form):
         self.fields['age'].label = "גיל"
         self.fields['transportation'].label = "דרכי התניידות"
         self.fields['hearing_way'].label = "איך שמעת עלינו"
-
+        self.fields['want_guide'].label = "אני מעוניין\נת בהתנדבות בהדרכה במשפחתונים (מינימום 3 ימים)"
+        self.fields['no_corona'].label = "אני מאשר\ת כי לא שהיתי במקום שהוגדר כבעל סיכון להידבקות על פי משרד הבריאות וכי לא הייתי ליד נשא\בעל תסמינים בתקופה האחרונה"
 
 
 class ScheduleForm(forms.Form):
