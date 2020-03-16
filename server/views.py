@@ -49,6 +49,15 @@ def show_all_help_request(request):
     return render(request, 'server/help_table.html', context)
 
 
-def help_edit_stat(request, pk, new_stat):
+def help_edit_stat(request, pk):
     # get user objects
+    print(request.POST)
     to_edit = HelpRequest.objects.get(id=pk)
+    print(to_edit.status)
+
+    if request.POST.get('status') is not None:
+        to_edit.status = request.POST.get('status')
+
+    print(to_edit.status)
+    to_edit.save()
+    return redirect('show_all_help_request')
