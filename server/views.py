@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from client.models import Volunteer, HelpRequest
+from client.models import Volunteer, HelpRequest, Area
 from django.db.models import F
 
 def index(request):
@@ -9,6 +9,8 @@ def index(request):
 
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
+
+
 
     # ------- filters -------
     print("post: ")
@@ -22,10 +24,15 @@ def show_all_volunteers(request):
     language_qs = HelpRequest.objects.none()
 
     if len(areas) != 0 :
-        area_qs = qs.filter(area__in=areas)
+
+        area_qs = qs.filter(areas__name__in=areas)
+        print(area_qs)
 
     if len(lans) != 0 :
+        print("I am here")
         language_qs = qs.filter(languages__name__in=lans)
+        print(language_qs)
+
 
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
@@ -34,6 +41,10 @@ def show_all_volunteers(request):
     if len(match_qs) == 0:
         match_qs = qs
 
+    # # ----- orders -----
+    # if 'field' in request.POST:
+    #     field = request.POST.get('field')
+    #     match_qs = match_qs.order_by(field)
 
     context = {'volunteer_data': match_qs}
     return render(request, 'server/volunteer_table.html', context)
