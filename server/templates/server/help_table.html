@@ -6,7 +6,7 @@
 
 {% block body %}
 <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת בקשות עזרה
-<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">בצע פילטרים</a></p>
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">ערוך</a></p>
 
 <table class="table table-hover table-bordered text-center">
     <thead>
@@ -67,7 +67,7 @@
 
                          <form method="post" action="{% url 'change_stat' help_request.id%}">
                               {% csrf_token %}
-                              <div class="modal-header text-right">
+                              <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">שינוי סטאטוס בקשה:</h4>
                               </div>
                               <div class="modal-body mx-3">

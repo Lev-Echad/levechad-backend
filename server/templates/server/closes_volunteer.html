@@ -61,14 +61,14 @@
 
                          <form method="post" action="{% url 'change_stat' help_request.id%}">
                               {% csrf_token %}
-                              <div class="modal-header text-right">
+                              <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">שינוי סטאטוס בקשה:</h4>
                               </div>
                               <div class="modal-body mx-3">
 
 {#                               increas?#}
                                 <div class="right">
-                                    <p class="text-right h5"><u>המצב הנוכחי הוא:</u></p>
+                                    <p class="h5"><u>המצב הנוכחי הוא:</u></p>
 
 
                                     <div>
@@ -98,7 +98,7 @@
                                 </div>
 
                                   <div class="right">
-                                    <p class="text-right h5"><u>שינוי זהות</u></p>
+                                    <p class="h5"><u>שינוי זהות</u></p>
 
 
                                     <div>
@@ -146,7 +146,11 @@
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
                 <td>{{ volunteer.age }}</td>
-                <td>{{ volunteer.get_area_display }}</td>
+                <td>
+                    {% for area in volunteer.areas.all %}
+                        {{ area }},
+                    {% endfor %}
+                </td>
                 <td>
                     {% for lanu in volunteer.languages.all %}
                         {{ lanu.name }}
