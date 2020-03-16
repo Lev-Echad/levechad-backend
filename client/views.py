@@ -327,3 +327,5 @@ def phone_help(request):
 
     return render(request, 'help_pages/phone.html', {'form': form})
 
+def helper_help(pk, fullName):
+    return HelpRequest.objects.get(pk = pk, full_name = fullName)
