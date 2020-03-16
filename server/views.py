@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 
 from client.models import Volunteer, HelpRequest
-
+import numpy as np
 
 def index(request):
     context = {}
@@ -85,7 +85,11 @@ def help_edit_stat(request, pk):
 def find_closes_persons(request, pk):
     request_person = HelpRequest.objects.get(id=pk)
 
-    closes_volunteer = Volunteer.objects.all()
+    req_city = request_person.city
+    req_x =  req_city.x
+    req_y = req_city.y
 
+    closes_volunteer = Volunteer.objects.all()
+    closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
     context = {'help_request': request_person, 'closes_volunteer': closes_volunteer}
     return render(request, 'server/closes_volunteer.html', context)
