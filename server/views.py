@@ -11,47 +11,60 @@ def index(request):
 
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
+    print("post: ")
     print(request.POST)
     areas = request.POST.getlist('area')
     lans = request.POST.getlist('language')
     print("areas: "+str(areas))
     print("languages: " + str(lans))
-    if areas is not None:
-        print("area")
-        temp_qs = qs.filter(area__in = areas)
-        # check there were matches
-        if len(temp_qs) != 0:
-            qs = temp_qs
-        print(qs)
-    if lans is not None:
-        print("lan")
-        print(lans)
-        # check there were matches
-        temp_qs = qs.filter(languages__name__in=lans)
-        if len(temp_qs) != 0:
-            qs = temp_qs
-        print(qs)
+
+    area_qs = HelpRequest.objects.none()
+    language_qs = HelpRequest.objects.none()
+
+    if len(areas) != 0 :
+        area_qs = qs.filter(area__in = areas)
+
+    if len(lans) != 0 :
+        language_qs = qs.filter(languages__name__in=lans)
+
+    # union matchings from both categoties
+    match_qs = area_qs.union(language_qs)
+
+    # if there were no matches display all
+    if len(match_qs) == 0:
+        match_qs = qs
 
 
-    context = {'volunteer_data': qs}
+    context = {'volunteer_data': match_qs}
     return render(request, 'server/volunteer_table.html', context)
-
-def order_by_name(request):
-    all_volunteer_data = Volunteer.objects.all()
-    all_volunteer_data_by_name = all_volunteer_data.order_by('-full_name')
-    context = {'all_volunteer_data': all_volunteer_data_by_name}
-    return render(request, 'server/volunteer_table.html', context)
-
-# def order_by_age(request):
-#     all_volunteer_data = Volunteer.objects.all()
-#     all_volunteer_data_by_name = all_volunteer_data.order_by('age')
-#     context = {'all_volunteer_data': all_volunteer_data_by_name}
-#     return render(request, 'server/volunteer_table.html', context)
 
 
 def show_all_help_request(request):
-    all_help_requests = HelpRequest.objects.all()
-    context = {'help_requests': all_help_requests}
+    qs = HelpRequest.objects.all()
+    print("post:")
+    print(request.POST)
+    statuses = request.POST.getlist('status')
+    type = request.POST.getlist('type')
+    print("status: " + str(statuses))
+    print("type: " + str(type))
+
+    status_qs =HelpRequest.objects.none()
+    type_qs = HelpRequest.objects.none()
+
+    if len(statuses) != 0 :
+        status_qs = qs.filter(status__in=statuses)
+
+    if len(type) != 0:
+        type_qs = qs.filter(type__in=type)
+
+    # union matchings from both categoties
+    match_qs = status_qs.union(type_qs)
+
+    # if there were no matches display all
+    if len(match_qs) ==0:
+        match_qs = qs
+
+    context = {'help_requests': match_qs}
     return render(request, 'server/help_table.html', context)
 
 
