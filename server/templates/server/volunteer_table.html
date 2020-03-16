@@ -22,7 +22,9 @@
 </head>
 
 <body dir="rtl">
-<p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת רכבים</p>
+<p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת מתנדבים
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm">ערוך</a></p>
+
 <table class="table table-hover table-bordered text-center">
     <thead>
         <tr>
@@ -36,22 +38,27 @@
 
         </tr>
     </thead>
-    <tbody>ת
+    <tbody>
         {% for volunteer in volunteer_data %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
                 <td>{{ volunteer.age }}</td>
-                <td>{{ volunteer.area }}</td>
+                <td>{{ volunteer.get_area_display }}</td>
                 <td>{{ volunteer.phone_number }}</td>
-                <td>{{ volunteer.בןאט }}</td>
+                <td>{{ volunteer.city }}</td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
 
+                    <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
 
-<form method="post" action="{% url 'show_all_volunteers' %}">
+
+                            <form method="post" action="{% url 'show_all_volunteers' %}">
                               {% csrf_token %}
                               <div class="modal-header text-center">
                                 <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
@@ -59,9 +66,66 @@
                               <div class="modal-body mx-3">
 
 {#                               increas?#}
-                                <div class="md-form mb-5">
-                                    <p class="text-right h5"><u>האם למיין לפי סדר עולה?</u></p>
-                                  <input type="checkbox" name="test" class="form-control valid" value='1'>
+                                <div>
+                                    <p class="text-right h5"><u>בחר אזורים להצגה</u></p>
+
+
+                                    <div>
+                                        <label for="area">צפון</label>
+                                        <input type="checkbox" name="area" id="area" value='TZAF'>
+                                    </div>
+
+                                    <div>
+                                        <label for="area">ירושלים והסביבה</label>
+                                        <input type="checkbox" name="area" id="area" value='JERU'>
+                                    </div>
+
+                                    <div>
+                                        <label for="area">מרכז</label>
+                                        <input type="checkbox" name="area" id="area" value='MERK'>
+                                    </div>
+
+                                    <div>
+                                        <label for="area">יהודה ושומרון</label>
+                                        <input type="checkbox" name="area" id="area" value='YEHU'>
+                                    </div>
+                                    <div>
+                                        <label for="area">דרום</label>
+                                        <input type="checkbox" name="area" id="area" value='DARO'>
+                                    </div>
+
+                                </div>
+                                  <div>
+                                    <div>
+                                        <p class="text-right h5"><u>בחר שפה</u></p>
+                                        <label for="language">עברית</label>
+                                        <input type="checkbox" name="language" id="language" value='HEBREW'>
+                                    </div>
+
+                                    <div>
+                                        <label for="language">אנגלית</label>
+                                        <input type="checkbox" name="language" id="language" value='ENGLISH'>
+                                    </div>
+
+                                    <div>
+                                        <label for="language">רוסית</label>
+                                        <input type="checkbox" name="language" id="language" value='RUSSIA'>
+                                    </div>
+
+                                    <div>
+                                        <label for="language">צרפתית</label>
+                                        <input type="checkbox" name="language" id="language" value='FRANCE'>
+                                    </div>
+
+                                    <div>
+                                        <label for="language">ערבית</label>
+                                        <input type="checkbox" name="language" id="language" value='ARAB'>
+                                    </div>
+
+                                    <div>
+                                        <label for="language">אחר</label>
+                                        <input type="checkbox" name="language" id="language" value='ELSE'>
+                                    </div>
                                 </div>
 
                               </div>
@@ -69,15 +133,18 @@
                                 <button type="submit" class="btn btn-default">בצע פילטר</button>
                               </div>
                           </form>
+                        </div>
+                      </div>
+                    </div>
 
   <!-- jQuery -->
-  <script type="text/javascript" src="{% static 'tasks/js/jquery.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/jquery.min.js' %}"></script>
   <!-- Bootstrap tooltips -->
-  <script type="text/javascript" src="{% static 'tasks/js/popper.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/popper.min.js' %}"></script>
   <!-- Bootstrap core JavaScript -->
-  <script type="text/javascript" src="{% static 'tasks/js/bootstrap.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/bootstrap.min.js' %}"></script>
   <!-- MDB core JavaScript -->
-  <script type="text/javascript" src="{% static 'tasks/js/mdb.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/mdb.min.js' %}"></script>
 
 </body>
 </html>

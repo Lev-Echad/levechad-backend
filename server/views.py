@@ -5,12 +5,28 @@ from client.models import Volunteer, HelpRequest
 
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
-    test = request.POST.get('test')
-    print("test= " + str(test))
-    if test is not None:
-        qs = qs.filter(age=12)
-    else:
-        qs = qs.order_by('-full_name')
+    print(request.POST)
+    areas = request.POST.getlist('area')
+    lans = request.POST.getlist('language')
+    print("areas: "+str(areas))
+    print("languages: " + str(lans))
+    if areas is not None:
+        print("area")
+        temp_qs = qs.filter(area__in = areas)
+        # check there were matches
+        if len(temp_qs) != 0:
+            qs = temp_qs
+        print(qs)
+    if lans is not None:
+        print("lan")
+        print(lans)
+        # check there were matches
+        temp_qs = qs.filter(languages__name__in=lans)
+        if len(temp_qs) != 0:
+            qs = temp_qs
+        print(qs)
+
+
     context = {'volunteer_data': qs}
     return render(request, 'server/volunteer_table.html', context)
 
@@ -31,3 +47,17 @@ def show_all_help_request(request):
     all_help_requests = HelpRequest.objects.all()
     context = {'help_requests': all_help_requests}
     return render(request, 'server/help_table.html', context)
+
+
+def help_edit_stat(request, pk):
+    # get user objects
+    print(request.POST)
+    to_edit = HelpRequest.objects.get(id=pk)
+    print(to_edit.status)
+
+    if request.POST.get('status') is not None:
+        to_edit.status = request.POST.get('status')
+
+    print(to_edit.status)
+    to_edit.save()
+    return redirect('show_all_help_request')

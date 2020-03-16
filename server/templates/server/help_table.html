@@ -22,7 +22,9 @@
 </head>
 
 <body dir="rtl">
-<p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת בקשות עזרה</p>
+<p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת בקשות עזרה
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">בצע פילטרים</a></p>
+
 <table class="table table-hover table-bordered text-center">
     <thead>
         <tr>
@@ -30,28 +32,279 @@
             <th scope="col">שם מלא</th>
             <th scope="col">מספר טלפון</th>
             <th scope="col">עיר</th>
+            <th scope="col">כתובת</th>
+            <th scope="col">הערות</th>
+            <th scope="col">סוג</th>
+            <th scope="col">פירוט סוג</th>
+            <th scope="col">סטאטוס</th>
+            <th scope="col">בצע פעולות</th>
         </tr>
     </thead>
     <tbody>
         {% for help_request in help_requests %}
-            <tr>
+            {% if help_request.get_status_display == "התקבלה" %}
+                <tr bgcolor="green">
+            {% endif %}
+            {% if help_request.get_status_display == "טופל" %}
+                <tr bgcolor="yellow">
+            {% endif %}
+            {% if help_request.get_status_display == "בטיפול" %}
+                <tr bgcolor="red">
+            {% endif %}
+            {% if help_request.get_status_display == "הועבר למתנדב" %}
+                <tr bgcolor="#5f9ea0">
+            {% endif %}
                 <th scope="row">{{ help_request.id }}</th>
                 <td>{{ help_request.full_name }}</td>
                 <td>{{ help_request.phone_number }}</td>
                 <td>{{ help_request.city }}</td>
+                <td>{{ help_request.address }}</td>
+                <td>{{ help_request.notes }}</td>
+                <td>{{ help_request.get_type_display }}</td>
+                <td>{{ help_request.type_text }}</td>
+                <td>{{ help_request.get_status_display }}</td>
+                <td>
+                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#change_status{{ help_request.id }}">שנה סטאטוס</a>
+                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#find_closes{{ help_request.id }}">מצא התאמה</a>
+                </td>
+
+{#                    change status#}
+                    <div class="modal fade" id="change_status{{ help_request.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+
+
+                         <form method="post" action="{% url 'change_stat' help_request.id%}">
+                              {% csrf_token %}
+                              <div class="modal-header text-right">
+                                <h4 class="modal-title w-100 font-weight-bold">שינוי סטאטוס בקשה:</h4>
+                              </div>
+                              <div class="modal-body mx-3">
+
+{#                               increas?#}
+                                <div class="right">
+                                    <p class="text-right h5"><u>המצב הנוכחי הוא:</u></p>
+
+
+                                    <div>
+                                        <label for="status">התקבלה</label>
+                                        <input type="radio" name="status" id="status" value='WAITING'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">בטיפול</label>
+                                        <input type="radio" name="status" id="status" value='IN_CARE'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">הועבר למתנדב</label>
+                                        <input type="radio" name="status" id="status" value='TO_VOLUNTER'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">טופל</label>
+                                        <input type="radio" name="status" id="status" value='DONE'>
+                                    </div>
+                                </div>
+
+                                  <div class="right">
+                                    <p class="text-right h5"><u>שינוי זהות</u></p>
+
+
+                                    <div>
+                                        <label for="user_name">שם משנה הבקשה </label>
+                                        <input type="text" name="user_name" id="user_name" value='{{ help_request.phone_number }}'>
+                                    </div>
+                                </div>
+
+
+
+                              </div>
+                              <div class="modal-footer d-flex justify-content-center">
+                                <button type="submit" class="btn btn-default">שמור שינויים</button>
+                              </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+{#                    find closes volunteer#}
+                    <div class="modal fade" id="find_closes{{ help_request.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+
+
+                         <form method="post" action="{% url 'change_stat' help_request.id%}">
+                              {% csrf_token %}
+                              <div class="modal-header text-right">
+                                <h4 class="modal-title w-100 font-weight-bold">המתנדבים הקרובים ביותר הזמינים</h4>
+                              </div>
+                              <div class="modal-body mx-3">
+
+{#                               increas?#}
+                                <div class="right">
+                                    <p class="text-right h5"><u>המצב הנוכחי הוא:</u></p>
+
+
+                                    <div>
+                                        <label for="status">התקבלה</label>
+                                        <input type="radio" name="status" id="status" value='WAITING'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">בטיפול</label>
+                                        <input type="radio" name="status" id="status" value='IN_CARE'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">הועבר למתנדב</label>
+                                        <input type="radio" name="status" id="status" value='TO_VOLUNTER'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">טופל</label>
+                                        <input type="radio" name="status" id="status" value='DONE'>
+                                    </div>
+                                </div>
+
+                                  <div class="right">
+                                    <p class="text-right h5"><u>שינוי זהות</u></p>
+
+
+                                    <div>
+                                        <label for="user_name">שם משנה הבקשה </label>
+                                        <input type="text" name="user_name" id="user_name" value='{{ help_request.phone_number }}'>
+                                    </div>
+                                </div>
+
+
+
+                              </div>
+                              <div class="modal-footer d-flex justify-content-center">
+                                <button type="submit" class="btn btn-default">שמור שינויים</button>
+                              </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
             </tr>
         {% endfor %}
     </tbody>
 </table>
 
+
+
+
+
+
+
+
+
+
+
+{#                    filter mode#}
+                    <div class="modal fade" id="modalLoginForm1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+
+
+                         <form method="post" action="{% url 'show_all_help_request' %}">
+                              {% csrf_token %}
+                              <div class="modal-header text-center">
+                                <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
+                              </div>
+                              <div class="modal-body mx-3">
+
+{#                               increas?#}
+                                <div>
+                                    <p class="text-right h5"><u>בחר סטטוסים להצגה</u></p>
+
+
+                                    <div>
+                                        <label for="status">התקבלה</label>
+                                        <input type="checkbox" name="status" id="status" value='ACCEPT'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">בטיפול</label>
+                                        <input type="checkbox" name="status" id="status" value='IN_POGRESS'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">הועבר לטיפול</label>
+                                        <input type="checkbox" name="status" id="status" value='PASS_TO_VAL'>
+                                    </div>
+
+                                    <div>
+                                        <label for="status">טופל</label>
+                                        <input type="checkbox" name="status" id="status" value='TOPAL'>
+                                    </div>
+
+                                </div>
+
+
+
+                                  <div>
+                                    <p class="text-right h5"><u>בחר סוג עזרה</u></p>
+
+
+                                    <div>
+                                        <label for="type">קניות</label>
+                                        <input type="checkbox" name="type" id="type" value='SHOPPING'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">איסוף</label>
+                                        <input type="checkbox" name="type" id="type" value='COLLECTING'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">תרופות</label>
+                                        <input type="checkbox" name="type" id="type" value='MEDICINE'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">עזרה בבית</label>
+                                        <input type="checkbox" name="type" id="type" value='HELP_IN_HOME'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">תמיכה טלפונית</label>
+                                        <input type="checkbox" name="type" id="type" value='PHONE_HELP'>
+                                    </div>
+
+                                    <div>
+                                        <label for="type">אחר</label>
+                                        <input type="checkbox" name="type" id="type" value='ELSE'>
+                                    </div>
+
+                                </div>
+
+
+
+
+
+                              </div>
+                              <div class="modal-footer d-flex justify-content-center">
+                                <button type="submit" class="btn btn-default">בצע פילטר</button>
+                              </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
   <!-- jQuery -->
-  <script type="text/javascript" src="{% static 'tasks/js/jquery.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/jquery.min.js' %}"></script>
   <!-- Bootstrap tooltips -->
-  <script type="text/javascript" src="{% static 'tasks/js/popper.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/popper.min.js' %}"></script>
   <!-- Bootstrap core JavaScript -->
-  <script type="text/javascript" src="{% static 'tasks/js/bootstrap.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/bootstrap.min.js' %}"></script>
   <!-- MDB core JavaScript -->
-  <script type="text/javascript" src="{% static 'tasks/js/mdb.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'server/js/mdb.min.js' %}"></script>
 
 </body>
 </html>
