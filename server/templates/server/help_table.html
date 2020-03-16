@@ -6,8 +6,7 @@
 
 {% block body %}
 <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת בקשות עזרה
-<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">בצע פילטרים</a>
-<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#sortModel">בצע מיון</a></p>
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">בצע פילטרים</a></p>
 
 <table class="table table-hover table-bordered text-center">
     <thead>
@@ -16,6 +15,7 @@
             <th scope="col">שם מלא</th>
             <th scope="col">מספר טלפון</th>
             <th scope="col">עיר</th>
+            <th scope="col">תאריך הבקשה</th>
             <th scope="col">כתובת</th>
             <th scope="col">הערות</th>
             <th scope="col">סוג</th>
@@ -46,6 +46,7 @@
                 <td>{{ help_request.full_name }}</td>
                 <td>{{ help_request.phone_number }}</td>
                 <td>{{ help_request.city }}</td>
+                <td>{{ help_request.created_date }}</td>
                 <td>{{ help_request.address }}</td>
                 <td>{{ help_request.notes }}</td>
                 <td>{{ help_request.get_type_display }}</td>
@@ -212,133 +213,23 @@
                                 </div>
 
 
-
-
-
-                              </div>
-                              <div class="modal-footer d-flex justify-content-center">
-                                <button type="submit" class="btn btn-default">בצע פילטר</button>
-                              </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                <div class="modal fade" id="sortModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-                      aria-hidden="true">
-                      <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-
-
-                         <form method="post" action="{% url 'show_all_help_request' %}">
-                              {% csrf_token %}
-                              <div class="modal-header text-center">
-                                <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
-                              </div>
-                              <div class="modal-body mx-3">
-
                                 <div>
-                                    <p class="h5"><u>בחר סטטוסים להצגה</u></p>
-
-
+                                    <p class="h5"><u>בחר את השדה שאתה מעוניין למיין לפיו</u></p>
+                                </div>
                                     <div>
-                                        <label for="status">התקבלה</label>
-                                        <input type="checkbox" name="status" id="status" value='WAITING'>
+                                        <label for="field">סטאטוס</label>
+                                        <input type="radio" name="field" id="field" value='status'>
                                     </div>
-
                                     <div>
-                                        <label for="status">בטיפול</label>
-                                        <input type="checkbox" name="status" id="status" value='IN_CARE'>
+                                        <label for="field">סוג הבקשה</label>
+                                        <input type="radio" name="field" id="field" value='type'>
                                     </div>
-
                                     <div>
-                                        <label for="status">הועבר לטיפול</label>
-                                        <input type="checkbox" name="status" id="status" value='TO_VOLUNTER'>
+                                        <label for="field">עיר</label>
+                                        <input type="radio" name="field" id="field" value='city'>
                                     </div>
-
-                                    <div>
-                                        <label for="status">טופל</label>
-                                        <input type="checkbox" name="status" id="status" value='DONE'>
-                                    </div>
-
-                                    <div>
-                                        <label for="status">לא טופל</label>
-                                        <input type="checkbox" name="status" id="status" value='NOT_DONE'>
-                                    </div>
-
                                 </div>
 
-
-
-                                  <div>
-                                    <p class="h5"><u>בחר סוג עזרה</u></p>
-
-
-                                    <div>
-                                        <label for="type">קניות</label>
-                                        <input type="checkbox" name="type" id="type" value='BUYIN'>
-                                    </div>
-
-                                    <div>
-                                        <label for="type">איסוף</label>
-                                        <input type="checkbox" name="type" id="type" value='TRAVEL'>
-                                    </div>
-
-                                    <div>
-                                        <label for="type">תרופות</label>
-                                        <input type="checkbox" name="type" id="type" value='MEDICI'>
-                                    </div>
-
-                                    <div>
-                                        <label for="type">עזרה בבית</label>
-                                        <input type="checkbox" name="type" id="type" value='HOME_HEL'>
-                                    </div>
-
-                                    <div>
-                                        <label for="type">תמיכה טלפונית</label>
-                                        <input type="checkbox" name="type" id="type" value='PHONE_HEL'>
-                                    </div>
-
-                                    <div>
-                                        <label for="type">אחר</label>
-                                        <input type="checkbox" name="type" id="type" value='OTHER'>
-                                    </div>
-
-                                </div>
-
-
-
-
-
-                              </div>
                               <div class="modal-footer d-flex justify-content-center">
                                 <button type="submit" class="btn btn-default">בצע פילטר</button>
                               </div>
@@ -346,6 +237,9 @@
                         </div>
                       </div>
                     </div>
+
+
+
 
 
 {% endblock %}

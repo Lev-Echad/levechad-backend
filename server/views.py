@@ -9,6 +9,8 @@ def index(request):
 
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
+
+    # ------- filters -------
     print("post: ")
     print(request.POST)
     areas = request.POST.getlist('area')
@@ -20,7 +22,7 @@ def show_all_volunteers(request):
     language_qs = HelpRequest.objects.none()
 
     if len(areas) != 0 :
-        area_qs = qs.filter(area__in = areas)
+        area_qs = qs.filter(area__in=areas)
 
     if len(lans) != 0 :
         language_qs = qs.filter(languages__name__in=lans)
@@ -61,6 +63,14 @@ def show_all_help_request(request):
     # if there were no matches display all
     if len(match_qs) ==0:
         match_qs = qs
+
+    # ----- orders -----
+    field = request.POST.get('field')
+    print(request.POST['field'])
+    print("the fiels is: ", field)
+    if len(field) != 0:
+        match_qs = match_qs.order_by(field)
+
 
     context = {'help_requests': match_qs}
     return render(request, 'server/help_table.html', context)
