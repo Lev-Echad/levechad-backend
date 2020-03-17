@@ -25,21 +25,16 @@ def show_all_volunteers(request):
     qs = Volunteer.objects.all()
 
 
-    print("post: ")
-    print(request)
     # ------- filters -------
     areas = request.POST.getlist('area')
     lans = request.POST.getlist('language')
     availability = request.POST.getlist('availability')
 
-    print(areas)
-    print(lans)
-
     something_mark = False
 
-    area_qs =  Volunteer.objects.all().none()
-    language_qs =  Volunteer.objects.all().none()
-    availability_qs =  Volunteer.objects.all().all()
+    area_qs=Volunteer.objects.all().none()
+    language_qs=Volunteer.objects.all().none()
+    availability_qs=Volunteer.objects.all().all()
 
     if len(areas) != 0 and not '' in areas:
 
@@ -59,61 +54,64 @@ def show_all_volunteers(request):
 
     yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
     yesterday_day = yesterday.strftime("%A")
-    #
-
 
     # check option 1
     if is_time_between(time(7, 00), time(15, 00)):
-        filter = "schedule__" + now_day
+        print("1")
+        filter = "schedule__" + now_day + "__contains"
         availability_qs = qs.filter(**{filter:1})
 
     # check option 2
     elif is_time_between(time(15, 00), time(23, 00)):
-        filter = "schedule__" + now_day
+        print("2")
+        filter = "schedule__" + now_day + "__contains"
         availability_qs = qs.filter(**{filter:2})
 
 
     # check option 3 before midnight
     elif is_time_between(time(23, 00), time(00, 00)):
-        filter = "schedule__" + now_day
+        print("3")
+        filter = "schedule__" + now_day + "__contains"
         availability_qs = qs.filter(**{filter:3})
 
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
-        filter = "schedule__" + yesterday_day
-        availability_qs = qs.filter(**{filter: 3})
+        print("4")
+        filter = "schedule__" + yesterday_day + "__contains"
+        print(filter)
+        availability_qs = qs.filter(**{filter:3})
 
 
+
+    # check for the persons that good timing if the day is good
+    good_also_date = []
+
+    for volunnter in availability_qs:
+        if now.date() <= volunnter.schedule.end_date:
+            good_also_date.append(volunnter)
+
+    availability_qs = good_also_date
     availability_now_id = []
     if availability_qs != []:
         for volu in availability_qs:
             availability_now_id.append(volu.id)
 
 
+
+
     if len(availability) == 0:
         availability_qs = Volunteer.objects.all().all()
 
 
-    print("bedore match area", area_qs)
-    print("bedore match len", language_qs)
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
 
-    print("match", match_qs)
     # if there were no matches display all and there are people available
-    print(something_mark)
     if len(match_qs) == 0 and (not something_mark):
-        print("in")
         match_qs = Volunteer.objects.all()
 
 
-
-    print("before date")
-    print(match_qs)
-    print("asgffffffffffffffffffffff", availability_qs)
     match_qs = match_qs.intersection(availability_qs)
-    print("after intersection")
-    print(match_qs)
 
 
 
@@ -137,20 +135,24 @@ def show_all_help_request(request):
     print("status: " + str(statuses))
     print("type: " + str(type))
 
+    something_mark = False
+
     status_qs =HelpRequest.objects.none()
     type_qs = HelpRequest.objects.none()
 
-    if len(statuses) != 0 :
+    if len(statuses) != 0 and not '' in statuses:
+        something_mark = True
         status_qs = qs.filter(status__in=statuses)
 
-    if len(type) != 0:
+    if len(type) != 0 and not '' in type:
+        something_mark = True
         type_qs = qs.filter(type__in=type)
 
     # union matchings from both categoties
     match_qs = status_qs.union(type_qs)
 
     # if there were no matches display all
-    if len(match_qs) ==0:
+    if len(match_qs) == 0 and (not something_mark):
         match_qs = qs
 
 
@@ -221,6 +223,62 @@ def find_closes_persons(request, pk):
     closes_volunteer = Volunteer.objects.all()
     closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
 
+
+
+    # adding here a function that tell if the volunteer is aviavble
+    # --------- check time now --------
+    now = datetime.datetime.now()
+    now_day = now.strftime("%A")
+
+    yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
+    yesterday_day = yesterday.strftime("%A")
+
+    availability_qs = []
+
+    # check option 1
+    if is_time_between(time(7, 00), time(15, 00)):
+        print("1")
+        filter = "schedule__" + now_day + "__contains"
+        availability_qs = closes_volunteer.filter(**{filter: 1})
+
+    # check option 2
+    elif is_time_between(time(15, 00), time(23, 00)):
+        print("2")
+        filter = "schedule__" + now_day + "__contains"
+        availability_qs = closes_volunteer.filter(**{filter: 2})
+
+
+    # check option 3 before midnight
+    elif is_time_between(time(23, 00), time(00, 00)):
+        print("3")
+        filter = "schedule__" + now_day + "__contains"
+        availability_qs = closes_volunteer.filter(**{filter: 3})
+
+    # check option 3 after midnight
+    elif is_time_between(time(00, 00), time(7, 00)):
+        print("4")
+        filter = "schedule__" + yesterday_day + "__contains"
+        print(filter)
+        availability_qs = closes_volunteer.filter(**{filter: 3})
+
+    # check for the persons that good timing if the day is good
+    good_also_date = []
+
+    for volunnter in availability_qs:
+        if now.date() <= volunnter.schedule.end_date:
+            good_also_date.append(volunnter)
+
+    availability_qs = good_also_date
+    availability_now_id = []
+    if availability_qs != []:
+        for volu in availability_qs:
+            availability_now_id.append(volu.id)
+
+    closes_volunteer = availability_qs
+
+    if len(closes_volunteer) > 30:
+        closes_volunteer = closes_volunteer[0:29]
+
     final_data = []
     for volunteer in closes_volunteer:
         tot_x = (volunteer.city.x - request_person.city.x) ** 2
@@ -228,5 +286,5 @@ def find_closes_persons(request, pk):
         tot_value = int(((tot_x + tot_y) ** 0.5) / 100)
         final_data.append((volunteer, tot_value))
 
-    context = {'help_request': request_person, 'closes_volunteer': final_data}
+    context = {'help_request': request_person, 'closes_volunteer': final_data, 'availability_now_id': availability_now_id}
     return render(request, 'server/closes_volunteer.html', context)
