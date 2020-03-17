@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest
-from django.db.models import F, Q
+from django.db.models import F
 from django.core.paginator import Paginator
 import datetime
 from datetime import  time
@@ -47,18 +47,14 @@ def show_all_volunteers(request, page = 1):
     language_qs=Volunteer.objects.all().none()
     availability_qs=Volunteer.objects.all().all()
 
-    cret1 = Q(areas__name__in=get_mandatory_areas(request))
-    area_qs = qs.filter(cret1)
+    area_qs = qs.filter(areas__name__in=get_mandatory_areas(request))
 
     if len(areas) != 0 and not '' in areas:
-
         something_mark = True
-        cret2 = Q(areas__name__in=areas)
-        area_qs = qs.filter(cret1 & cret2)
+        area_qs = area_qs.filter(areas__name__in=areas)
 
 
     if len(lans) != 0 and not '' in lans:
-
         something_mark = True
         language_qs = qs.filter(languages__name__in=lans)
 
