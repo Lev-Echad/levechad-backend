@@ -62,7 +62,7 @@ class VolunteerForm(forms.Form):
     available_on_saturday = forms.BooleanField(required=False)
     notes = forms.CharField(max_length=200)
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
-    hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS, widget=forms.CheckboxSelectMultiple())
+    hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
     want_guide = forms.BooleanField(required=False)
     no_corona = forms.BooleanField()
 
@@ -205,4 +205,3 @@ class TravelForm(BaseHelpForm):
         self.fields['address'].label = "כתובת מגורים"
         self.fields['notes'].label = "הערות"
         self.fields['travel_need'].label = "'פרט את מסלול הנסיעה הנדרש"
-
