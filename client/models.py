@@ -70,7 +70,7 @@ class Volunteer(Timestampable):
     address = models.CharField(max_length=200)
     available_saturday = models.BooleanField()
     guiding = models.BooleanField()
-    notes = models.CharField(max_length=200)
+    notes = models.CharField(max_length=5000)
     moving_way = models.CharField(max_length=20, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=20, choices=HEARING_WAYS)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, null=True)
