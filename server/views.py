@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from client.models import Volunteer, HelpRequest
 from django.db.models import F
+from django.core.paginator import Paginator
 import datetime
 from datetime import  time
 
+RESULTS_IN_PAGE = 50
 
 def is_time_between(begin_time, end_time, check_time=None):
     # If check time is not given, default to current UTC time
@@ -21,16 +23,16 @@ def index(request):
 """
 also filters by filter
 """
-def show_all_volunteers(request):
+def show_all_volunteers(request, page = 1):
     qs = Volunteer.objects.all()
 
     for test in qs:
         print(test.full_name)
         print(test.guiding)
     # ------- filters -------
-    areas = request.POST.getlist('area')
-    lans = request.POST.getlist('language')
-    availability = request.POST.getlist('availability')
+    areas = request.GET.getlist('area')
+    lans = request.GET.getlist('language')
+    availability = request.GET.getlist('availability')
 
     something_mark = False
 
@@ -98,7 +100,7 @@ def show_all_volunteers(request):
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
 
-    guidings1 = request.POST.getlist('guiding')
+    guidings1 = request.GET.getlist('guiding')
 
 
     # if there were no matches display all and there are people available
@@ -114,8 +116,8 @@ def show_all_volunteers(request):
 
 
     # ----- orders -----
-    if 'field' in request.POST:
-        field = request.POST.get('field')
+    if 'field' in request.GET:
+        field = request.GET.get('field')
         match_qs = match_qs.order_by(field)
 
 
@@ -130,14 +132,17 @@ def show_all_volunteers(request):
     for i in range (0, len(match_qs)):
         final_data.append((match_qs[i], appers_list[i]))
 
+    paginator = Paginator(final_data, RESULTS_IN_PAGE)
 
-    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id}
+    final_data = paginator.page(page)
+
+    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page, 'num_pages': paginator.num_pages}
     return render(request, 'server/volunteer_table.html', context)
 
 """
 also filters by filter
 """
-def show_all_help_request(request):
+def show_all_help_request(request, page = 1):
     qs = HelpRequest.objects.all()
 
     print("post help:")
@@ -173,7 +178,10 @@ def show_all_help_request(request):
         match_qs = match_qs.order_by(field)
 
 
-    context = {'help_requests': match_qs}
+    paginator = Paginator(match_qs, RESULTS_IN_PAGE)
+    match_qs = paginator.page(page)
+
+    context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages}
     return render(request, 'server/help_table.html', context)
 
 

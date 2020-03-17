@@ -1,6 +1,7 @@
 {% extends "server/template.html" %}
 {% load bootstrap %}
 {% load static %}
+{% load mathfilters %}
 
 {% block title %}לב אחד - מתנדבים קרובים לבקשה{% endblock %}
 
@@ -99,13 +100,23 @@
     </tbody>
 </table>
 
+<div>
+    {% if page != 1 %}
+    <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
+    {% endif %}
+    &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
+    {% if not page == num_pages %}
+    <a href="{% url 'show_all_volunteers' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
+    {% endif %}
+</div>
+
                     <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
                       aria-hidden="true">
                       <div class="modal-dialog" role="document">
                         <div class="modal-content">
 
 
-                            <form method="post" action="{% url 'show_all_volunteers' %}">
+                            <form method="get" action="{% url 'show_all_volunteers' %}">
                               {% csrf_token %}
                               <div class="modal-header text-center">
                                 <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
@@ -225,6 +236,8 @@
                         </div>
                       </div>
                     </div>
+
+
 
 
 

@@ -144,6 +144,17 @@
     </tbody>
 </table>
 
+<div>
+    {% if page != 1 %}
+    <a href="{% url 'show_all_help_request' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
+    {% endif %}
+    &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
+    {% if not page == num_pages %}
+    <a href="{% url 'show_all_help_request' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
+    {% endif %}
+</div>
+
+
 
 {#                    filter mode#}
                     <div class="modal fade" id="modalLoginForm1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
