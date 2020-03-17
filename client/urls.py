@@ -17,4 +17,5 @@ urlpatterns = [
     path('help/phone', views.phone_help, name='show_all'),
     path('help/shopping', views.shopping_help, name='show_all'),
     path('help/travel', views.travel_help, name='show_all'),
+    path('help/workers', views.workers_help, name='show_all'),
 ]

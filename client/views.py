@@ -34,7 +34,7 @@ def volunteer(request):
                                      city=City.objects.get(name=answer["city"]), address=answer["address"],
                                      available_saturday=answer["available_on_saturday"],
                                      notes=answer["notes"], moving_way=answer["transportation"],
-                                     hearing_way=answer["hearing_way"], guiding=answer["want_guide"], keep_mandatory_worker_children = answer["childrens"])
+                                     hearing_way=answer["hearing_way"], keep_mandatory_worker_children = answer["childrens"])
             volunter_new.save()
             volunter_new.languages.set(languagesGot)
             volunter_new.areas.set(areasGot)
@@ -61,7 +61,7 @@ def schedule(request):
             new_schedule = VolunteerSchedule(Sunday="".join(answer["sunday"]), Monday="".join(answer["monday"]),
                                              Tuesday="".join(answer["tuesday"]), Wednesday="".join(answer["wednesday"]),
                                              Thursday="".join(answer["thursday"]), Friday="".join(answer["friday"]),
-                                             Saturday="".join(answer["saturday"]), end_date=answer["end_date"])
+                                             Saturday="".join(answer["saturday"]))
             volunteerSchedule = Volunteer.objects.get(id=int(request.POST.get('vol_id', '')))
             new_schedule.save()
             volunteerSchedule.schedule = new_schedule
@@ -87,9 +87,14 @@ def shopping_help(request):
         # check whether it's valid:
         if form.is_valid():
             answer = form.cleaned_data
+            areasGot = Area.objects.filter(name__in=answer["area"])
+
             new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
                                       address = answer["address"], notes = answer["notes"], type = "BUYIN", type_text = answer["to_buy"])
             new_request.save()
+            new_request.areas.set(areasGot)
+            new_request.save()
+
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
@@ -113,8 +118,12 @@ def medic_help(request):
             type_text = ""
             if(answer["need_prescription"]):
                 type_text = "\nתרופת מרשם"
+
+            areasGot = Area.objects.filter(name__in=answer["area"])
             new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
                                       address = answer["address"], notes = answer["notes"], type = "MEDICI", type_text = type_text + answer["medic_name"])
+            new_request.save()
+            new_request.areas.set(areasGot)
             new_request.save()
 
             # process the data in form.cleaned_data as required
@@ -137,8 +146,11 @@ def other_help(request):
         # check whether it's valid:
         if form.is_valid():
             answer = form.cleaned_data
+            areasGot = Area.objects.filter(name__in=answer["area"])
             new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
                                       address = answer["address"], notes = answer["notes"], type = "OTHER", type_text = answer["other_need"])
+            new_request.save()
+            new_request.areas.set(areasGot)
             new_request.save()
             return HttpResponseRedirect('/client/thanks')
 
@@ -157,8 +169,11 @@ def home_help(request):
         # check whether it's valid:
         if form.is_valid():
             answer = form.cleaned_data
+            areasGot = Area.objects.filter(name__in=answer["area"])
             new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
                                       address = answer["address"], notes = answer["notes"], type = "HOME_HEL", type_text = answer["need_text"])
+            new_request.save()
+            new_request.areas.set(areasGot)
             new_request.save()
 
             # process the data in form.cleaned_data as required
@@ -181,8 +196,12 @@ def travel_help(request):
         # check whether it's valid:
         if form.is_valid():
             answer = form.cleaned_data
+            areasGot = Area.objects.filter(name__in=answer["area"])
+
             new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
                                       address = answer["address"], notes = answer["notes"], type = "TRAVEL", type_text = answer["travel_need"])
+            new_request.save()
+            new_request.areas.set(areasGot)
             new_request.save()
 
             # process the data in form.cleaned_data as required
@@ -205,10 +224,13 @@ def phone_help(request):
         # check whether it's valid:
         if form.is_valid():
             answer = form.cleaned_data
-            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
-                                      address = answer["address"], notes = answer["notes"], type = "PHONE_HEL", type_text = "")
-            new_request.save()
+            areasGot = Area.objects.filter(name__in=answer["area"])
 
+            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
+                                      address = answer["address"], notes = answer["notes"], type = "PHONE_HEL", type_text = answer["workplace_name"] + answer["workplace_need"])
+            new_request.save()
+            new_request.areas.set(areasGot)
+            new_request.save()
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
@@ -219,6 +241,34 @@ def phone_help(request):
         form = BaseHelpForm()
 
     return render(request, 'help_pages/phone.html', {'form': form})
+
+
+def workers_help(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = WorkersForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            answer = form.cleaned_data
+            areasGot = Area.objects.filter(name__in=answer["area"])
+
+            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
+                                      address = answer["address"], notes = answer["notes"], type = "WORKERS_HELP", type_text = "")
+            new_request.save()
+            new_request.areas.set(areasGot)
+            new_request.save()
+
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:y
+            return HttpResponseRedirect('/client/thanks')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = WorkersForm()
+
+    return render(request, 'help_pages/workers.html', {'form': form})
 
 def helper_help(pk, fullName):
     return HelpRequest.objects.get(pk = pk, full_name = fullName)

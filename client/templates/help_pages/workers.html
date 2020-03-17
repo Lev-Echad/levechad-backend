@@ -1,0 +1,13 @@
+{% extends "template.html" %}
+{% load bootstrap %}
+
+{% block title %}לב אחד - סיוע לעובדים חיוניים{% endblock %}
+
+
+{% block body %}
+<form action="/client/help/workers" method="post">
+    {% csrf_token %}
+    {{ form|bootstrap }}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}
