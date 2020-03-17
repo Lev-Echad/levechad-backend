@@ -80,9 +80,6 @@ def show_all_volunteers(request):
         availability_qs = qs.filter(**{filter:3})
 
 
-    availability_qs = availability_qs.filter(schedule__end_date__gte=now.date())
-
-
     availability_now_id = []
     if availability_qs != []:
         for volu in availability_qs:
@@ -292,7 +289,6 @@ def find_closes_persons(request, pk):
         availability_qs = closes_volunteer.filter(**{filter: 3})
 
     # check for the persons that good timing if the day is good
-    availability_qs = availability_qs.filter(schedule__end_date__gte=now.date())
 
     availability_now_id = []
     if availability_qs != []:
