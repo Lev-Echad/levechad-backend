@@ -50,6 +50,11 @@
                        href="https://www.paypal.com/donate/?token=ldb3bnZ8Bd_MAn_i4z3GFLRAp78s_pvqGWDGxkps5yntvGr9xEf15Au9szALvFs5uFwhyW&country.x=GB&locale.x=GB">לתרומות</a>
                 </li>
             </ul>
+            <ul class="navbar-nav mr-auto left">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout'%}">{{ user.username }}: התנתק</a>
+                </li>
+            </ul>
         </div>
     </nav>
 </div>

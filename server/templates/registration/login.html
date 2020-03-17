@@ -1,0 +1,34 @@
+{% extends "server/template.html" %}
+
+{% block body %}
+
+  {% if form.errors %}
+    <p>שם משתמש או סיסמה שגויים. נסה שוב</p>
+  {% endif %}
+
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>Your account doesn't have access to this page. To proceed,
+      please login with an account that has access.</p>
+    {% else %}
+      <p>התחבר כדי לראות דף זה.</p>
+    {% endif %}
+  {% endif %}
+
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <table>
+      <tr>
+        <td>שם משתמש:</td>
+        <td>{{ form.username }}</td>
+      </tr>
+      <tr>
+        <td>סיסמה:</td>
+        <td>{{ form.password }}</td>
+      </tr>
+    </table>
+    <input type="submit" value="התחבר" />
+    <input type="hidden" name="next" value="{{ next }}" />
+  </form>
+
+{% endblock %}

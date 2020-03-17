@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest
 from django.db.models import F
 from django.core.paginator import Paginator
@@ -16,6 +17,7 @@ def is_time_between(begin_time, end_time, check_time=None):
         return check_time >= begin_time or check_time <= end_time
 
 
+@login_required
 def index(request):
     context = {}
     return render(request, 'server/server_index.html', context)
@@ -23,6 +25,7 @@ def index(request):
 """
 also filters by filter
 """
+@login_required
 def show_all_volunteers(request, page = 1):
     qs = Volunteer.objects.all()
 
@@ -134,6 +137,7 @@ def show_all_volunteers(request, page = 1):
 """
 also filters by filter
 """
+@login_required
 def show_all_help_request(request, page = 1):
     qs = HelpRequest.objects.all()
 
@@ -178,6 +182,7 @@ def show_all_help_request(request, page = 1):
 """
 also filters by filter
 """
+@login_required
 def order_help_request(request):
     qs = HelpRequest.objects.all()
     statuses = request.POST.getlist('status')
@@ -204,7 +209,7 @@ def order_help_request(request):
     return render(request, 'server/help_table.html', context)
 
 
-
+@login_required
 def help_edit_stat(request, pk):
     # get user objects
     to_edit = HelpRequest.objects.get(id=pk)
@@ -234,7 +239,7 @@ def help_edit_stat(request, pk):
 
 
 
-
+@login_required
 def volunteer_edit_notes(request, pk):
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('notes') is not None:
@@ -244,7 +249,7 @@ def volunteer_edit_notes(request, pk):
 
 
 
-
+@login_required
 def find_closes_persons(request, pk):
     request_person = HelpRequest.objects.get(id=pk)
 
