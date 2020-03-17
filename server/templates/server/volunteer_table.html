@@ -23,11 +23,12 @@
             <th scope="col">כתובת</th>
             <th scope="col">דרכי התניידות</th>
             <th scope="col">האם זמין עכשיו?</th>
+            <th scope="col">מספר הפעמים שעזר</th>
             <th scope="col">ערוך הערות</th>
         </tr>
     </thead>
     <tbody>
-        {% for volunteer in volunteer_data %}
+        {% for volunteer, num_of_appers in volunteer_data %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
@@ -55,6 +56,7 @@
                         לא פנוי
                     {% endif %}
                 </td>
+                <td>{{ num_of_appers }}</td>
                 <td>
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#edit_volu{{ volunteer.id }}">ערוך</a>
                 </td>

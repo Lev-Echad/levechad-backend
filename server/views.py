@@ -118,7 +118,20 @@ def show_all_volunteers(request):
         field = request.POST.get('field')
         match_qs = match_qs.order_by(field)
 
-    context = {'volunteer_data': match_qs, 'availability_now_id': availability_now_id}
+
+
+    #----- check for each volunterr how much times he apper
+    appers_list = []
+    for volu in match_qs:
+        appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
+
+    # make match qs to tuple
+    final_data = []
+    for i in range (0, len(match_qs)):
+        final_data.append((match_qs[i], appers_list[i]))
+
+
+    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id}
     return render(request, 'server/volunteer_table.html', context)
 
 """
@@ -206,6 +219,17 @@ def help_edit_stat(request, pk):
 
     if request.POST.get('notes') is not None:
         to_edit.notes = request.POST.get('notes')
+
+    if request.POST.get('volunteer_id') is not None:
+        volunteer_id = request.POST.get('volunteer_id')
+
+        # check if this volunteer exist
+        try:
+            volunteer_to_add = Volunteer.objects.get(id=volunteer_id)
+            to_edit.helping_volunteer = volunteer_to_add
+        except:
+            pass
+
 
     to_edit.save()
     return redirect('show_all_help_request')

@@ -22,6 +22,7 @@
             <th scope="col">פירוט</th>
             <th scope="col">סטאטוס</th>
             <th scope="col">ערך בפעם האחרונה</th>
+            <th scope="col">המתנדב שטיפל</th>
             <th scope="col">בצע פעולות</th>
         </tr>
     </thead>
@@ -53,6 +54,11 @@
                 <td>{{ help_request.type_text }}</td>
                 <td>{{ help_request.get_status_display }}</td>
                 <td>{{ help_request.status_updater }}</td>
+                {% if help_request.helping_volunteer %}
+                    <td>{{ help_request.helping_volunteer.full_name }} - {{ help_request.helping_volunteer.id }}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
                 <td width="40%">
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#change_status{{ help_request.id }}">ערוך</a>
                     <a href="{% url 'find_closes_persons' help_request.id %}" class="btn btn-outline-dark waves-effect m-2">  מצא התאמה</a>
@@ -105,21 +111,22 @@
                                 </div>
 
                                   <div class="right">
-                                    <h5><u>שינוי זהות</u></h5>
-
-
                                     <div>
-                                        <label for="user_name">שם משנה הבקשה </label>
+                                        <label for="user_name">נציג חמל</label>
                                         <input type="text" name="user_name" id="user_name" value='{{ help_request.status_updater }}'>
                                     </div>
                                 </div>
 
-                              <div class="right">
-                                    <h5><u>שינוי הערות חמל</u></h5>
-
-
+                                  <div class="right">
                                     <div>
-                                        <label for="notes">הערה:</label>
+                                        <label for="volunteer_id">הקוד של המתנדב</label>
+                                        <input type="number" name="volunteer_id" id="volunteer_id" value='{{ help_request.helping_volunteer.id }}'>
+                                    </div>
+                                </div>
+
+                              <div class="right">
+                                    <div>
+                                        <label for="notes">הערות:</label>
                                         <input type="text" name="notes" id="notes" value='{{ help_request.notes }}'>
                                     </div>
                                 </div>
