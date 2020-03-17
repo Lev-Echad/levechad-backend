@@ -89,13 +89,13 @@ class ScheduleForm(forms.Form):
         ("2", 'צהריים'),
         ("3", 'ערב')
     )
-    sunday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
-    monday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
-    tuesday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
-    wednesday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
-    thursday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
-    friday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
-    saturday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
+    sunday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple(), required=False)
+    monday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple(), required=False)
+    tuesday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple(), required=False)
+    wednesday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple(), required=False)
+    thursday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple(), required=False)
+    friday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple(), required=False)
+    saturday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple(), required=False)
     end_date = forms.DateField(widget=forms.SelectDateWidget())
 
     def __init__(self, *args, **kwargs):
@@ -128,7 +128,7 @@ class BaseHelpForm(forms.Form):
     phone_number = forms.CharField(max_length=200)
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=200)
-    notes = forms.CharField(max_length=200)
+    notes = forms.CharField(max_length=200, required=False)
     #type = forms.ChoiceField(choices=TYPES)
     #type_text = forms.CharField(max_length=5000)
 
