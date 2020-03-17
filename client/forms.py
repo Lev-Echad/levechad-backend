@@ -1,6 +1,8 @@
 from django import forms
 import json
 
+from client.models import Language
+
 FIELD_NAME_MAPPING = {
 }
 
@@ -18,9 +20,10 @@ json_file = open('./client/city.json', encoding="utf-8")
 data = json.load(json_file)
 onlyNames = [a["name"] for a in data]
 onlyNames.sort()
-CITIES = tuple({i: onlyNames[i] for i in range(0, len(onlyNames))}.items())
+CITIES = [(str(x),str(x)) for x in onlyNames]
 json_file.close()
 
+LANG_CHOICES = [(str(x),str(x)) for x in Language.objects.all()]
 # class NameForm(forms.Form):
 #     your_name = forms.CharField(label='Your name', max_length=100)
 
@@ -33,12 +36,7 @@ json_file.close()
 class VolunteerForm(forms.Form):
 
 
-    LANG_CHOICES = (
-        ("1", "ערבית"),
-        ("2", "רוסית"),
-        ("3", "צרפתית"),
-        ("4", "אנגלית"),
-    )
+
 
     MOVING_WAYS = (
         ("CAR", "רכב"),
@@ -87,18 +85,18 @@ class VolunteerForm(forms.Form):
 
 class ScheduleForm(forms.Form):
     TIMES = (
-        ("MORNING", "בוקר"),
-        ("NOON", 'צהריים'),
-        ("EVENING", 'ערב')
+        ("1", "בוקר"),
+        ("2", 'צהריים'),
+        ("3", 'ערב')
     )
-    sunday = forms.MultipleChoiceField(choices=TIMES)
-    monday = forms.MultipleChoiceField(choices=TIMES)
-    tuesday = forms.MultipleChoiceField(choices=TIMES)
-    wednesday = forms.MultipleChoiceField(choices=TIMES)
-    thursday = forms.MultipleChoiceField(choices=TIMES)
-    friday = forms.MultipleChoiceField(choices=TIMES)
-    saturday = forms.MultipleChoiceField(choices=TIMES)
-    end_date = forms.DateField()
+    sunday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
+    monday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
+    tuesday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
+    wednesday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
+    thursday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
+    friday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
+    saturday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple())
+    end_date = forms.DateField(widget=forms.SelectDateWidget())
 
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
@@ -110,9 +108,6 @@ class ScheduleForm(forms.Form):
         self.fields['friday'].label = "שישי"
         self.fields['saturday'].label = "שבת"
         self.fields['end_date'].label = "תאריך סיום"
-        self.fields['age'].label = "גיל"
-        self.fields['transportation'].label = "דרכי התניידות"
-        self.fields['hearing_way'].label = "איך שמעת עלינו"
 
 
 
@@ -149,7 +144,7 @@ class HomeForm(BaseHelpForm):
     need_text = forms.CharField(max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(forms.Form, self).__init__(*args, **kwargs)
+        super(BaseHelpForm, self).__init__(*args, **kwargs)
         self.fields['need_text'].label = "מהי העזרה שאתה צריך"
 
 
@@ -158,7 +153,7 @@ class MedicForm(BaseHelpForm):
     medic_name = forms.CharField(max_length=200)
 
     def __init__(self, *args, **kwargs):
-        super(forms.Form, self).__init__(*args, **kwargs)
+        super(BaseHelpForm, self).__init__(*args, **kwargs)
         self.fields['need_prescription'].label = "האם מדובר בתרופת מרשם"
         self.fields['medic_name'].label = "שם תרופה"
 
@@ -167,14 +162,14 @@ class OtherForm(BaseHelpForm):
     other_need = forms.CharField(max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(forms.Form, self).__init__(*args, **kwargs)
+        super(BaseHelpForm, self).__init__(*args, **kwargs)
         self.fields['other_need'].label = "פרט לאיזו עזרה אתה זקוק"
 
 
 class ShoppingForm(BaseHelpForm):
     to_buy = forms.CharField(max_length=5000, widget=forms.Textarea)
     def __init__(self, *args, **kwargs):
-        super(forms.Form, self).__init__(*args, **kwargs)
+        super(BaseHelpForm, self).__init__(*args, **kwargs)
         self.fields['to_buy'].label = "הכנס את רשימת הקניות שלך"
 
 
@@ -183,6 +178,6 @@ class ShoppingForm(BaseHelpForm):
 class TravelForm(BaseHelpForm):
     travel_need = forms.CharField(max_length=5000)
     def __init__(self, *args, **kwargs):
-        super(forms.Form, self).__init__(*args, **kwargs)
+        super(BaseHelpForm, self).__init__(*args, **kwargs)
         self.fields['travel_need'].label = "'פרט את מסלול הנסיעה הנדרש"
 
