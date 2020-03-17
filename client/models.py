@@ -105,3 +105,4 @@ class HelpRequest(Timestampable):
     type_text = models.CharField(max_length=5000)
     status = models.CharField(max_length=25, choices=STATUSES, blank=True)
     status_updater = models.CharField(max_length=100, blank=True)
+    helping_volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, null=True)
