@@ -52,7 +52,7 @@ class VolunteerForm(forms.Form):
     full_name = forms.CharField(max_length=200)
     age = forms.IntegerField()
     area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
-    languages = forms.MultipleChoiceField(choices = get_the_lang_choices(), widget=forms.CheckboxSelectMultiple())
+    languages = forms.MultipleChoiceField(choices = get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=200)
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=200)
