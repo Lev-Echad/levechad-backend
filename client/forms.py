@@ -49,12 +49,12 @@ class VolunteerForm(forms.Form):
     )
 
     my_validator = RegexValidator(r"^\d+$")
-
     full_name = forms.CharField(max_length=200)
-    tz_number = forms.CharField(max_length=9, validators=[my_validator])
+    identity = forms.CharField(max_length=9, validators=[my_validator])
     age = forms.IntegerField()
     area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
     languages = forms.MultipleChoiceField(choices = get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
+    childrens = forms.BooleanField(required=False)
     phone_number = forms.CharField(max_length=200)
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=200)
@@ -68,7 +68,7 @@ class VolunteerForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
         self.fields['full_name'].label = "שם מלא"
-        self.fields['tz_number'].label = "מס. תעודת זהות"
+        self.fields['identity'].label = "מספר ת.ז"
         self.fields['area'].label = "איזור"
         self.fields['languages'].label = "שפות שאתה דובר"
         self.fields['phone_number'].label = "מספר פלאפון"
@@ -80,7 +80,8 @@ class VolunteerForm(forms.Form):
         self.fields['transportation'].label = "דרכי התניידות"
         self.fields['hearing_way'].label = "איך שמעת עלינו"
         self.fields['want_guide'].label = "אני מעוניין\נת בהתנדבות בהדרכה במשפחתונים (מינימום 3 ימים)"
-        self.fields['no_corona'].label = "אני מאשר\ת כי לא שהיתי במקום שהוגדר כבעל סיכון להידבקות על פי משרד הבריאות וכי לא הייתי ליד נשא\בעל תסמינים בתקופה האחרונה"
+        self.fields['no_corona'].label = "אני מאשר\ת כי לא שהיתי במקום שהוגדר כבעל סיכון להידבקות על פי משרד הבריאות וכי לא הייתי ליד נשא\בעל תסמינים ב-14 יום האחרונים"
+        self.fields['childrens'].label = "אני מעוניין\נת להפעיל ילדי עובדים חיוניים (מינימום 3 ימים)"
 
 
 class ScheduleForm(forms.Form):
@@ -179,7 +180,7 @@ class OtherForm(BaseHelpForm):
         self.fields['city'].label = "עיר מגורים"
         self.fields['address'].label = "כתובת מגורים"
         self.fields['notes'].label = "הערות"
-        self.fields['other_need'].label = "פרט לאיזו עזרה אתה זקוק"
+        self.fields['other_need'].label = "פרט לאיזו עזרה אתה זקוק" + "\n" + "(הארגון אינו תומך בסיוע כלכלי,נוכל להפנות לגורמים הרלוונטיים)"
 
 
 class ShoppingForm(BaseHelpForm):
