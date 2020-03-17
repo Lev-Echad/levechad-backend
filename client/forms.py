@@ -145,6 +145,11 @@ class HomeForm(BaseHelpForm):
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
+        self.fields['full_name'].label = "שם מלא"
+        self.fields['phone_number'].label = "מספר פלאפון"
+        self.fields['city'].label = "עיר מגורים"
+        self.fields['address'].label = "כתובת מגורים"
+        self.fields['notes'].label = "הערות"
         self.fields['need_text'].label = "מהי העזרה שאתה צריך"
 
 
@@ -154,6 +159,11 @@ class MedicForm(BaseHelpForm):
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
+        self.fields['full_name'].label = "שם מלא"
+        self.fields['phone_number'].label = "מספר פלאפון"
+        self.fields['city'].label = "עיר מגורים"
+        self.fields['address'].label = "כתובת מגורים"
+        self.fields['notes'].label = "הערות"
         self.fields['need_prescription'].label = "האם מדובר בתרופת מרשם"
         self.fields['medic_name'].label = "שם תרופה"
 
@@ -163,6 +173,11 @@ class OtherForm(BaseHelpForm):
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
+        self.fields['full_name'].label = "שם מלא"
+        self.fields['phone_number'].label = "מספר פלאפון"
+        self.fields['city'].label = "עיר מגורים"
+        self.fields['address'].label = "כתובת מגורים"
+        self.fields['notes'].label = "הערות"
         self.fields['other_need'].label = "פרט לאיזו עזרה אתה זקוק"
 
 
@@ -170,6 +185,11 @@ class ShoppingForm(BaseHelpForm):
     to_buy = forms.CharField(max_length=5000, widget=forms.Textarea)
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
+        self.fields['full_name'].label = "שם מלא"
+        self.fields['phone_number'].label = "מספר פלאפון"
+        self.fields['city'].label = "עיר מגורים"
+        self.fields['address'].label = "כתובת מגורים"
+        self.fields['notes'].label = "הערות"
         self.fields['to_buy'].label = "הכנס את רשימת הקניות שלך"
 
 
@@ -179,5 +199,10 @@ class TravelForm(BaseHelpForm):
     travel_need = forms.CharField(max_length=5000)
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
+        self.fields['full_name'].label = "שם מלא"
+        self.fields['phone_number'].label = "מספר פלאפון"
+        self.fields['city'].label = "עיר מגורים"
+        self.fields['address'].label = "כתובת מגורים"
+        self.fields['notes'].label = "הערות"
         self.fields['travel_need'].label = "'פרט את מסלול הנסיעה הנדרש"
 
