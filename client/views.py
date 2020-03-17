@@ -21,7 +21,7 @@ def get_help(request):
     return render(request, 'get_help.html', {})
 
 
-def send_help(request):
+def volunteer(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         form = VolunteerForm(request.POST)
@@ -48,7 +48,7 @@ def send_help(request):
     else:
         form = VolunteerForm()
 
-    return render(request, 'send_help.html', {'form': form})
+    return render(request, 'volunteer.html', {'form': form})
 
 
 def schedule(request):
