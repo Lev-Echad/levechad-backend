@@ -1,6 +1,6 @@
 from django import forms
 import json
-
+from django.core.validators import RegexValidator
 from client.models import Language
 
 FIELD_NAME_MAPPING = {
@@ -22,8 +22,6 @@ onlyNames = [a["name"] for a in data]
 onlyNames.sort()
 CITIES = [(str(x),str(x)) for x in onlyNames]
 json_file.close()
-
-LANG_CHOICES = [(str(x),str(x)) for x in Language.objects.all()]
 # class NameForm(forms.Form):
 #     your_name = forms.CharField(label='Your name', max_length=100)
 
@@ -33,11 +31,10 @@ LANG_CHOICES = [(str(x),str(x)) for x in Language.objects.all()]
 # SEND HELP FORM
 # -------------------------------------------------------------------------------------------------------
 
+def get_the_lang_choices():
+    return  [(str(x),str(x)) for x in Language.objects.all()]
+
 class VolunteerForm(forms.Form):
-
-
-
-
     MOVING_WAYS = (
         ("CAR", "רכב"),
         ("PUBL", 'תחב"צ'),
@@ -55,14 +52,14 @@ class VolunteerForm(forms.Form):
     full_name = forms.CharField(max_length=200)
     age = forms.IntegerField()
     area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
-    languages = forms.MultipleChoiceField(choices = LANG_CHOICES, widget=forms.CheckboxSelectMultiple())
+    languages = forms.MultipleChoiceField(choices = get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=200)
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=200)
     available_on_saturday = forms.BooleanField(required=False)
     notes = forms.CharField(max_length=200)
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
-    hearing_way = forms.MultipleChoiceField(choices=HEARING_WAYS, widget=forms.CheckboxSelectMultiple())
+    hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
     want_guide = forms.BooleanField(required=False)
     no_corona = forms.BooleanField()
 
@@ -124,8 +121,9 @@ class BaseHelpForm(forms.Form):
         ('OTHER', 'אחר')
     )"""
 
+    my_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
     full_name = forms.CharField(max_length=200)
-    phone_number = forms.CharField(max_length=200)
+    phone_number = forms.CharField(max_length=200, required=True, validators=[my_validator])
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=200)
     notes = forms.CharField(max_length=200, required=False)
@@ -205,4 +203,3 @@ class TravelForm(BaseHelpForm):
         self.fields['address'].label = "כתובת מגורים"
         self.fields['notes'].label = "הערות"
         self.fields['travel_need'].label = "'פרט את מסלול הנסיעה הנדרש"
-
