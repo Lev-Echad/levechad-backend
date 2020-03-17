@@ -1,6 +1,6 @@
 from django import forms
 import json
-
+from django.core.validators import RegexValidator
 from client.models import Language
 
 FIELD_NAME_MAPPING = {
@@ -122,8 +122,9 @@ class BaseHelpForm(forms.Form):
         ('OTHER', 'אחר')
     )"""
 
+    my_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
     full_name = forms.CharField(max_length=200)
-    phone_number = forms.CharField(max_length=200)
+    phone_number = forms.CharField(max_length=200, required=True, validators=[my_validator])
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=200)
     notes = forms.CharField(max_length=200)
