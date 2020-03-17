@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from client.models import Volunteer, HelpRequest, Area
+from client.models import Volunteer, HelpRequest
 from django.db.models import F
 import datetime
 from datetime import  time
@@ -82,15 +82,9 @@ def show_all_volunteers(request):
         availability_qs = qs.filter(**{filter:3})
 
 
+    availability_qs = availability_qs.filter(schedule__end_date__gte=now.date())
 
-    # check for the persons that good timing if the day is good
-    good_also_date = []
 
-    for volunnter in availability_qs:
-        if now.date() <= volunnter.schedule.end_date:
-            good_also_date.append(volunnter)
-
-    availability_qs = good_also_date
     availability_now_id = []
     if availability_qs != []:
         for volu in availability_qs:
@@ -110,7 +104,9 @@ def show_all_volunteers(request):
     if len(match_qs) == 0 and (not something_mark):
         match_qs = Volunteer.objects.all()
 
-
+    print("sfgsdfgsdfgsdfg", match_qs)
+    availability_qs = (availability_qs)
+    print("sfgsdfgsdsdfaEFEAEFAEFfgsdfg", availability_qs)
     match_qs = match_qs.intersection(availability_qs)
 
 
@@ -262,13 +258,8 @@ def find_closes_persons(request, pk):
         availability_qs = closes_volunteer.filter(**{filter: 3})
 
     # check for the persons that good timing if the day is good
-    good_also_date = []
+    availability_qs = availability_qs.filter(schedule__end_date__gte=now.date())
 
-    for volunnter in availability_qs:
-        if now.date() <= volunnter.schedule.end_date:
-            good_also_date.append(volunnter)
-
-    availability_qs = good_also_date
     availability_now_id = []
     if availability_qs != []:
         for volu in availability_qs:
