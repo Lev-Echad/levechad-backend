@@ -103,6 +103,10 @@ input[type=submit] {
     background-color: rgba(255, 0, 0, 0.15);
 }
 
+.list-group-item:hover {
+    background-color: rgba(255, 0, 0, 0.40);
+}
+
 .scroll {
     max-height: calc(80vh - 40px);
     overflow-y: auto;

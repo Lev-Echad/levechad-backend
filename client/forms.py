@@ -141,7 +141,7 @@ class BaseHelpForm(forms.Form):
         self.fields['notes'].label = "הערות"
 
 class HomeForm(BaseHelpForm):
-    need_text = forms.CharField(max_length=5000)
+    need_text = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
@@ -155,7 +155,7 @@ class HomeForm(BaseHelpForm):
 
 class MedicForm(BaseHelpForm):
     need_prescription = forms.BooleanField(required=False)
-    medic_name = forms.CharField(max_length=200)
+    medic_name = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
@@ -169,7 +169,7 @@ class MedicForm(BaseHelpForm):
 
 
 class OtherForm(BaseHelpForm):
-    other_need = forms.CharField(max_length=5000)
+    other_need = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
@@ -183,6 +183,7 @@ class OtherForm(BaseHelpForm):
 
 class ShoppingForm(BaseHelpForm):
     to_buy = forms.CharField(max_length=5000, widget=forms.Textarea)
+
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
         self.fields['full_name'].label = "שם מלא"
@@ -193,10 +194,9 @@ class ShoppingForm(BaseHelpForm):
         self.fields['to_buy'].label = "הכנס את רשימת הקניות שלך"
 
 
-
-
 class TravelForm(BaseHelpForm):
-    travel_need = forms.CharField(max_length=5000)
+    travel_need = forms.CharField(widget=forms.Textarea, max_length=5000)
+
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
         self.fields['full_name'].label = "שם מלא"
