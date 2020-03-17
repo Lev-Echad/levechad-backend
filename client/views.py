@@ -29,12 +29,12 @@ def volunteer(request):
             answer = form.cleaned_data
             languagesGot = Language.objects.filter(name__in=answer["languages"])
             areasGot = Area.objects.filter(name__in=answer["area"])
-            volunter_new = Volunteer(tz_number=answer["tz_number"], full_name=answer["full_name"], age=answer["age"],
+            volunter_new = Volunteer(tz_number = answer["identity"], full_name=answer["full_name"], age=answer["age"],
                                      phone_number=answer["phone_number"],
                                      city=City.objects.get(name=answer["city"]), address=answer["address"],
                                      available_saturday=answer["available_on_saturday"],
                                      notes=answer["notes"], moving_way=answer["transportation"],
-                                     hearing_way=answer["hearing_way"], guiding=answer["want_guide"])
+                                     hearing_way=answer["hearing_way"], guiding=answer["want_guide"], keep_mandatory_worker_children = answer["childrens"])
             volunter_new.save()
             volunter_new.languages.set(languagesGot)
             volunter_new.areas.set(areasGot)
