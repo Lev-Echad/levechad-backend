@@ -153,12 +153,13 @@ def show_all_help_request(request, page = 1):
 
     statuses = request.POST.getlist('status')
     type = request.POST.getlist('type')
-
+    areas = request.GET.getlist('area')
 
     something_mark = False
 
     status_qs =HelpRequest.objects.none()
     type_qs = HelpRequest.objects.none()
+    area_qs = HelpRequest.objects.all().none()
 
     if len(statuses) != 0 and not '' in statuses:
         something_mark = True
@@ -168,8 +169,12 @@ def show_all_help_request(request, page = 1):
         something_mark = True
         type_qs = qs.filter(type__in=type)
 
+    if len(areas) != 0 and not '' in areas:
+        something_mark = True
+        area_qs = area_qs.filter(areas__name__in=areas)
+
     # union matchings from both categoties
-    match_qs = status_qs.union(type_qs)
+    match_qs = status_qs.union(type_qs, area_qs)
 
     # if there were no matches display all
     if len(match_qs) == 0 and (not something_mark):
