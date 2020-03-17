@@ -70,6 +70,7 @@ class Volunteer(Timestampable):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=200)
     available_saturday = models.BooleanField()
+    keep_mandatory_worker_children = models.BooleanField(default=False)
     guiding = models.BooleanField()
     notes = models.CharField(max_length=5000)
     moving_way = models.CharField(max_length=20, choices=MOVING_WAYS)
