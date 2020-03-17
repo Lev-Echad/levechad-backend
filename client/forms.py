@@ -80,7 +80,7 @@ class VolunteerForm(forms.Form):
         self.fields['transportation'].label = "דרכי התניידות"
         self.fields['hearing_way'].label = "איך שמעת עלינו"
         self.fields['want_guide'].label = "אני מעוניין\נת בהתנדבות בהדרכה במשפחתונים (מינימום 3 ימים)"
-        self.fields['no_corona'].label = "אני מאשר\ת כי לא שהיתי במקום שהוגדר כבעל סיכון להידבקות על פי משרד הבריאות וכי לא הייתי ליד נשא\בעל תסמינים ב-14 יום האחרונים"
+        self.fields['no_corona'].label = "אני מאשר כי אינני צריך\ה להמצא בבידוד, כי אינני בקבוצת סיכון וכי אין לי תסמינים של חום ו\או מחלה נשימתית."
         self.fields['childrens'].label = "אני מעוניין\נת להפעיל ילדי עובדים חיוניים (מינימום 3 ימים)"
 
 
