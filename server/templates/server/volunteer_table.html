@@ -1,4 +1,4 @@
-{% extends "template.html" %}
+{% extends "server/template.html" %}
 {% load bootstrap %}
 {% load static %}
 
@@ -20,7 +20,7 @@
             <th scope="col">עיר</th>
             <th scope="col">כתובת</th>
             <th scope="col">דרכי התניידות</th>
-
+            <th scope="col">האם זמין עכשיו?</th>
         </tr>
     </thead>
     <tbody>
@@ -29,17 +29,27 @@
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
                 <td>{{ volunteer.age }}</td>
-                <td>{{ volunteer.get_area_display }}</td>
+                <td>
+                    {% for area in volunteer.areas.all %}
+                        {{ area }},
+                    {% endfor %}
+                </td>
                 <td>
                     {% for lanu in volunteer.languages.all %}
-                        {{ lanu.name }}
+                        {{ lanu.name }},
                     {% endfor %}
                 </td>
                 <td>{{ volunteer.phone_number }}</td>
                 <td>{{ volunteer.city }}</td>
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
-
+                <td>
+                    {% if volunteer.id in availability_now_id %}
+                        פנוי
+                    {% else %}
+                        לא פנוי
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
     </tbody>
@@ -60,66 +70,89 @@
 
 {#                               increas?#}
                                 <div>
-                                    <p class="text-right h5"><u>בחר אזורים להצגה</u></p>
+                                    <p class="h5"><u>בחר אזורים להצגה</u></p>
 
 
                                     <div>
+                                        <label for="area">הכל</label>
+                                        <input type="checkbox" name="area" id="area" value=>
+                                    </div>
+                                    <div>
                                         <label for="area">צפון</label>
-                                        <input type="checkbox" name="area" id="area" value='TZAF'>
+                                        <input type="checkbox" name="area" id="area" value='צפון'>
                                     </div>
 
                                     <div>
                                         <label for="area">ירושלים והסביבה</label>
-                                        <input type="checkbox" name="area" id="area" value='JERU'>
+                                        <input type="checkbox" name="area" id="area" value='ירושלים והסביבה'>
                                     </div>
 
                                     <div>
                                         <label for="area">מרכז</label>
-                                        <input type="checkbox" name="area" id="area" value='MERK'>
+                                        <input type="checkbox" name="area" id="area" value='מרכז'>
                                     </div>
 
                                     <div>
                                         <label for="area">יהודה ושומרון</label>
-                                        <input type="checkbox" name="area" id="area" value='YEHU'>
+                                        <input type="checkbox" name="area" id="area" value='יהודה ושומרון'>
                                     </div>
                                     <div>
                                         <label for="area">דרום</label>
-                                        <input type="checkbox" name="area" id="area" value='DARO'>
+                                        <input type="checkbox" name="area" id="area" value='דרום'>
                                     </div>
 
                                 </div>
                                   <div>
-                                    <div>
-                                        <p class="text-right h5"><u>בחר שפה</u></p>
+
+                                        <p class="h5"><u>בחר שפה</u></p>
+                                      <div>
                                         <label for="language">עברית</label>
-                                        <input type="checkbox" name="language" id="language" value='HEBREW'>
+                                        <input type="checkbox" name="language" id="language" value='עברית'>
                                     </div>
+
 
                                     <div>
                                         <label for="language">אנגלית</label>
-                                        <input type="checkbox" name="language" id="language" value='ENGLISH'>
+                                        <input type="checkbox" name="language" id="language" value='אנגלית'>
                                     </div>
 
                                     <div>
                                         <label for="language">רוסית</label>
-                                        <input type="checkbox" name="language" id="language" value='RUSSIA'>
+                                        <input type="checkbox" name="language" id="language" value='רוסית'>
                                     </div>
 
                                     <div>
                                         <label for="language">צרפתית</label>
-                                        <input type="checkbox" name="language" id="language" value='FRANCE'>
+                                        <input type="checkbox" name="language" id="language" value='צרפתית'>
                                     </div>
 
                                     <div>
                                         <label for="language">ערבית</label>
-                                        <input type="checkbox" name="language" id="language" value='ARAB'>
+                                        <input type="checkbox" name="language" id="language" value='ערבית'>
                                     </div>
 
                                     <div>
                                         <label for="language">אחר</label>
-                                        <input type="checkbox" name="language" id="language" value='ELSE'>
+                                        <input type="checkbox" name="language" id="language" value='אחר'>
                                     </div>
                                 </div>
+
+
+                                <div>
+                                    <p class="h5"><u>בחר את השדה שאתה מעוניין למיין לפיו</u></p>
+                                </div>
+                                    <div>
+                                        <label for="field">אזור</label>
+                                        <input type="radio" name="field" id="field" value='areas'>
+                                    </div>
+                                    <div>
+                                        <label for="field">שפות</label>
+                                        <input type="radio" name="field" id="field" value='languages'>
+                                    </div>
+                                    <div>
+                                        <label for="field">דרכי התניידות</label>
+                                        <input type="radio" name="field" id="field" value='moving_way'>
+                                    </div>
 
                                 <div>
                                     <p class="h5"><u>זמינות</u></p>

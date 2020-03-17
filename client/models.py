@@ -37,14 +37,14 @@ class City(models.Model):
 
 
 class VolunteerSchedule(Timestampable):
-    end_date = models.DateField(blank=True)
-    sunday = models.CharField(max_length=3)
-    monday = models.CharField(max_length=3)
-    tuesday = models.CharField(max_length=3)
-    wednesday = models.CharField(max_length=3)
-    thursday = models.CharField(max_length=3)
-    friday = models.CharField(max_length=3)
-    saturday = models.CharField(max_length=3)
+    end_date = models.DateField(null=True)
+    Sunday = models.CharField(max_length=3)
+    Monday = models.CharField(max_length=3)
+    Tuesday = models.CharField(max_length=3)
+    Wednesday = models.CharField(max_length=3)
+    Thursday = models.CharField(max_length=3)
+    Friday = models.CharField(max_length=3)
+    Saturday = models.CharField(max_length=3)
 
 
 class Volunteer(Timestampable):
@@ -69,6 +69,7 @@ class Volunteer(Timestampable):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=200)
     available_saturday = models.BooleanField()
+    guiding = models.BooleanField()
     notes = models.CharField(max_length=200)
     moving_way = models.CharField(max_length=20, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=20, choices=HEARING_WAYS)

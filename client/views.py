@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from .forms import *
-from .models import Volunteer, City, Language, VolunteerSchedule, HelpRequest
+from .models import Volunteer, City, Language, VolunteerSchedule, HelpRequest, Area
 
 
 
@@ -138,19 +138,23 @@ def send_help(request):
         form = VolunteerForm(request.POST)
         if form.is_valid():
             answer = form.cleaned_data
-            volunter_new = Volunteer(full_name=answer["full_name"], age=answer["age"], area=answer["area"],
-                                     languages=Language.objects.get(name=answer["languages"]),
+            languagesGot = Language.objects.filter(name__in=answer["languages"])
+            areasGot = Area.objects.filter(name__in=answer["area"])
+            volunter_new = Volunteer(full_name=answer["full_name"], age=answer["age"],
                                      phone_number=answer["phone_number"],
                                      city=City.objects.get(name=answer["city"]), address=answer["address"],
                                      available_saturday=answer["available_on_saturday"],
-                                     notes=answer["notes"], transportation=answer["transportation"],
-                                     hearing_way=answer["hearing_way"])
+                                     notes=answer["notes"], moving_way=answer["transportation"],
+                                     hearing_way=answer["hearing_way"], guiding=answer["want_guide"])
+            volunter_new.save()
+            volunter_new.languages.set(languagesGot)
+            volunter_new.areas.set(areasGot)
             volunter_new.save()
 
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/schedule?vol_id=' + volunter_new.pk)
+            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunter_new.pk))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = VolunteerForm()
@@ -165,11 +169,11 @@ def schedule(request):
         # check whether it's valid:
         if form.is_valid():
             answer = form.cleaned_data
-            new_schedule = VolunteerSchedule(sunday="".join(answer["sunday"]), monday="".join(answer["monday"]),
-                                             tuesday="".join(answer["tuesday"]), wednesday="".join(answer["wednesday"]),
-                                             thursday="".join(answer["thursday"]), friday="".join(answer["friday"]),
-                                             saturday="".join(answer["saturday"]), end_date=answer["end_date"])
-            volunteerSchedule = Volunteer.objects.get(id=request.GET.get('vol_id', ''))
+            new_schedule = VolunteerSchedule(Sunday="".join(answer["sunday"]), Monday="".join(answer["monday"]),
+                                             Tuesday="".join(answer["tuesday"]), Wednesday="".join(answer["wednesday"]),
+                                             Thursday="".join(answer["thursday"]), Friday="".join(answer["friday"]),
+                                             Saturday="".join(answer["saturday"]), end_date=answer["end_date"])
+            volunteerSchedule = Volunteer.objects.get(id=int(request.POST.get('vol_id', '')))
             new_schedule.save()
             volunteerSchedule.schedule = new_schedule
             volunteerSchedule.save()
@@ -183,7 +187,7 @@ def schedule(request):
     else:
         form = ScheduleForm()
 
-    return render(request, 'schedule.html', {'form': form})
+    return render(request, 'schedule.html', {'form': form, 'id':request.GET.get('vol_id', '')})
 
 
 def shopping_help(request):
@@ -327,3 +331,5 @@ def phone_help(request):
 
     return render(request, 'help_pages/phone.html', {'form': form})
 
+def helper_help(pk, fullName):
+    return HelpRequest.objects.get(pk = pk, full_name = fullName)

@@ -1,11 +1,11 @@
-{% extends "template.html" %}
+{% extends "server/template.html" %}
 {% load bootstrap %}
 {% load static %}
 
 {% block title %}לב אחד - מתנדבים קרובים לבקשה{% endblock %}
 
 {% block body %}
-<p class="font-weight-bold mb-2 m-lg-3 text-center h1">המתנדבים הקרובים ביותר</p>
+<p class="font-weight-bold mb-2 m-lg-3 text-center h1">הבקשה</p>
     <table class="table table-hover table-bordered text-center">
     <thead>
         <tr>
@@ -61,14 +61,14 @@
 
                          <form method="post" action="{% url 'change_stat' help_request.id%}">
                               {% csrf_token %}
-                              <div class="modal-header text-right">
+                              <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">שינוי סטאטוס בקשה:</h4>
                               </div>
                               <div class="modal-body mx-3">
 
 {#                               increas?#}
                                 <div class="right">
-                                    <p class="text-right h5"><u>המצב הנוכחי הוא:</u></p>
+                                    <p class="h5"><u>המצב הנוכחי הוא:</u></p>
 
 
                                     <div>
@@ -98,7 +98,7 @@
                                 </div>
 
                                   <div class="right">
-                                    <p class="text-right h5"><u>שינוי זהות</u></p>
+                                    <p class="h5"><u>שינוי זהות</u></p>
 
 
                                     <div>
@@ -123,7 +123,7 @@
 
 
 
-<p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת מתנדבים
+<p class="font-weight-bold mb-2 m-lg-3 text-center h1">המתנדבים הקרובים ביותר
 
 <table class="table table-hover table-bordered text-center">
     <thead>
@@ -146,7 +146,11 @@
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
                 <td>{{ volunteer.age }}</td>
-                <td>{{ volunteer.get_area_display }}</td>
+                <td>
+                    {% for area in volunteer.areas.all %}
+                        {{ area }},
+                    {% endfor %}
+                </td>
                 <td>
                     {% for lanu in volunteer.languages.all %}
                         {{ lanu.name }}
@@ -168,6 +172,3 @@
       </a>
     </div>
 {% endblock %}
-
-
-
