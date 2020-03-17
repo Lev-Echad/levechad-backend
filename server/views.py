@@ -127,6 +127,8 @@ also filters by filter
 def show_all_help_request(request):
     qs = HelpRequest.objects.all()
 
+    print("post help:")
+    print(request.POST)
     statuses = request.POST.getlist('status')
     type = request.POST.getlist('type')
 
@@ -194,6 +196,8 @@ def order_help_request(request):
 
 def help_edit_stat(request, pk):
     # get user objects
+    print("post edit:")
+    print(request.POST)
     to_edit = HelpRequest.objects.get(id=pk)
 
     if request.POST.get('status') is not None:
@@ -201,6 +205,9 @@ def help_edit_stat(request, pk):
 
     if request.POST.get('user_name') is not None:
         to_edit.status_updater = request.POST.get('user_name')
+
+    if request.POST.get('notes') is not None:
+        to_edit.notes = request.POST.get('notes')
 
     to_edit.save()
     return redirect('show_all_help_request')
