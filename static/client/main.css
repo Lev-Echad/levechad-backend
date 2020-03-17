@@ -73,9 +73,13 @@ input[type=submit] {
     height: 10vh;
 }
 
-.container {
+.max-container {
     max-width: 700px;
+    margin: auto;
+}
 
+.container {
+    text-align: center;
 }
 
 .choice-box > h2 {
