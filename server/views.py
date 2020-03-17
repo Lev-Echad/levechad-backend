@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest
-from django.db.models import F
+from django.db.models import F, Q
 from django.core.paginator import Paginator
 import datetime
 from datetime import  time
@@ -16,6 +16,13 @@ def is_time_between(begin_time, end_time, check_time=None):
     else: # crosses midnight
         return check_time >= begin_time or check_time <= end_time
 
+def get_mandatory_areas(request):
+    mandatory_areas = []
+
+    if request.user.hamaluser is not None:
+        mandatory_areas = [request.user.hamaluser.area]
+
+    return mandatory_areas
 
 @login_required
 def index(request):
@@ -40,10 +47,14 @@ def show_all_volunteers(request, page = 1):
     language_qs=Volunteer.objects.all().none()
     availability_qs=Volunteer.objects.all().all()
 
+    cret1 = Q(areas__name__in=get_mandatory_areas(request))
+    area_qs = qs.filter(cret1)
+
     if len(areas) != 0 and not '' in areas:
 
         something_mark = True
-        area_qs = qs.filter(areas__name__in=areas)
+        cret2 = Q(areas__name__in=areas)
+        area_qs = qs.filter(cret1 & cret2)
 
 
     if len(lans) != 0 and not '' in lans:
