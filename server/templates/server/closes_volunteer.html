@@ -134,6 +134,7 @@
             <th scope="col">אזור</th>
             <th scope="col">שפה</th>
             <th scope="col">מספר טלפון</th>
+            <th scope="col">תעודת זהות</th>
             <th scope="col">עיר</th>
             <th scope="col">כתובת</th>
             <th scope="col">דרכי התניידות</th>
@@ -158,6 +159,7 @@
                     {% endfor %}
                 </td>
                 <td>{{ volunteer.phone_number }}</td>
+                <td>{{ volunteer.tz_number }}</td>
                 <td>{{ volunteer.city }}</td>
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
