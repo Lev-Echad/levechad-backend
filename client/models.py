@@ -61,6 +61,7 @@ class Volunteer(Timestampable):
         ("OTHR", "אחר")
     )
 
+    tz_number = models.CharField(max_length=11, blank=True)
     full_name = models.CharField(max_length=200)
     age = models.IntegerField()
     areas = models.ManyToManyField(Area)
