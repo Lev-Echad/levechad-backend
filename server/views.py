@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest
 from django.db.models import F
+from django.core.paginator import Paginator
 import datetime
 from datetime import  time
 
+RESULTS_IN_PAGE = 50
 
 def is_time_between(begin_time, end_time, check_time=None):
     # If check time is not given, default to current UTC time
@@ -13,7 +16,15 @@ def is_time_between(begin_time, end_time, check_time=None):
     else: # crosses midnight
         return check_time >= begin_time or check_time <= end_time
 
+def get_mandatory_areas(request):
+    mandatory_areas = []
 
+    if request.user.hamaluser is not None:
+        mandatory_areas = [request.user.hamaluser.area]
+
+    return mandatory_areas
+
+@login_required
 def index(request):
     context = {}
     return render(request, 'server/server_index.html', context)
@@ -21,16 +32,14 @@ def index(request):
 """
 also filters by filter
 """
-def show_all_volunteers(request):
+@login_required
+def show_all_volunteers(request, page = 1):
     qs = Volunteer.objects.all()
 
-    for test in qs:
-        print(test.full_name)
-        print(test.guiding)
     # ------- filters -------
-    areas = request.POST.getlist('area')
-    lans = request.POST.getlist('language')
-    availability = request.POST.getlist('availability')
+    areas = request.GET.getlist('area')
+    lans = request.GET.getlist('language')
+    availability = request.GET.getlist('availability')
 
     something_mark = False
 
@@ -38,14 +47,14 @@ def show_all_volunteers(request):
     language_qs=Volunteer.objects.all().none()
     availability_qs=Volunteer.objects.all().all()
 
-    if len(areas) != 0 and not '' in areas:
+    area_qs = qs.filter(areas__name__in=get_mandatory_areas(request))
 
+    if len(areas) != 0 and not '' in areas:
         something_mark = True
-        area_qs = qs.filter(areas__name__in=areas)
+        area_qs = area_qs.filter(areas__name__in=areas)
 
 
     if len(lans) != 0 and not '' in lans:
-
         something_mark = True
         language_qs = qs.filter(languages__name__in=lans)
 
@@ -76,11 +85,7 @@ def show_all_volunteers(request):
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
         filter = "schedule__" + yesterday_day + "__contains"
-        print(filter)
         availability_qs = qs.filter(**{filter:3})
-
-
-    availability_qs = availability_qs.filter(schedule__end_date__gte=now.date())
 
 
     availability_now_id = []
@@ -98,7 +103,7 @@ def show_all_volunteers(request):
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
 
-    guidings1 = request.POST.getlist('guiding')
+    guidings1 = request.GET.getlist('guiding')
 
 
     # if there were no matches display all and there are people available
@@ -106,7 +111,6 @@ def show_all_volunteers(request):
         match_qs = Volunteer.objects.all()
 
     if len(guidings1) != 0:
-        print("i am in")
         match_qs = match_qs.filter(guiding=True)
 
     availability_qs = (availability_qs)
@@ -114,8 +118,8 @@ def show_all_volunteers(request):
 
 
     # ----- orders -----
-    if 'field' in request.POST:
-        field = request.POST.get('field')
+    if 'field' in request.GET:
+        field = request.GET.get('field')
         match_qs = match_qs.order_by(field)
 
 
@@ -130,18 +134,20 @@ def show_all_volunteers(request):
     for i in range (0, len(match_qs)):
         final_data.append((match_qs[i], appers_list[i]))
 
+    paginator = Paginator(final_data, RESULTS_IN_PAGE)
 
-    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id}
+    final_data = paginator.page(page)
+
+    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page, 'num_pages': paginator.num_pages}
     return render(request, 'server/volunteer_table.html', context)
 
 """
 also filters by filter
 """
-def show_all_help_request(request):
+@login_required
+def show_all_help_request(request, page = 1):
     qs = HelpRequest.objects.all()
 
-    print("post help:")
-    print(request.POST)
     statuses = request.POST.getlist('status')
     type = request.POST.getlist('type')
 
@@ -173,13 +179,17 @@ def show_all_help_request(request):
         match_qs = match_qs.order_by(field)
 
 
-    context = {'help_requests': match_qs}
+    paginator = Paginator(match_qs, RESULTS_IN_PAGE)
+    match_qs = paginator.page(page)
+
+    context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages}
     return render(request, 'server/help_table.html', context)
 
 
 """
 also filters by filter
 """
+@login_required
 def order_help_request(request):
     qs = HelpRequest.objects.all()
     statuses = request.POST.getlist('status')
@@ -206,7 +216,7 @@ def order_help_request(request):
     return render(request, 'server/help_table.html', context)
 
 
-
+@login_required
 def help_edit_stat(request, pk):
     # get user objects
     to_edit = HelpRequest.objects.get(id=pk)
@@ -236,7 +246,7 @@ def help_edit_stat(request, pk):
 
 
 
-
+@login_required
 def volunteer_edit_notes(request, pk):
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('notes') is not None:
@@ -246,7 +256,7 @@ def volunteer_edit_notes(request, pk):
 
 
 
-
+@login_required
 def find_closes_persons(request, pk):
     request_person = HelpRequest.objects.get(id=pk)
 
@@ -288,11 +298,9 @@ def find_closes_persons(request, pk):
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
         filter = "schedule__" + yesterday_day + "__contains"
-        print(filter)
         availability_qs = closes_volunteer.filter(**{filter: 3})
 
     # check for the persons that good timing if the day is good
-    availability_qs = availability_qs.filter(schedule__end_date__gte=now.date())
 
     availability_now_id = []
     if availability_qs != []:

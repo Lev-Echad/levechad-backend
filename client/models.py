@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 class Timestampable(models.Model):
     created_date = models.DateTimeField(null=True, editable=False)
@@ -108,3 +109,11 @@ class HelpRequest(Timestampable):
     status = models.CharField(max_length=25, choices=STATUSES, blank=True, default="WAITING")
     status_updater = models.CharField(max_length=100, blank=True)
     helping_volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, null=True)
+
+
+class HamalUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.area)

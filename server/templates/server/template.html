@@ -54,6 +54,11 @@
                        href="https://www.levechad.org/about-us">אודותנו</a>
                 </li>
             </ul>
+            <ul class="navbar-nav mr-auto left">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout'%}">{{ user.username }}: התנתק</a>
+                </li>
+            </ul>
         </div>
     </nav>
 </div>

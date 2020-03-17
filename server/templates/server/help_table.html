@@ -47,7 +47,7 @@
                 <td>{{ help_request.full_name }}</td>
                 <td>{{ help_request.phone_number }}</td>
                 <td>{{ help_request.city }}</td>
-                <td>{{ help_request.created_date|date:"d/m/Y" }}</td>
+                <td>{{ help_request.created_date|date:"d/m/Y H:i" }}</td>
                 <td>{{ help_request.address }}</td>
                 <td>{{ help_request.notes }}</td>
                 <td>{{ help_request.get_type_display }}</td>
@@ -72,7 +72,6 @@
 
 
                          <form method="post" action="{% url 'change_stat' help_request.id%}">
-                              {% csrf_token %}
                               <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">עריכת בקשה</h4>
                               </div>
@@ -143,6 +142,17 @@
         {% endfor %}
     </tbody>
 </table>
+
+<div>
+    {% if page != 1 %}
+    <a href="{% url 'show_all_help_request' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
+    {% endif %}
+    &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
+    {% if not page == num_pages %}
+    <a href="{% url 'show_all_help_request' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
+    {% endif %}
+</div>
+
 
 
 {#                    filter mode#}
