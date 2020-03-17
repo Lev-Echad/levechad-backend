@@ -169,7 +169,8 @@ def show_all_help_request(request, page = 1):
         something_mark = True
         type_qs = qs.filter(type__in=type)
 
-    area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
+    if len(get_mandatory_areas(request)) != 0:
+        area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
 
     if len(areas) != 0 and not '' in areas:
         something_mark = True
