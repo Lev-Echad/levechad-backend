@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,52 +14,47 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.2.1/css/bootstrap.min.css"
-          integrity="sha384-vus3nQHTD+5mpDiZ4rkEPlnkcyTP+49BhJ4wJeJunw06ZAp+wzzeBPUXr42fi8If" crossorigin="anonymous">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
-    <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
-    <!-- Material Design Bootstrap -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.14.1/css/mdb.min.css" rel="stylesheet">
-    <!-- JQuery -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <!-- Bootstrap tooltips -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
-    <!-- Bootstrap core JavaScript -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.14.1/js/mdb.min.js"></script>
+    <link
+            rel="stylesheet"
+            href="https://cdn.rtlcss.com/bootstrap/v4.2.1/css/bootstrap.min.css"
+            integrity="sha384-vus3nQHTD+5mpDiZ4rkEPlnkcyTP+49BhJ4wJeJunw06ZAp+wzzeBPUXr42fi8If"
+            crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'client/main.css' %}">
     <title>{% block title %}{% endblock %}</title>
-    {% load static %}
 </head>
 <body dir="rtl">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<div class="back">
+    <nav class="navbar navbar-expand-lg navbar-light">
 
-    <a class="navbar-brand" href="">
-        {% load static %}
-        <img src="{% static 'client/logo.png' %}" alt="My image">
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+        <a class="navbar-brand" href="/client/home">
+            <img class="logo" src="{% static 'client/logo.png' %}" alt="My image">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto right">
-            <li class="nav-item">
-                <a class="nav-link" href="home">בית</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="send_help">התנדבות</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="get_help">בקשת עזרה</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto right">
+                <li class="nav-item">
+                    <a class="nav-link" href="/client/home">דף הבית</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/client/get_help">בקשת עזרה</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/client/send_help">התנדבות</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="https://www.paypal.com/donate/?token=ldb3bnZ8Bd_MAn_i4z3GFLRAp78s_pvqGWDGxkps5yntvGr9xEf15Au9szALvFs5uFwhyW&country.x=GB&locale.x=GB">לתרומות</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
 <div class="container box">
+    {% include "translate.html" %}
     {% block body %}{% endblock %}
 </div>
 </body>
