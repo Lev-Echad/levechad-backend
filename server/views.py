@@ -24,7 +24,9 @@ also filters by filter
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
 
-
+    for test in qs:
+        print(test.full_name)
+        print(test.guiding)
     # ------- filters -------
     areas = request.POST.getlist('area')
     lans = request.POST.getlist('language')
@@ -57,26 +59,22 @@ def show_all_volunteers(request):
 
     # check option 1
     if is_time_between(time(7, 00), time(15, 00)):
-        print("1")
         filter = "schedule__" + now_day + "__contains"
         availability_qs = qs.filter(**{filter:1})
 
     # check option 2
     elif is_time_between(time(15, 00), time(23, 00)):
-        print("2")
         filter = "schedule__" + now_day + "__contains"
         availability_qs = qs.filter(**{filter:2})
 
 
     # check option 3 before midnight
     elif is_time_between(time(23, 00), time(00, 00)):
-        print("3")
         filter = "schedule__" + now_day + "__contains"
         availability_qs = qs.filter(**{filter:3})
 
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
-        print("4")
         filter = "schedule__" + yesterday_day + "__contains"
         print(filter)
         availability_qs = qs.filter(**{filter:3})
@@ -100,15 +98,19 @@ def show_all_volunteers(request):
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
 
+    guidings1 = request.POST.getlist('guiding')
+
+
     # if there were no matches display all and there are people available
     if len(match_qs) == 0 and (not something_mark):
         match_qs = Volunteer.objects.all()
 
-    print("sfgsdfgsdfgsdfg", match_qs)
-    availability_qs = (availability_qs)
-    print("sfgsdfgsdsdfaEFEAEFAEFfgsdfg", availability_qs)
-    match_qs = match_qs.intersection(availability_qs)
+    if len(guidings1) != 0:
+        print("i am in")
+        match_qs = match_qs.filter(guiding=True)
 
+    availability_qs = (availability_qs)
+    match_qs = match_qs.intersection(availability_qs)
 
 
     # ----- orders -----
@@ -124,12 +126,10 @@ also filters by filter
 """
 def show_all_help_request(request):
     qs = HelpRequest.objects.all()
-    print("post:")
-    print(request.POST)
+
     statuses = request.POST.getlist('status')
     type = request.POST.getlist('type')
-    print("status: " + str(statuses))
-    print("type: " + str(type))
+
 
     something_mark = False
 
@@ -167,12 +167,9 @@ also filters by filter
 """
 def order_help_request(request):
     qs = HelpRequest.objects.all()
-    print("post:")
-    print(request.POST)
     statuses = request.POST.getlist('status')
     type = request.POST.getlist('type')
-    print("status: " + str(statuses))
-    print("type: " + str(type))
+
 
     status_qs =HelpRequest.objects.none()
     type_qs = HelpRequest.objects.none()
@@ -233,26 +230,22 @@ def find_closes_persons(request, pk):
 
     # check option 1
     if is_time_between(time(7, 00), time(15, 00)):
-        print("1")
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 1})
 
     # check option 2
     elif is_time_between(time(15, 00), time(23, 00)):
-        print("2")
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 2})
 
 
     # check option 3 before midnight
     elif is_time_between(time(23, 00), time(00, 00)):
-        print("3")
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 3})
 
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
-        print("4")
         filter = "schedule__" + yesterday_day + "__contains"
         print(filter)
         availability_qs = closes_volunteer.filter(**{filter: 3})
