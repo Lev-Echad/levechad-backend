@@ -99,6 +99,7 @@ class HelpRequest(Timestampable):
 
     full_name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=200)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=200)
     notes = models.CharField(max_length=200)
