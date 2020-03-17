@@ -48,8 +48,10 @@ class VolunteerForm(forms.Form):
         ("OTHR", "אחר")
     )
 
+    my_validator = RegexValidator(r"^\d+$")
 
     full_name = forms.CharField(max_length=200)
+    tz_number = forms.CharField(max_length=9, validators=[my_validator])
     age = forms.IntegerField()
     area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
     languages = forms.MultipleChoiceField(choices = get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
@@ -66,6 +68,7 @@ class VolunteerForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
         self.fields['full_name'].label = "שם מלא"
+        self.fields['tz_number'].label = "מס. תעודת זהות"
         self.fields['area'].label = "איזור"
         self.fields['languages'].label = "שפות שאתה דובר"
         self.fields['phone_number'].label = "מספר פלאפון"

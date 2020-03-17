@@ -29,7 +29,7 @@ def volunteer(request):
             answer = form.cleaned_data
             languagesGot = Language.objects.filter(name__in=answer["languages"])
             areasGot = Area.objects.filter(name__in=answer["area"])
-            volunter_new = Volunteer(full_name=answer["full_name"], age=answer["age"],
+            volunter_new = Volunteer(tz_number=answer["tz_number"], full_name=answer["full_name"], age=answer["age"],
                                      phone_number=answer["phone_number"],
                                      city=City.objects.get(name=answer["city"]), address=answer["address"],
                                      available_saturday=answer["available_on_saturday"],
