@@ -6,7 +6,7 @@
 
 {% block body %}
 <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת בקשות עזרה
-<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">ערוך</a></p>
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">שינוי תצוגה</a></p>
 
 <table class="table table-hover table-bordered text-center">
     <thead>
@@ -31,10 +31,10 @@
                 <tr bgcolor="white">
             {% endif %}
             {% if help_request.get_status_display == "טופל" %}
-                <tr bgcolor="yellow">
+                <tr bgcolor="green">
             {% endif %}
             {% if help_request.get_status_display == "בטיפול" %}
-                <tr bgcolor="green">
+                <tr bgcolor="yellow">
             {% endif %}
             {% if help_request.get_status_display == "הועבר למתנדב" %}
                 <tr bgcolor="blue">
@@ -54,7 +54,7 @@
                 <td>{{ help_request.get_status_display }}</td>
                 <td>{{ help_request.status_updater }}</td>
                 <td width="40%">
-                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#change_status{{ help_request.id }}">שנה סטאטוס</a>
+                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#change_status{{ help_request.id }}">ערוך</a>
                     <a href="{% url 'find_closes_persons' help_request.id %}" class="btn btn-outline-dark waves-effect m-2">  מצא התאמה</a>
                 </td>
 
@@ -68,13 +68,14 @@
                          <form method="post" action="{% url 'change_stat' help_request.id%}">
                               {% csrf_token %}
                               <div class="modal-header">
-                                <h4 class="modal-title w-100 font-weight-bold">שינוי סטאטוס בקשה:</h4>
+                                <h4 class="modal-title w-100 font-weight-bold">עריכת בקשה</h4>
                               </div>
                               <div class="modal-body mx-3">
 
 {#                               increas?#}
                                 <div class="right">
-                                    <p class="h5"><u>המצב הנוכחי הוא:</u></p>
+                                    <h3 class="right"><u>שינוי סטאטוס בקשה:</u></h3>
+                                    <h5><u>המצב הנוכחי הוא:</u></h5>
 
 
                                     <div>
@@ -104,7 +105,7 @@
                                 </div>
 
                                   <div class="right">
-                                    <p class="h5"><u>שינוי זהות</u></p>
+                                    <h5><u>שינוי זהות</u></h5>
 
 
                                     <div>
@@ -113,7 +114,15 @@
                                     </div>
                                 </div>
 
+                              <div class="right">
+                                    <h5><u>שינוי הערות חמל</u></h5>
 
+
+                                    <div>
+                                        <label for="notes">הערה:</label>
+                                        <input type="text" name="notes" id="notes" value='{{ help_request.notes }}'>
+                                    </div>
+                                </div>
 
                               </div>
                               <div class="modal-footer d-flex justify-content-center">
