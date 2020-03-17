@@ -67,6 +67,7 @@ class Volunteer(Timestampable):
     areas = models.ManyToManyField(Area)
     languages = models.ManyToManyField(Language)
     phone_number = models.CharField(max_length=200)
+    email = models.CharField(max_length=200, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=200)
     available_saturday = models.BooleanField()
