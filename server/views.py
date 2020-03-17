@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from client.models import Volunteer, HelpRequest
+from client.models import Volunteer, HelpRequest, Area
 from django.db.models import F
 from django.core.paginator import Paginator
 import datetime
@@ -20,7 +20,11 @@ def get_mandatory_areas(request):
     mandatory_areas = []
 
     if request.user.hamaluser is not None:
-        mandatory_areas = [request.user.hamaluser.area]
+        area = request.user.hamaluser.area
+        if area.name == "מרכז":
+            mandatory_areas = Area.objects.all().filter(name__in=["ירושלים והסביבה", "מרכז", "יהודה ושומרון"])
+        else:
+            mandatory_areas = [area]
 
     return mandatory_areas
 
