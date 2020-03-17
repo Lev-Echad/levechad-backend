@@ -18,6 +18,7 @@
             <th scope="col">שפה</th>
             <th scope="col">מספר טלפון</th>
             <th scope="col">תעודת זהות</th>
+            <th scope="col">הערות</th>
             <th scope="col">עיר</th>
             <th scope="col">כתובת</th>
             <th scope="col">דרכי התניידות</th>
@@ -43,6 +44,7 @@
                 </td>
                 <td>{{ volunteer.phone_number }}</td>
                  <td>{{ volunteer.tz_number }}</td>
+                <td>{{ volunteer.notes }}</td>
                 <td>{{ volunteer.city }}</td>
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
@@ -53,8 +55,42 @@
                         לא פנוי
                     {% endif %}
                 </td>
-                <td>dasdasdasdasdasdasdasdasdasdasdasdasdasdasd</td>
+                <td>
+                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#edit_volu{{ volunteer.id }}">ערוך</a>
+                </td>
             </tr>
+
+
+            <div class="modal fade" id="edit_volu{{ volunteer.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+
+
+                         <form method="post" action="{% url 'volunteer_edit_notes' volunteer.id %}">
+                              {% csrf_token %}
+                              <div class="modal-header">
+                                <h4 class="modal-title w-100 font-weight-bold">עריכה</h4>
+                              </div>
+                              <div class="modal-body mx-3">
+                                  <div class="right">
+                                        <h5><u>שינוי הערות מתנדב</u></h5>
+
+
+                                        <div>
+                                            <label for="notes">הערה:</label>
+                                            <input type="text" name="notes" id="notes" value='{{ volunteer.notes }}'>
+                                        </div>
+                                    </div>
+
+                                  </div>
+                              <div class="modal-footer d-flex justify-content-center">
+                                <button type="submit" class="btn btn-default">שמור שינויים</button>
+                              </div>
+                          </form>
+                        </div>
+                      </div>
+                </div>
         {% endfor %}
     </tbody>
 </table>
