@@ -24,9 +24,6 @@ also filters by filter
 def show_all_volunteers(request):
     qs = Volunteer.objects.all()
 
-    for test in qs:
-        print(test.full_name)
-        print(test.guiding)
     # ------- filters -------
     areas = request.POST.getlist('area')
     lans = request.POST.getlist('language')
@@ -76,7 +73,6 @@ def show_all_volunteers(request):
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
         filter = "schedule__" + yesterday_day + "__contains"
-        print(filter)
         availability_qs = qs.filter(**{filter:3})
 
 
@@ -103,7 +99,6 @@ def show_all_volunteers(request):
         match_qs = Volunteer.objects.all()
 
     if len(guidings1) != 0:
-        print("i am in")
         match_qs = match_qs.filter(guiding=True)
 
     availability_qs = (availability_qs)
@@ -137,8 +132,6 @@ also filters by filter
 def show_all_help_request(request):
     qs = HelpRequest.objects.all()
 
-    print("post help:")
-    print(request.POST)
     statuses = request.POST.getlist('status')
     type = request.POST.getlist('type')
 
@@ -285,7 +278,6 @@ def find_closes_persons(request, pk):
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
         filter = "schedule__" + yesterday_day + "__contains"
-        print(filter)
         availability_qs = closes_volunteer.filter(**{filter: 3})
 
     # check for the persons that good timing if the day is good
