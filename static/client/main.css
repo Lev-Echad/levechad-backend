@@ -1,25 +1,55 @@
 @import url(http://fonts.googleapis.com/earlyaccess/alefhebrew.css);
 
-.logo {
-    margin-bottom: 2em;
+
+a.nav-link {
+    color: rgba(155, 0, 11, 1);
 }
 
-body{
+ul {
+ list-style-type: none;
+}
+
+.control-label {
+    color: rgba(155, 0, 11, 1);
+    font-size: 20px;
+}
+
+.form-group {
+    margin: 30px 0px;
+    text-align: center;
+}
+
+.logo {
+    width: 150px;
+    border-radius: 10px;
+        margin: 5px 5px;
+
+}
+
+
+body {
     font-family: "Alef Hebrew",
     "Helvetica Neue",
     Helvetica,
     Arial,
     sans-serif;
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 body * {
     direction: rtl;
 }
 
-.box * {
-    align-items: center;
+form {
+    align : center
     text-align: center;
 }
+
+input[type=submit] {
+    text-align:center;
+}
+
+
 
 .box {
     padding-bottom: 3em;
@@ -30,7 +60,6 @@ body * {
 
 .logo {
     right: 0;
-    margin-bottom: 2em;
 }
 
 .choice-box {
@@ -61,11 +90,11 @@ body * {
 }
 
 .list-group-item:nth-child(odd) {
-    background-color: rgba(190, 229, 235, 0.65)
+    background-color: rgba(255, 0, 0, 0.25);
 }
 
 .list-group-item:nth-child(even) {
-    background-color: rgba(190, 229, 235, 1)
+    background-color: rgba(255, 0, 0, 0.15);
 }
 
 .scroll {
@@ -84,4 +113,97 @@ body * {
 nav {
     direction: rtl;
 }
+
+.navbar {
+    background-color: rgba(155, 0, 11, 1);
+}
+
+
+a {
+  font-size: 20px;
+  text-align: center;
+  color: rgba(155, 0, 11, 1);
+  transition: 0.3;
+}
+
+a:hover {
+  color: rgba(200, 0, 11, 1);
+}
+
+a:hover, a:visited, a:link, a:active
+{
+    text-decoration: none;
+}
+
+div.center {
+  text-align: center;
+}
+
+.gflag{
+ margin: 10px;
+}
+
+
+.navbar-toggler {
+    background-color: rgba(255, 255, 255, 1);
+    padding: 15px 10px;
+    border-radius: 10px;
+    margin: 5px 5px;
+
+}
+
+.nav-item {
+    padding: 8px 5px;
+    margin: 5px 5px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 1);
+}
+
+h4 {
+    padding: 5px;
+}
+
+
+.exp {
+    width: 150px;
+    padding: 5px;
+}
+
+.card {
+    border-width: 5px;
+    border-radius: 10px;
+    margin: 5px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    border-radius: 20px;
+    background-color: rgba(255, 0, 0, 0.05);
+}
+
+@media screen and (min-width: 50em) {
+    .cards {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .card {
+        flex: 0 1 calc(33% - 1em);
+    }
+}
+
+ul {
+    text-align: right;
+}
+
+div {
+    text-align: center;
+}
+
+
+
+
+
+
 
