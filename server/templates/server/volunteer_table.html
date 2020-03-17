@@ -18,6 +18,7 @@
             <th scope="col">שפה</th>
             <th scope="col">מספר טלפון</th>
             <th scope="col">תעודת זהות</th>
+            <th scope="col">הערות</th>
             <th scope="col">עיר</th>
             <th scope="col">כתובת</th>
             <th scope="col">דרכי התניידות</th>
@@ -43,6 +44,7 @@
                 </td>
                 <td>{{ volunteer.phone_number }}</td>
                  <td>{{ volunteer.tz_number }}</td>
+                <td>{{ volunteer.notes }}</td>
                 <td>{{ volunteer.city }}</td>
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
@@ -65,7 +67,7 @@
                         <div class="modal-content">
 
 
-                         <form method="post" action="">
+                         <form method="post" action="{% url 'volunteer_edit_notes' volunteer.id %}">
                               {% csrf_token %}
                               <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">עריכה</h4>

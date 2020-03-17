@@ -196,8 +196,6 @@ def order_help_request(request):
 
 def help_edit_stat(request, pk):
     # get user objects
-    print("post edit:")
-    print(request.POST)
     to_edit = HelpRequest.objects.get(id=pk)
 
     if request.POST.get('status') is not None:
@@ -211,6 +209,18 @@ def help_edit_stat(request, pk):
 
     to_edit.save()
     return redirect('show_all_help_request')
+
+
+
+
+def volunteer_edit_notes(request, pk):
+    to_edit = Volunteer.objects.get(id=pk)
+    if request.POST.get('notes') is not None:
+        to_edit.notes = request.POST.get('notes')
+    to_edit.save()
+    return redirect('show_all_volunteers')
+
+
 
 
 def find_closes_persons(request, pk):
