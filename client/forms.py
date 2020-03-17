@@ -22,8 +22,6 @@ onlyNames = [a["name"] for a in data]
 onlyNames.sort()
 CITIES = [(str(x),str(x)) for x in onlyNames]
 json_file.close()
-
-LANG_CHOICES = [(str(x),str(x)) for x in Language.objects.all()]
 # class NameForm(forms.Form):
 #     your_name = forms.CharField(label='Your name', max_length=100)
 
@@ -36,7 +34,7 @@ LANG_CHOICES = [(str(x),str(x)) for x in Language.objects.all()]
 class VolunteerForm(forms.Form):
 
 
-
+    LANG_CHOICES = [(str(x),str(x)) for x in Language.objects.all()]
 
     MOVING_WAYS = (
         ("CAR", "רכב"),
