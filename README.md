@@ -24,5 +24,5 @@ How to update models
 To update the models, run ```git pull``` and then run the following:
 
     python manage.py makemigrations client
-    python manage.py migrate --fake-initial
+    python manage.py migrate client
 
