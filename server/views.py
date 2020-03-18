@@ -44,7 +44,7 @@ also filters by filter
 """
 @login_required
 def show_all_volunteers(request, page = 1):
-    qs = Volunteer.objects.order_by('id')
+    qs = Volunteer.objects.all().order_by('area')
 
     # ------- filters -------
     areas = request.GET.getlist('area')
