@@ -5,8 +5,26 @@ from .forms import *
 from .models import Volunteer, City, Language, VolunteerSchedule, HelpRequest, Area
 
 
+def helper_help(pk, fullName):
+    return HelpRequest.objects.get(pk=pk, full_name = fullName)
+
 def thanks(request):
-    return render(request, 'thanks.html', {})
+    try:
+        username = request.GET['username']
+        pk = request.GET['pk']
+
+        hr = helper_help(pk, username)
+        print(str(hr.status))
+
+        return render(request, 'thanks.html', {
+            "message": "סטאטוס הבקשה שלך בLIVE",
+            "status" : str(hr.get_status_display())
+        })
+    except Exception as e:
+        return render(request, 'thanks.html', {
+            "message": "התקשר למוקד שלנו לפרטים נוספים",
+            "status": ""
+        })
 
 
 def homepage(request):
@@ -92,13 +110,13 @@ def shopping_help(request):
             new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
                                       address = answer["address"], notes = answer["notes"], type = "BUYIN", type_text = answer["to_buy"])
             new_request.save()
-            new_request.areas.set(areasGot)
-            new_request.save()
+            # new_request.areas.set(areasGot)
+            # new_request.save()
 
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks')
+            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -270,5 +288,4 @@ def workers_help(request):
 
     return render(request, 'help_pages/workers.html', {'form': form})
 
-def helper_help(pk, fullName):
-    return HelpRequest.objects.get(pk = pk, full_name = fullName)
+
