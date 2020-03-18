@@ -284,7 +284,7 @@ def volunteer_edit_notes(request, pk):
 @login_required
 def delete_volunteer(request, pk):
     to_delete = Volunteer.objects.get(id=pk)
-    to_delete.objects.filter(id=pk).delete()
+    to_delete.delete()
     to_delete.save()
     return redirect('show_all_volunteers')
 
