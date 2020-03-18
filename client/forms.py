@@ -83,6 +83,7 @@ class VolunteerForm(forms.Form):
         self.fields['area'].label = "איזור"
         self.fields['languages'].label = "שפות שאתה דובר"
         self.fields['phone_number'].label = "מספר פלאפון"
+        self.fields['email'].label = "כתובת אימייל"
         self.fields['city'].label = "עיר מגורים"
         self.fields['address'].label = "כתובת מגורים"
         self.fields['available_on_saturday'].label = "האם זמין בשבת"
