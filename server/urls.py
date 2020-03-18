@@ -12,5 +12,5 @@ urlpatterns = [
     path('find_closes/<int:pk>', views.find_closes_persons, name='find_closes_persons'),
     path('edit_note/<int:pk>', views.volunteer_edit_notes, name='volunteer_edit_notes'),  
     path('delete_volunteer/<int:pk>', views.delete_volunteer, name='delete_volunteer'),
-    path('search_volunteer', views.search_volunteer, name='search_volunteer'),
+    
 ]
