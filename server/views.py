@@ -162,8 +162,12 @@ def show_all_volunteers(request, page = 1):
 
 @login_required
 def search_volunteer(request):
-    name = request.GET.get('name')
-    qs = Volunteer.objects.filter(full_name = name)
+    qs = Volunteer.objects.all()
+   
+    fullname = request.POST.get('name')
+    
+    for name_part in fullname.split():
+        qs = qs.filter( Q(first_name__icontains = term) | Q(last_name__icontains = term))
     
 """
 also filters by filter
