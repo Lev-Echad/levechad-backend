@@ -167,7 +167,7 @@ def search_volunteer(request):
     fullname = request.POST.get('name')
     
     for name_part in fullname.split():
-        qs = qs.filter( Q(first_name__icontains = term) | Q(last_name__icontains = term))
+        qs = qs.filter( Q(first_name__icontains = name_part) | Q(last_name__icontains = name_part))
     
 """
 also filters by filter
