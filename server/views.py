@@ -50,6 +50,7 @@ def show_all_volunteers(request, page = 1):
     areas = request.GET.getlist('area')
     lans = request.GET.getlist('language')
     availability = request.GET.getlist('availability')
+    guidings = request.GET.getlist('guiding')
 
     something_mark = False
 
@@ -60,6 +61,7 @@ def show_all_volunteers(request, page = 1):
     area_qs = qs
     if len(get_mandatory_areas(request)) != 0:
         area_qs = qs.filter(areas__name__in=get_mandatory_areas(request))
+   
 
     if len(areas) != 0 and not '' in areas:
         something_mark = True
@@ -69,6 +71,11 @@ def show_all_volunteers(request, page = 1):
     if len(lans) != 0 and not '' in lans:
         something_mark = True
         language_qs = qs.filter(languages__name__in=lans)
+    
+    if len(guidings) != 0:
+        something_mark = True
+        qs = qs.filter(guiding = True)
+    
 
 
     # --------- check time now --------
@@ -115,15 +122,15 @@ def show_all_volunteers(request, page = 1):
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
 
-    guidings1 = request.GET.getlist('guiding')
+#     guidings1 = request.GET.getlist('guiding')
 
 
     # if there were no matches display all and there are people available
     if len(match_qs) == 0 and (not something_mark):
         match_qs = Volunteer.objects.all()
 
-    if len(guidings1) != 0:
-        match_qs = match_qs.filter(guiding=True)
+#     if len(guidings1) != 0:
+#         match_qs = match_qs.filter(guiding=True)
 
     availability_qs = (availability_qs)
     match_qs = match_qs.intersection(availability_qs)
