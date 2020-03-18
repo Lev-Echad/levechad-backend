@@ -160,14 +160,6 @@ def show_all_volunteers(request, page = 1):
     context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page, 'num_pages': paginator.num_pages}
     return render(request, 'server/volunteer_table.html', context)
 
-# @login_required
-# def search_volunteer(request):
-#     qs = Volunteer.objects.all()
-   
-#     fullname = request.POST.get('name')
-    
-#     for name_part in fullname.split():
-#         qs = qs.filter( Q(first_name__icontains = name_part) | Q(last_name__icontains = name_part))
 
     
 """
