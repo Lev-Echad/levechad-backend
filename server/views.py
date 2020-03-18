@@ -177,7 +177,18 @@ def show_all_help_request(request, page = 1):
 
     status_qs =HelpRequest.objects.none()
     type_qs = HelpRequest.objects.none()
-    area_qs = HelpRequest.objects.all().all()
+    area_qs = HelpRequest.objects.all().none()
+    
+    
+    area_qs = qs
+    if len(get_mandatory_areas(request)) != 0:
+        area_qs = qs.filter(areas__name__in=get_mandatory_areas(request))
+   
+
+    if len(areas) != 0 and not '' in areas:
+        something_mark = True
+        area_qs = area_qs.filter(areas__name__in=areas)
+
 
     if len(statuses) != 0 and not '' in statuses:
         something_mark = True
@@ -186,13 +197,9 @@ def show_all_help_request(request, page = 1):
     if len(type) != 0 and not '' in type:
         something_mark = True
         type_qs = qs.filter(type__in=type)
+    
 
-    if len(get_mandatory_areas(request)) != 0:
-        area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
-
-    if len(areas) != 0 and not '' in areas:
-        something_mark = True
-        area_qs = area_qs.filter(area__name__in=areas)
+    
 
     # union matchings from both categoties
     match_qs = status_qs.union(type_qs, area_qs)
