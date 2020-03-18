@@ -26,6 +26,7 @@
             <th scope="col">דרכי התניידות</th>
             <th scope="col">האם זמין עכשיו?</th>
             <th scope="col">מספר הפעמים שעזר</th>
+            <th scope="col">רוצה חוגים</th>
             <th scope="col">ערוך הערות</th>
         </tr>
     </thead>
@@ -60,6 +61,7 @@
                     {% endif %}
                 </td>
                 <td>{{ num_of_appers }}</td>
+                <td>{{ volunteer.guiding }}</td>
                 <td>
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#edit_volu{{ volunteer.id }}">ערוך</a>
                 </td>
