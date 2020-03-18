@@ -47,7 +47,7 @@ class VolunteerForm(forms.Form):
         ("RAD_TV", "רדיו וטלוויזיה"),
         ("OTHR", "אחר")
     )
-
+    
     BOOL = (
         ("YES", "כן"),
         ("NO", "לא"),
@@ -68,7 +68,7 @@ class VolunteerForm(forms.Form):
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
     hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
     area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
-    childrens = forms.MultipleChoiceField(choices = BOOL, widget=forms.CheckboxSelectMultiple())
+    childrens = forms.ChoiceField(choices=BOOL)
     no_corona1 = forms.BooleanField()
     no_corona2 = forms.BooleanField()
     no_corona3 = forms.BooleanField()
