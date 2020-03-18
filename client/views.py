@@ -150,7 +150,7 @@ def medic_help(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks')
+            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -173,7 +173,7 @@ def other_help(request):
             new_request.save()
             new_request.areas.set(areasGot)
             new_request.save()
-            return HttpResponseRedirect('/client/thanks')
+            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -200,7 +200,7 @@ def home_help(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks')
+            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -228,7 +228,7 @@ def travel_help(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks')
+            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -255,7 +255,7 @@ def phone_help(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks')
+            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -283,7 +283,7 @@ def workers_help(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks')
+            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
 
     # if a GET (or any other method) we'll create a blank form
     else:
