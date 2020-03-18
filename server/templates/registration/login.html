@@ -17,16 +17,16 @@
 
   <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
-    <table>
-      <tr>
-        <td>שם משתמש:</td>
-        <td>{{ form.username }}</td>
-      </tr>
-      <tr>
-        <td>סיסמה:</td>
-        <td>{{ form.password }}</td>
-      </tr>
-    </table>
+      <div class="form-group">
+        <label class="control-label  ">שם משתמש</label>
+        {{ form.username }}
+      </div>
+
+      <div class="form-group">
+        <label class="control-label  ">סיסמא</label>
+        {{ form.username }}
+      </div>
+
     <input type="submit" value="התחבר" />
     <input type="hidden" name="next" value="{{ next }}" />
   </form>
