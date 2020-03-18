@@ -19,7 +19,7 @@ def is_time_between(begin_time, end_time, check_time=None):
 def get_mandatory_areas(request):
     mandatory_areas = []
 
-    if request.user.hamaluser is not None:
+    if hasattr(request.user, 'hamaluser') and request.user.hamaluser is not None:
         area = request.user.hamaluser.area
         if area.name == "מרכז":
             mandatory_areas = Area.objects.all().filter(name__in=["ירושלים והסביבה", "מרכז", "יהודה ושומרון"])
