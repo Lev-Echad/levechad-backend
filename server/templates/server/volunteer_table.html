@@ -7,7 +7,12 @@
 
 {% block body %}
 <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת מתנדבים
-<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm">ערוך</a></p>
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm">ערוך</a>
+<form method="post" action="{% url 'search_volunteer' %}">
+    <input type = "text" name = "name" placeholder= "שם מתנדב">
+    <input type = "submit" value = "חפש">
+</form>
+</p>
 
 <table class="table table-hover table-bordered text-center">
     <thead>
