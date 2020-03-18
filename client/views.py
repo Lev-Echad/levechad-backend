@@ -47,12 +47,15 @@ def volunteer(request):
             answer = form.cleaned_data
             languagesGot = Language.objects.filter(name__in=answer["languages"])
             areasGot = Area.objects.filter(name__in=answer["area"])
+            keep_mandatory_worker_children = False
+            if answer["childrens"] == "YES":
+                keep_mandatory_worker_children = True
             volunter_new = Volunteer(tz_number = answer["identity"], full_name=answer["full_name"], age=answer["age"],
                                      phone_number=answer["phone_number"],
                                      city=City.objects.get(name=answer["city"]), address=answer["address"],
                                      available_saturday=answer["available_on_saturday"],
                                      notes=answer["notes"], moving_way=answer["transportation"],
-                                     hearing_way=answer["hearing_way"], keep_mandatory_worker_children = answer["childrens"])
+                                     hearing_way=answer["hearing_way"], keep_mandatory_worker_children = keep_mandatory_worker_children, guiding=False)
             volunter_new.save()
             volunter_new.languages.set(languagesGot)
             volunter_new.areas.set(areasGot)
@@ -287,5 +290,3 @@ def workers_help(request):
         form = WorkersForm()
 
     return render(request, 'help_pages/workers.html', {'form': form})
-
-
