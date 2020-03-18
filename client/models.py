@@ -87,6 +87,7 @@ class HelpRequest(Timestampable):
         ('MEDICI', 'תרופות'),
         ('HOME_HEL', 'עזרה בבית'),
         ('PHONE_HEL', 'תמיכה טלפונית'),
+        ('VITAL_WORK', 'סיוע לעובדים חיוניים'),
         ('OTHER', 'אחר')
     )
 

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from client.models import Volunteer, HelpRequest
+from client.models import Volunteer, HelpRequest, Area
 from django.db.models import F
 from django.core.paginator import Paginator
 import datetime
@@ -19,8 +19,12 @@ def is_time_between(begin_time, end_time, check_time=None):
 def get_mandatory_areas(request):
     mandatory_areas = []
 
-    if request.user.hamaluser is not None:
-        mandatory_areas = [request.user.hamaluser.area]
+    if hasattr(request.user, 'hamaluser') and request.user.hamaluser is not None:
+        area = request.user.hamaluser.area
+        if area.name == "מרכז":
+            mandatory_areas = Area.objects.all().filter(name__in=["ירושלים והסביבה", "מרכז", "יהודה ושומרון"])
+        else:
+            mandatory_areas = [area]
 
     return mandatory_areas
 
@@ -123,7 +127,6 @@ def show_all_volunteers(request, page = 1):
         match_qs = match_qs.order_by(field)
 
 
-
     #----- check for each volunterr how much times he apper
     appers_list = []
     for volu in match_qs:
@@ -150,12 +153,13 @@ def show_all_help_request(request, page = 1):
 
     statuses = request.POST.getlist('status')
     type = request.POST.getlist('type')
-
+    areas = request.GET.getlist('area')
 
     something_mark = False
 
     status_qs =HelpRequest.objects.none()
     type_qs = HelpRequest.objects.none()
+    area_qs = HelpRequest.objects.all().none()
 
     if len(statuses) != 0 and not '' in statuses:
         something_mark = True
@@ -165,8 +169,15 @@ def show_all_help_request(request, page = 1):
         something_mark = True
         type_qs = qs.filter(type__in=type)
 
+    if len(get_mandatory_areas(request)) != 0:
+        area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
+
+    if len(areas) != 0 and not '' in areas:
+        something_mark = True
+        area_qs = area_qs.filter(area__name__in=areas)
+
     # union matchings from both categoties
-    match_qs = status_qs.union(type_qs)
+    match_qs = status_qs.union(type_qs, area_qs)
 
     # if there were no matches display all
     if len(match_qs) == 0 and (not something_mark):
@@ -265,9 +276,6 @@ def find_closes_persons(request, pk):
     req_y = req_city.y
 
     closes_volunteer = Volunteer.objects.all()
-    closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
-
-
 
     # adding here a function that tell if the volunteer is aviavble
     # --------- check time now --------
@@ -309,15 +317,37 @@ def find_closes_persons(request, pk):
 
     closes_volunteer = availability_qs
 
+
+
+
+
+
+    closes_volunteer = sorted(closes_volunteer, key=lambda volu: -HelpRequest.objects.filter(helping_volunteer=volu).count())
+    closes_volunteer = sorted(closes_volunteer, key=lambda volu: (volu.city.x-req_x)**2 + (volu.city.y-req_y)**2)
+
+
+
+    # closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
+
+
+
     if len(closes_volunteer) > 30:
         closes_volunteer = closes_volunteer[0:29]
 
+
+
+    # ----- check for each volunterr how much times he apper
+    appers_list = []
+    for volu in closes_volunteer:
+        appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
+
+
     final_data = []
-    for volunteer in closes_volunteer:
-        tot_x = (volunteer.city.x - request_person.city.x) ** 2
-        tot_y = (volunteer.city.y - request_person.city.y) ** 2
+    for i in range (0, len(closes_volunteer)):
+        tot_x = (closes_volunteer[i].city.x - request_person.city.x) ** 2
+        tot_y = (closes_volunteer[i].city.y - request_person.city.y) ** 2
         tot_value = int(((tot_x + tot_y) ** 0.5) / 100)
-        final_data.append((volunteer, tot_value))
+        final_data.append((closes_volunteer[i], tot_value, appers_list[i]))
 
     context = {'help_request': request_person, 'closes_volunteer': final_data, 'availability_now_id': availability_now_id}
     return render(request, 'server/closes_volunteer.html', context)

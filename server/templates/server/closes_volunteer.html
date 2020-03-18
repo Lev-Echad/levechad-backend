@@ -12,7 +12,7 @@
             <th scope="col">#</th>
             <th scope="col">שם מלא</th>
             <th scope="col">מספר טלפון</th>
-             <th scope="col">כתובת מייל</th>
+            <th scope="col">אזור</th>
             <th scope="col">עיר</th>
             <th scope="col">תאריך הבקשה</th>
             <th scope="col">כתובת</th>
@@ -30,23 +30,27 @@
                 <tr bgcolor="white">
             {% endif %}
             {% if help_request.get_status_display == "טופל" %}
-                <tr bgcolor="green">
+                <tr bgcolor="#9acd32">
             {% endif %}
             {% if help_request.get_status_display == "בטיפול" %}
-                <tr bgcolor="yellow">
+                <tr bgcolor="#f0e68c">
             {% endif %}
             {% if help_request.get_status_display == "הועבר למתנדב" %}
-                <tr bgcolor="blue">
+                <tr bgcolor="#6495ed">
             {% endif %}
             {% if help_request.get_status_display == "לא טופל" %}
-                <tr bgcolor="red">
+                <tr bgcolor="#ff6347">
             {% endif %}
                 <th scope="row">{{ help_request.id }}</th>
                 <td>{{ help_request.full_name }}</td>
                 <td>{{ help_request.phone_number }}</td>
-                <td>{{ volunteer.email }}</td>
+                <td>
+                    {% for area in help_request.areas.all %}
+                        {{ area }},
+                    {% endfor %}
+                </td>
                 <td>{{ help_request.city }}</td>
-                <td>{{ help_request.created_date|date:"d/m/Y" }}</td>
+                <td>{{ help_request.created_date|date:"d/m/Y H:i" }}</td>
                 <td>{{ help_request.address }}</td>
                 <td>{{ help_request.notes }}</td>
                 <td>{{ help_request.get_type_display }}</td>
@@ -70,7 +74,7 @@
 
 
                          <form method="post" action="{% url 'change_stat' help_request.id%}">
-                              {% csrf_token %}
+                             {% csrf_token %}
                               <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">עריכת בקשה</h4>
                               </div>
@@ -160,11 +164,12 @@
             <th scope="col">דרכי התניידות</th>
             <th scope="col">האם זמין עכשיו?</th>
             <th scope="col">מרחק מהיעד</th>
+            <th scope="col">מספר הפעמים שעזר</th>
             <th scope="col">אפשרויות</th>
         </tr>
     </thead>
     <tbody>
-        {% for volunteer, distance in closes_volunteer %}
+        {% for volunteer, distance, num_of_time in closes_volunteer %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
@@ -192,6 +197,7 @@
                     {% endif %}
                 </td>
                 <td>{{ distance }} ק"מ</td>
+                <td>{{ num_of_time }}</td>
                 <td><a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#choose_volu{{ volunteer.id }}">נבחר</a></td>
             </tr>
 
