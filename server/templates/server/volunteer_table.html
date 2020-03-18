@@ -108,6 +108,16 @@
     {% if not page == num_pages %}
     <a href="{% url 'show_all_volunteers' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
     {% endif %}
+    
+    {% if page == 23 %}
+    <a href="{% url 'show_all_volunteers' %}/{{ page|add:-22 }}?{{ request.META.QUERY_STRING }}">עמוד ראשון</a>
+    {% endif %}
+    &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
+       
+    {% if page == 1 %}
+    <a href="{% url 'show_all_volunteers' %}/{{ page|add:22 }}?{{ request.META.QUERY_STRING }}">עמוד אחרון</a>
+    {% endif %}
+    &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
 </div>
 
                     <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
