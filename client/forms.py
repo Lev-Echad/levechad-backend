@@ -137,7 +137,6 @@ class BaseHelpForm(forms.Form):
     """TYPES = (
         ('BUYIN', 'קניות\\איסוף'),
         ('MEDICI', 'תרופות'),
-        ('HOME_HEL', 'עזרה בבית'),
         ('PHONE_HEL', 'תמיכה טלפונית'),
         ('OTHER', 'אחר')
     )"""
@@ -161,18 +160,18 @@ class BaseHelpForm(forms.Form):
         self.fields['address'].label = "כתובת מגורים"
         self.fields['notes'].label = "הערות"
 
-class HomeForm(BaseHelpForm):
-    need_text = forms.CharField(widget=forms.Textarea, max_length=5000)
+# class HomeForm(BaseHelpForm):
+#     need_text = forms.CharField(widget=forms.Textarea, max_length=5000)
 
-    def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
-        self.fields['notes'].label = "הערות"
-        self.fields['need_text'].label = "מהי העזרה שאתה צריך"
+#     def __init__(self, *args, **kwargs):
+#         super(BaseHelpForm, self).__init__(*args, **kwargs)
+#         self.fields['full_name'].label = "שם מלא"
+#         self.fields['phone_number'].label = "מספר פלאפון"
+#         self.fields['area'].label = "אזור"
+#         self.fields['city'].label = "עיר מגורים"
+#         self.fields['address'].label = "כתובת מגורים"
+#         self.fields['notes'].label = "הערות"
+#         self.fields['need_text'].label = "מהי העזרה שאתה צריך"
 
 
 class MedicForm(BaseHelpForm):
