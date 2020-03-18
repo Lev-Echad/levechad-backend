@@ -9,11 +9,11 @@ FIELD_NAME_MAPPING = {
 
 # Create your models here.
 AREAS = (
-    ("TZAF", "צפון"),
-    ("JERU", "ירושלים והסביבה"),
-    ("MERK", "מרכז"),
-    ("YEHU", "יהודה ושומרון"),
-    ("DARO", "דרום")
+    ("צפון", "צפון"),
+    ("ירושלים והסביבה", "ירושלים והסביבה"),
+    ("מרכז", "מרכז"),
+    ("יהודה ושומרון", "יהודה ושומרון"),
+    ("דרום", "דרום")
 )
 
 json_file = open('./client/city.json', encoding="utf-8")
@@ -133,7 +133,7 @@ class BaseHelpForm(forms.Form):
     my_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
     full_name = forms.CharField(max_length=200)
     phone_number = forms.CharField(max_length=200, required=True, validators=[my_validator])
-    area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
+    area = forms.ChoiceField(choices = AREAS)
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=200)
     notes = forms.CharField(max_length=200, required=False)

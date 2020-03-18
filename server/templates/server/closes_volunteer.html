@@ -45,9 +45,7 @@
                 <td>{{ help_request.full_name }}</td>
                 <td>{{ help_request.phone_number }}</td>
                 <td>
-                    {% for area in help_request.areas.all %}
-                        {{ area }},
-                    {% endfor %}
+                    {{ help_request.area }}
                 </td>
                 <td>{{ help_request.city }}</td>
                 <td>{{ help_request.created_date|date:"d/m/Y H:i" }}</td>
