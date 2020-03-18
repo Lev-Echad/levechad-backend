@@ -22,7 +22,8 @@
     <link rel="stylesheet" href="{% static 'client/main.css' %}">
     <title>{% block title %}{% endblock %}</title>
 </head>
-<body dir="rtl">
+<body dir="rtl" style="height: 100%">
+<div class="page-wrap">
 <div class="back">
     <nav class="navbar navbar-expand-lg navbar-light">
 
@@ -59,7 +60,20 @@
 </div>
 <div class="container box">
     {% include "translate.html" %}
-    {% block body %}{% endblock %}
+    {% block body %}
+    {% endblock %}
 </div>
+
+
+</div>
+
+
+<footer class="page-footer"><!-- Footer -->
+    <div class="navbar navbar-default navbar-static-bottom navbar-fixed-bottom">
+      <label class="center"> אתר זה נבנה בתרומה ע"י תוכנית תלפיות  </label>
+    </div>
+  <!-- End of Footer -->
+</footer>
+
 </body>
 </html>

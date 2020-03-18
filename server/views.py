@@ -132,6 +132,7 @@ def show_all_volunteers(request, page = 1):
     # ----- orders -----
     if 'field' in request.GET:
         field = request.GET.get('field')
+        field = "-" + field
         match_qs = match_qs.order_by(field)
 
 
