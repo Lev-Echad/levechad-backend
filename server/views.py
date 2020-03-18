@@ -51,7 +51,9 @@ def show_all_volunteers(request, page = 1):
     language_qs=Volunteer.objects.all().none()
     availability_qs=Volunteer.objects.all().all()
 
-    area_qs = qs.filter(areas__name__in=get_mandatory_areas(request))
+    area_qs = qs
+    if len(get_mandatory_areas(request)) != 0:
+        area_qs = qs.filter(areas__name__in=get_mandatory_areas(request))
 
     if len(areas) != 0 and not '' in areas:
         something_mark = True
