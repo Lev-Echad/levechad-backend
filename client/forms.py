@@ -69,7 +69,12 @@ class VolunteerForm(forms.Form):
     hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
     area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
     childrens = forms.MultipleChoiceField(choices = BOOL, widget=forms.CheckboxSelectMultiple())
-    no_corona = forms.BooleanField()
+    no_corona1 = forms.BooleanField()
+    no_corona2 = forms.BooleanField()
+    no_corona3 = forms.BooleanField()
+    no_corona4 = forms.BooleanField()
+
+
 
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
@@ -87,7 +92,9 @@ class VolunteerForm(forms.Form):
         self.fields['hearing_way'].label = "איך שמעת עלינו"
         self.fields['no_corona1'].label = "אני מאשר\ת כי לא חזרתי מחו''ל ב-14 הימים האחרונים"
         self.fields['no_corona2'].label = "אני מאשר\ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
-        self.fields['no_corona3'].label = "אני מאשר\ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
+        self.fields['no_corona3'].label = "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
+
+        self.fields['no_corona4'].label = "אני מאשר\ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
 
         self.fields['childrens'].label = (
             "סיוע לעובדים חיוניים"
