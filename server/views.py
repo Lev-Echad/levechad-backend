@@ -56,7 +56,6 @@ def show_all_volunteers(request, page = 1):
 
     area_qs=Volunteer.objects.all().none()
     language_qs=Volunteer.objects.all().none()
-    guidings_qs = Volunteer.objects.all().all()
     availability_qs=Volunteer.objects.all().all()
 
     area_qs = qs
@@ -75,7 +74,7 @@ def show_all_volunteers(request, page = 1):
     
     if len(guidings) != 0:
         something_mark = True
-        guidings_qs = qs.filter(guiding = True)
+        qs = qs.filter(guiding = True)
     
 
 
