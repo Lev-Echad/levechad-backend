@@ -177,7 +177,7 @@ def show_all_help_request(request, page = 1):
 
     status_qs =HelpRequest.objects.none()
     type_qs = HelpRequest.objects.none()
-    area_qs = HelpRequest.objects.all().none()
+    area_qs = HelpRequest.objects.all().all()
 
     if len(statuses) != 0 and not '' in statuses:
         something_mark = True
