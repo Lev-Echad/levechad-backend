@@ -30,7 +30,13 @@ def get_mandatory_areas(request):
 
 @login_required
 def index(request):
-    context = {}
+    context = {
+        "numbers": {
+            "total_volunteers": Volunteer.objects.count(),
+            "total_help_requests": HelpRequest.objects.count(),
+            "solved_help_requests": HelpRequest.objects.filter(status="DONE").count()
+        }
+    }
     return render(request, 'server/server_index.html', context)
 
 """
