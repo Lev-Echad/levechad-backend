@@ -50,7 +50,7 @@ def volunteer(request):
             keep_mandatory_worker_children = False
             if answer["childrens"] == "YES":
                 keep_mandatory_worker_children = True
-            volunter_new = Volunteer(tz_number = answer["identity"], full_name=answer["full_name"], age=answer["age"],
+            volunter_new = Volunteer(tz_number = answer["identity"], full_name=answer["full_name"],email = answer["email"], age=answer["age"],
                                      phone_number=answer["phone_number"],
                                      city=City.objects.get(name=answer["city"]), address=answer["address"],
                                      available_saturday=answer["available_on_saturday"],
