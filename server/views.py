@@ -160,6 +160,11 @@ def show_all_volunteers(request, page = 1):
     context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page, 'num_pages': paginator.num_pages}
     return render(request, 'server/volunteer_table.html', context)
 
+@login_required
+def search_volunteer(request):
+    name = request.GET.get('name')
+    qs = Volunteer.objects.filter(full_name = name)
+    
 """
 also filters by filter
 """
