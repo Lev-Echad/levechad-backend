@@ -22,58 +22,50 @@
     <link rel="stylesheet" href="{% static 'client/main.css' %}">
     <title>{% block title %}{% endblock %}</title>
 </head>
-<body dir="rtl" style="height: 100%">
-<div class="page-wrap">
-<div class="back">
-    <nav class="navbar navbar-expand-lg navbar-light">
+<body dir="rtl">
+    <div class="page-wrapper">
+        <div class="back">
+            <nav class="navbar navbar-expand-lg navbar-light">
 
-        <a class="navbar-brand" href="/client/home">
-            <img class="logo" src="{% static 'client/logo.png' %}" alt="My image">
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+                <a class="navbar-brand" href="/client/home">
+                    <img class="logo" src="{% static 'client/logo.png' %}" alt="My image">
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto right">
-                <li class="nav-item">
-                    <a class="nav-link" href="/client/home">דף הבית</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/client/get_help">בקשת עזרה</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/client/volunteer">התנדבות</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="https://www.levechad.org/donates">לתרומות</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link"
-                       href="https://www.levechad.org/about-us">אודותנו</a>
-                </li>
-            </ul>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto right">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/client/home">דף הבית</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/client/get_help">בקשת עזרה</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/client/volunteer">התנדבות</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="https://www.levechad.org/donates">לתרומות</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="https://www.levechad.org/about-us">אודותנו</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
         </div>
-    </nav>
-</div>
-<div class="container box">
-    {% include "translate.html" %}
-    {% block body %}
-    {% endblock %}
-</div>
-
-
-</div>
-
-
-<footer class="page-footer"><!-- Footer -->
-    <div class="navbar navbar-default navbar-static-bottom navbar-fixed-bottom">
-      <label class="center"> אתר זה נבנה בתרומה ע"י תוכנית תלפיות  </label>
+        <div class="container box">
+            {% include "translate.html" %}
+            {% block body %}
+            {% endblock %}
+        </div>
     </div>
-  <!-- End of Footer -->
-</footer>
-
+    <footer class="page-footer">
+        <label class="center"> אתר זה נבנה בתרומה ע"י תוכנית תלפיות  </label>
+    </footer>
 </body>
 </html>

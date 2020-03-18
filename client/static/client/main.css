@@ -26,6 +26,12 @@ ul {
 
 }
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
 
 body {
     font-family: "Alef Hebrew",
@@ -217,5 +223,22 @@ div {
     text-align: center;
 }
 
+.page-wrapper {
+  position: relative;
+  min-height: 100%;
+  /* equal to footer height */
+  margin-bottom: -60px;
+}
 
+.page-footer {
+  position:relative; /* This is a footer that is contained by a positioned main container */
+  bottom:0;
+  height: 60px;
+  width: 100%;
+  background-color: #efefef;
+  text-align: center;
+}
 
+.page-footer p {
+  margin: 0px;
+}
