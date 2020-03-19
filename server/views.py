@@ -51,7 +51,7 @@ def show_all_volunteers(request, page = 1):
     lans = request.GET.getlist('language')
     availability = request.GET.getlist('availability')
     guidings = request.GET.getlist('guiding')
-    search_name = request.GET.get('searchname')
+    search_name = request.GET.getlist('searchname')
     something_mark = False
 
     area_qs=Volunteer.objects.all().none()
