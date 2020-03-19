@@ -76,7 +76,7 @@
                         <div class="modal-content">
 
 
-                         <form method="post" action="{% url 'help_edit_stat' help_request.id%}">
+                         <form method="post" action="{% url 'change_stat' help_request.id%}">
                              {% csrf_token %}
                               <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">עריכת בקשה</h4>
@@ -121,12 +121,7 @@
                                         <input type="text" name="user_name" id="user_name" value='{{ help_request.status_updater }}'>
                                     </div>
                                 </div>
-                                 <div class="right">
-                                    <div>
-                                        <label for="area"> עידכון איזור</label>
-                                        <input type="text" name="area" id="area" value='{{ help_request.area }}'>
-                                    </div>
-                                </div>
+                                
 
 
                                   <div class="right">
