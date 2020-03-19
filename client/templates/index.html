@@ -38,5 +38,30 @@
         <!-- /card-three -->
 
     </section>
-</div>
+<br/>
+
+  <div  style="text-align: center;">
+    <div class="card-deck">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">מתנדבים</h5>
+          <h2 class="card-text font-weight-bold mb-3">{{ numbers.total_volunteers }}</h2>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">בקשות עזרה</h5>
+          <h2 class="card-text font-weight-bold mb-3">{{ numbers.total_help_requests }}</h2>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">בקשות עזרה שטופלו</h5>
+          <h2 class="card-text font-weight-bold mb-3">{{ numbers.solved_help_requests }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+ </div>
+
 {% endblock %}
