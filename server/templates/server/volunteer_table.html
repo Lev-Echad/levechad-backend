@@ -132,12 +132,24 @@
 </table>
 
 <div>
+  
     {% if page != 1 %}
     <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
     {% endif %}
     &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
     {% if not page == num_pages %}
     <a href="{% url 'show_all_volunteers' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
+    {% endif %}
+    
+    {% if page == num_pages %}
+    
+     <a href="{% url 'show_all_volunteers' %}/{{ page|1 }}?{{ request.META.QUERY_STRING }}">עמוד ראשון</a>
+    
+    {% endif %}
+    {% if page == 1 %}
+    
+     <a href="{% url 'show_all_volunteers' %}/{{ page|num_pages }}?{{ request.META.QUERY_STRING }}">עמוד ראשון</a>
+    
     {% endif %}
     
     
