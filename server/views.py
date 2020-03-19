@@ -44,7 +44,7 @@ also filters by filter
 """
 @login_required
 def show_all_volunteers(request, page = 1):
-    qs = Volunteer.objects.all().order_by('id').reverse()
+    qs = Volunteer.objects.all().order_by('-id')
 
     # ------- filters -------
     areas = request.GET.getlist('area')
@@ -132,7 +132,7 @@ def show_all_volunteers(request, page = 1):
 
     # if there were no matches display all and there are people available
     if len(match_qs) == 0 and (not something_mark):
-        match_qs = Volunteer.objects.all().order_by('id').reverse()
+        match_qs = Volunteer.objects.all().order_by('-id')
 
 #     if len(guidings1) != 0:
 #         match_qs = match_qs.filter(guiding=True)
@@ -172,7 +172,7 @@ also filters by filter
 """
 @login_required
 def show_all_help_request(request, page = 1):
-    qs = HelpRequest.objects.all().order_by('id').reverse()
+    qs = HelpRequest.objects.all().order_by('-id')
 
     statuses = request.GET.getlist('status')
     type = request.GET.getlist('type')
@@ -207,7 +207,7 @@ def show_all_help_request(request, page = 1):
 
     # if there were no matches display all
     if len(match_qs) == 0 and (not something_mark):
-        match_qs = qs.order_by('id').reverse()
+        match_qs = qs.order_by('-id')
 
 
     # ----- orders -----
