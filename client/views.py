@@ -31,7 +31,15 @@ def thanks(request):
 
 
 def homepage(request):
-    return render(request, 'index.html', {})
+    context = {
+        "numbers": {
+            "total_volunteers": Volunteer.objects.count(),
+            "total_help_requests": HelpRequest.objects.count(),
+            "solved_help_requests": HelpRequest.objects.filter(status="DONE").count()
+        }
+    }
+   
+    return render(request, 'index.html', context)
 
 
 def donation(request):
