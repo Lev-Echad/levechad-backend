@@ -134,8 +134,6 @@
 <div>
     {% if page != 1 %}
     <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
-    <br>
-    <a href="{% url 'show_all_volunteers' %}/{{ page|add:-(page-1) }}?{{ request.META.QUERY_STRING }}">עמוד ראשון</a>
     {% endif %}
     &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
     {% if not page == num_pages %}
@@ -143,7 +141,7 @@
     {% endif %}
     
     {% if page == 23 %}
-        <a href="{% url 'show_all_volunteers' %}/{{ page|add:-(page-1) }}?{{ request.META.QUERY_STRING }}">עמוד ראשון</a>
+        <a href="{% url 'show_all_volunteers' %}/{{ page|add:-22) }}?{{ request.META.QUERY_STRING }}">עמוד ראשון</a>
 
     {% endif %}
        
