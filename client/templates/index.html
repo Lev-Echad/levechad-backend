@@ -44,22 +44,13 @@
     <div class="card-deck">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">מתנדבים</h5>
-          <h2 class="card-text font-weight-bold mb-3">{{ numbers.total_volunteers }}</h2>
+          <h5 class="card-title">{{ numbers.total_volunteers }} :מתנדבים עד כה</h5>
+            h5 class="card-title">{{ numbers.total_help_requests }} :בקשות עזרה עד כה</h5>
+                      h5 class="card-title">{{ numbers.solved_help_requests }} :בקשות עזרה שטופלו עד כה</h5>
+
         </div>
       </div>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">בקשות עזרה</h5>
-          <h2 class="card-text font-weight-bold mb-3">{{ numbers.total_help_requests }}</h2>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">בקשות עזרה שטופלו</h5>
-          <h2 class="card-text font-weight-bold mb-3">{{ numbers.solved_help_requests }}</h2>
-        </div>
-      </div>
+     
     </div>
   </div>
  </div>
