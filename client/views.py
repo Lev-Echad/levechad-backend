@@ -19,7 +19,7 @@ def thanks(request):
         return render(request, 'thanks.html', {
             "message": "סטאטוס הבקשה שלך בLIVE",
             "status" : str(hr.get_status_display())
-            "id" : hr.id
+           
         })
     except Exception as e:
         return render(request, 'thanks.html', {
