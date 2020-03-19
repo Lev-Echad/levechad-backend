@@ -177,6 +177,10 @@ def show_all_help_request(request, page = 1):
     statuses = request.GET.getlist('status')
     type = request.GET.getlist('type')
     areas = request.GET.getlist('area')
+    search_name = request.GET.getlist('search_name')
+    search_id = request.GET.getlist('search_id')
+
+
 
     something_mark = False
 
@@ -199,6 +203,15 @@ def show_all_help_request(request, page = 1):
     if len(areas) != 0 and not '' in areas:
         something_mark = True
         area_qs = area_qs.filter(area__name__in=areas)
+        
+    if len(search_name) != 0:
+        something_mark = True
+        qs = qs.filter(full_name = search_name[0])
+    if len(search_id) != 0:
+        something_mark = True
+        qs = qs.filter(id = search_id[0])
+    
+    
 
     
 
