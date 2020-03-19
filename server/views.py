@@ -224,10 +224,9 @@ def show_all_help_request(request, page = 1):
 
 
     # ----- orders -----
-    if 'field' in request.POST:
-        field = request.POST.get('field')
-        match_qs = match_qs.order_by(field)
-
+    if 'field' in request.GET:
+        field = request.GET.get('field')
+        field = "-" + field
 
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
     match_qs = paginator.page(page)
