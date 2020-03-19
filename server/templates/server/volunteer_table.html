@@ -69,7 +69,8 @@
                 <td>{{ volunteer.guiding }}</td>
 
                 <td>
-                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#edit_volu{{ volunteer.id }}">ערוך</a>
+                    {{ volunteer.notes }} <br>
+                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#edit_volu{{ volunteer.id }}"> ערוך</a>
                 </td>
                   <td>
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#delete_volunteer{{ volunteer.id }}">למחוק</a>
