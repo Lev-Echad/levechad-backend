@@ -181,6 +181,7 @@ def show_all_help_request(request, page = 1):
     
     if len(statuses) != 0 and not '' in statuses:
         something_mark = True
+        status_qs = qs.filter(status = statuses)
         
     if len(type) != 0 and not '' in type:
         something_mark = True
