@@ -17,12 +17,14 @@ def thanks(request):
         print(str(hr.status))
 
         return render(request, 'thanks.html', {
+            "id" : pk,
             "message": "סטאטוס הבקשה שלך בLIVE",
             "status" : str(hr.get_status_display())
            
         })
     except Exception as e:
         return render(request, 'thanks.html', {
+            "id" : " ",
             "message": "התקשר למוקד שלנו לפרטים נוספים",
             "status": ""
         })
