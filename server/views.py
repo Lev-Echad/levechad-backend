@@ -169,8 +169,8 @@ also filters by filter
 def show_all_help_request(request, page = 1):
     qs = HelpRequest.objects.all()
 
-    statuses = request.POST.getlist('status')
-    type = request.POST.getlist('type')
+    statuses = request.GET.getlist('status')
+    type = request.GET.getlist('type')
     areas = request.GET.getlist('area')
 
     something_mark = False
