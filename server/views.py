@@ -172,7 +172,7 @@ also filters by filter
 """
 @login_required
 def show_all_help_request(request, page = 1):
-    qs = HelpRequest.objects.all()
+    qs = HelpRequest.objects.all().order_by('id')
 
     statuses = request.GET.getlist('status')
     type = request.GET.getlist('type')
@@ -207,7 +207,7 @@ def show_all_help_request(request, page = 1):
 
     # if there were no matches display all
     if len(match_qs) == 0 and (not something_mark):
-        match_qs = qs
+        match_qs = qs.order_by('id')
 
 
     # ----- orders -----
