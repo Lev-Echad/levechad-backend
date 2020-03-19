@@ -49,6 +49,7 @@
                 <td>{{ help_request.phone_number }}</td>
                 <td>
                     {{ help_request.area }}
+                    
                 </td>
                 <td>{{ help_request.city }}</td>
                 <td>{{ help_request.created_date|date:"d/m/Y H:i" }}</td>
@@ -120,6 +121,13 @@
                                         <input type="text" name="user_name" id="user_name" value='{{ help_request.status_updater }}'>
                                     </div>
                                 </div>
+                                 <div class="right">
+                                    <div>
+                                        <label for="area"> עידכון איזור</label>
+                                        <input type="text" name="area" id="area" value='{{ help_request.area }}'>
+                                    </div>
+                                </div>
+
 
                                   <div class="right">
                                     <div>
