@@ -8,6 +8,8 @@ from .models import Volunteer, City, Language, VolunteerSchedule, HelpRequest, A
 def helper_help(pk, fullName):
     return HelpRequest.objects.get(pk=pk, full_name = fullName)
 
+def vol(pk):
+    return Volunteer.objects.get(pk=pk)
 def thanks(request):
     try:
         username = request.GET['username']
@@ -30,8 +32,21 @@ def thanks(request):
         })
 def thanks_volunteer(request):
    
+        pk = request.GET['vol_id']
 
-        return render(request, 'thanks_volunteer.html')
+        vr = vol(pk)
+        print(str(hr.status))
+        return render(request, 'thanks_volunteer.html', {
+            "name" : vr.full_name,
+            "taz": vr.tz_number
+          
+           
+        })
+    except Exception as e:
+        return render(request, 'thanks_volunteer.html', {
+            "name" : " ",
+            "taz": " "
+        })
 
 def homepage(request):
     context = {
@@ -87,7 +102,7 @@ def volunteer(request):
 
 
 def schedule(request):
-
+    vol = Volunteer.objects.get(pk = int(request.GET.get('vol_id', '')))
     if request.method == 'POST':
         form = ScheduleForm(request.POST)
         # check whether it's valid:
@@ -105,7 +120,7 @@ def schedule(request):
             # ...
             # redirect to a new URL:
 
-            return HttpResponseRedirect('/client/thanks_volunteer')
+            return HttpResponseRedirect('/client/thanks_volunteer?vol_id=' + str(vol.pk)')
 
     # if a GET (or any other method) we'll create a blank form
     else:
