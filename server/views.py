@@ -178,7 +178,6 @@ def show_all_help_request(request, page = 1):
     type = request.GET.getlist('type')
     areas = request.GET.getlist('area')
     search_name = request.GET.getlist('search_name')
-    search_id = request.GET.getlist('search_id')
 
 
 
@@ -208,10 +207,7 @@ def show_all_help_request(request, page = 1):
         something_mark = True
         qs = qs.filter(full_name = search_name[0])
         
-    if len(search_id) != 0:
-        something_mark = True
-        qs = qs.filter(id = search_id[0])
-    
+ 
     
 
     
