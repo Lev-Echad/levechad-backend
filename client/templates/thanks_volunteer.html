@@ -1,0 +1,16 @@
+{% extends "template.html" %}
+
+{% block title %}לב אחד - דף הבית{% endblock %}
+
+
+{% block body %}
+<h1>תודה רבה!</h1>
+<h2>אנחנו מעבדים את הבקשה</h2>
+
+<br><br>
+
+{{ message }}
+
+<img class="logo" src="{% static 'client/logo.png' %}" alt="My image">
+
+{% endblock %}
