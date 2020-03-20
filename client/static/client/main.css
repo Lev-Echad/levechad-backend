@@ -243,6 +243,18 @@ div {
   margin: 0px;
 }
 @media only screen and (max-width: 600px) {
-  tag {
-    width:200px;
+  .tag {
+    left:25%;
+    width:250px;
   }
+  .taginfo{
+      font-size:10px;
+    }
+    #taz{
+        top:60px;
+    }
+    #shem{
+        bottom:60px;
+    }
+    
+}
