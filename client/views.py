@@ -28,7 +28,15 @@ def thanks(request):
             "message": "התקשר למוקד שלנו לפרטים נוספים",
             "status": ""
         })
+def thanks_volunteer(request):
+   
 
+        return render(request, 'thanks_volunteer.html', {
+           
+            "message": "סטאטוס הבקשה שלך בLIVE"
+            
+        })
+ 
 
 def homepage(request):
     context = {
