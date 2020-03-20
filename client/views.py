@@ -8,8 +8,6 @@ from .models import Volunteer, City, Language, VolunteerSchedule, HelpRequest, A
 def helper_help(pk, fullName):
     return HelpRequest.objects.get(pk=pk, full_name = fullName)
 
-def vol(pk):
-    return Volunteer.objects.get(pk=pk)
 def thanks(request):
     try:
         username = request.GET['username']
