@@ -69,6 +69,8 @@ class VolunteerForm(forms.Form):
     hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
     area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
     childrens = forms.ChoiceField(choices=BOOL)
+    chamal = forms.ChoiceField(choices=BOOL)
+
     no_corona1 = forms.BooleanField()
     no_corona2 = forms.BooleanField()
     no_corona3 = forms.BooleanField()
@@ -98,9 +100,14 @@ class VolunteerForm(forms.Form):
         self.fields['no_corona4'].label = "אני מאשר\ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
 
         self.fields['childrens'].label = (
-            "האם את\ה מעוניינ\ת לסייע לעובדים חיוניים (בעיקר השגחה על ילדי רופאים בבתי חולים)? - עדיפות ל-3 ימי התנדבות.  "
+            "האם את\ה מעוניינ\ת לסייע לעובדים חיוניים (מסגרות חיוניות לילדי צוות רפואי)? - עדיפות ל-3 ימי התנדבות.  "
            
         )
+        self.fields['chamal'].label = (
+            " ?האם אתה מתנדב חמ''ל"
+           
+        )
+
 
 class ScheduleForm(forms.Form):
     TIMES = (
