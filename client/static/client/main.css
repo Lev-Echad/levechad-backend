@@ -250,7 +250,10 @@ div {
   }
   .taginfo{
       font-size:10px;
+    |
     }
-  
+    #aboutvolu{
+    font-size:10px;
+    }
     
 }
