@@ -242,3 +242,7 @@ div {
 .page-footer p {
   margin: 0px;
 }
+@media only screen and (max-width: 600px) {
+  tag {
+    width:200px;
+  }
