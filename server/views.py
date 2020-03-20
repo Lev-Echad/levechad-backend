@@ -76,7 +76,7 @@ def show_all_volunteers(request, page = 1):
         something_mark = True
         qs = qs.filter(guiding = True)
         
-    if search_name != []:
+    if len(search_name[0]) > 2:
         something_mark = True
         qs = qs.filter(full_name = search_name[0])
     
