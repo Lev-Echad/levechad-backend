@@ -31,12 +31,7 @@ def thanks(request):
 def thanks_volunteer(request):
    
 
-        return render(request, 'thanks_volunteer.html', {
-           
-            "message": "סטאטוס הבקשה שלך בLIVE"
-            
-        })
- 
+        return render(request, 'thanks_volunteer.html')
 
 def homepage(request):
     context = {
