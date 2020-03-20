@@ -207,6 +207,7 @@ def show_all_help_request(request, page = 1):
     if len(search_name) != 0:
         something_mark = True
         qs = qs.filter(full_name = search_name[0])
+        
     if len(search_id) != 0:
         something_mark = True
         qs = qs.filter(id = search_id[0])
@@ -228,11 +229,16 @@ def show_all_help_request(request, page = 1):
         field = request.GET.get('field')
         field = "-" + field
         match_qs = match_qs.order_by(field)
+        
+        
+    final_data = []
+    for i in range (0, len(match_qs)):
+        final_data.append((match_qs[i])
 
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
-    match_qs = paginator.page(page)
+    final_data = paginator.page(page)
 
-    context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages}
+    context = {'help_requests': final_data, 'page': page, 'num_pages': paginator.num_pages}
     return render(request, 'server/help_table.html', context)
 
 
