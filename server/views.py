@@ -184,17 +184,12 @@ def show_all_help_request(request, page = 1):
 
     something_mark = False
 
-    status_qs =HelpRequest.objects.all().none()
-    type_qs = HelpRequest.objects.all().none()
+    status_qs =HelpRequest.objects.none()
+    type_qs = HelpRequest.objects.none()
     area_qs = HelpRequest.objects.all().none()
     
-    area_qs = qs
-    if len(get_mandatory_areas(request)) != 0:
-        area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
-
-    if len(areas) != 0 and not '' in areas:
-        something_mark = True
-        area_qs = area_qs.filter(area__name__in=areas)
+    
+   
     
     if len(statuses) != 0 and not '' in statuses:
         something_mark = True
@@ -203,7 +198,12 @@ def show_all_help_request(request, page = 1):
     if len(type) != 0 and not '' in type:
         something_mark = True
         type_qs = qs.filter(type__in=type)
-    
+    if len(get_mandatory_areas(request)) != 0:
+        area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
+
+    if len(areas) != 0 and not '' in areas:
+        something_mark = True
+        area_qs = area_qs.filter(area__name__in=areas)
     if len(search_name) != 0:
         something_mark = True
         qs = qs.filter(full_name = search_name[0])
@@ -224,21 +224,14 @@ def show_all_help_request(request, page = 1):
         match_qs = HelpRequest.objects.all().order_by('-id')
 
 
-    # ----- orders -----
-    if 'field' in request.GET:
-        field = request.GET.get('field')
-        field = "-" + field
-        match_qs = match_qs.order_by(field)
+  
         
-        
-    final_data = []
-    for i in range (0, len(match_qs)):
-        final_data.append((match_qs[i])
+  
 
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
-    final_data = paginator.page(page)
+    match_qs = paginator.page(page)
 
-    context = {'help_requests': final_data, 'page': page, 'num_pages': paginator.num_pages}
+    context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages}
     return render(request, 'server/help_table.html', context)
 
 
