@@ -105,7 +105,7 @@ def schedule(request):
             # ...
             # redirect to a new URL:
 
-            return HttpResponseRedirect('/client/thanks_volunteer)
+            return HttpResponseRedirect('/client/thanks_volunteer')
 
     # if a GET (or any other method) we'll create a blank form
     else:
