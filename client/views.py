@@ -35,7 +35,6 @@ def thanks_volunteer(request):
         pk = request.GET['vol_id']
 
         vr = vol(pk)
-        print(str(hr.status))
         return render(request, 'thanks_volunteer.html', {
             "name" : vr.full_name,
             "taz": vr.tz_number
