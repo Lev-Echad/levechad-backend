@@ -76,7 +76,7 @@
                         <div class="modal-content">
 
 
-                         <form method="get" action="{% url 'change_stat' help_request.id%}">
+                         <form method="post" action="{% url 'change_stat' help_request.id%}">
                              {% csrf_token %}
                               <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">עריכת בקשה</h4>
@@ -181,7 +181,7 @@
                         <div class="modal-content">
 
 
-                         <form method="post" action="{% url 'show_all_help_request' %}">
+                         <form method="get" action="{% url 'show_all_help_request' %}">
                               {% csrf_token %}
                               <div class="modal-header text-center">
                                 <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
