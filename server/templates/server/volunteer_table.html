@@ -141,13 +141,13 @@
     <a href="{% url 'show_all_volunteers' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
     {% endif %}
     {% if page == 1 %}
-    <a href="{% url 'show_all_volunteers' %}/{{ page|add:29 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אחרון</a>
-        <a href="{% url 'show_all_volunteers' %}/{{ page|add:15 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
+    <a href="{% url 'show_all_volunteers' %}/{{ page|add:39 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אחרון</a>
+        <a href="{% url 'show_all_volunteers' %}/{{ page|add:20 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
 
     {% endif %}
-     {% if page == 30 %}
-    <a href="{% url 'show_all_volunteers' %}/{{ page|add:-29 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;">עמוד ראשון</a>
-        <a href="{% url 'show_all_volunteers' %}/{{ page|add:-15 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
+     {% if page == 41 %}
+    <a href="{% url 'show_all_volunteers' %}/{{ page|add:-40 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;">עמוד ראשון</a>
+        <a href="{% url 'show_all_volunteers' %}/{{ page|add:-20 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
 
     
     {% endif %}
