@@ -49,7 +49,7 @@ also filters by filter
 """
 @login_required
 def show_all_volunteers(request, page = 1):
-    qs = Volunteer.objects.all().order_by('-id')
+    qs = Volunteer.objects.all().order_by('id')
 
     # ------- filters -------
     areas = request.GET.getlist('area')
@@ -137,7 +137,7 @@ def show_all_volunteers(request, page = 1):
 
     # if there were no matches display all and there are people available
     if len(match_qs) == 0 and (not something_mark):
-        match_qs = Volunteer.objects.all().order_by('-id')
+        match_qs = Volunteer.objects.all().order_by('id')
 
 #     if len(guidings1) != 0:
 #         match_qs = match_qs.filter(guiding=True)
