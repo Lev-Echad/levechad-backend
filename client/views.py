@@ -29,25 +29,8 @@ def thanks(request):
             "status": ""
         })
 def thanks_volunteer(request):
- try:
-        
-        pk = request.GET['pk']
-        vol = Volunteer.objects.get(pk = pk)
-
-       
-
-        return render(request, 'thanks_volunteer.html', {
-            "taz" : vol.tz_number,
-            "name" : vol.full_name
-            
-          
-           
-        })
-    except Exception as e:
-        return render(request, 'thanks_volunteer.html', {
-            "taz" : " ",
-            "name" : " "
-        })           
+ 
+    return render(request, 'thanks_volunteer.html')
 def homepage(request):
     context = {
         "numbers": {
