@@ -5,6 +5,8 @@ from django.db.models import F
 from django.core.paginator import Paginator
 import datetime
 from datetime import  time
+from django.conf import settings
+
 import logging
 logging.warning("levechad debug try")
 
