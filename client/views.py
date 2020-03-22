@@ -120,7 +120,8 @@ def schedule(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            vol_pk = request.POST.get(int(request.POST.get('vol_id')))
+            vol_pk = request.POST['vol_id']
+
             return HttpResponseRedirect('/client/thanks_volunteer?vol_id=' + str(vol_pk))
 
     # if a GET (or any other method) we'll create a blank form

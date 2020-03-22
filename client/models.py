@@ -1,6 +1,9 @@
+# coding=utf-8
+
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+# -*- coding: utf-8 -*-
 
 class Timestampable(models.Model):
     created_date = models.DateTimeField(null=True, editable=False)
@@ -51,10 +54,9 @@ class VolunteerSchedule(Timestampable):
 class Volunteer(Timestampable):
     MOVING_WAYS = (
         ("CAR", "רכב"),
-        ("PUBL", 'תחב"צ'),
-        ("FOOT", 'רגלית')
+        ("PUBL", "תחבצ"),
+        ("FOOT","רגלית")
     )
-
     HEARING_WAYS = (
         ("FB_INST", "פייסבוק ואינסטגרם"),
         ("WHTSP", "ווצאפ"),
