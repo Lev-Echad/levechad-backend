@@ -6,6 +6,8 @@ from django.core.paginator import Paginator
 import datetime
 from datetime import  time
 import logging
+logging.warning("levechad debug try")
+
 
 RESULTS_IN_PAGE = 50
 
