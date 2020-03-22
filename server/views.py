@@ -5,10 +5,7 @@ from django.db.models import F
 from django.core.paginator import Paginator
 import datetime
 from datetime import  time
-from django.conf import settings
 
-import logging
-logging.warning("levechad debug try")
 
 
 RESULTS_IN_PAGE = 50
@@ -205,9 +202,14 @@ def show_all_help_request(request, page = 1):
         type_qs = qs.filter(type__in=type)
     if len(get_mandatory_areas(request)) != 0:
         area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
+   
     if len(areas) != 0 and not '' in areas:
+        with open("templog.log", "wb") as file_obj:
+            file_obj.write("%s\n%s" % repr(areas_qs), repr(areas))
         something_mark = True
         area_qs = area_qs.filter(area__name__in=areas)
+        
+    
     if len(search_name) != 0:
         something_mark = True
         qs = qs.filter(full_name = search_name[0])
