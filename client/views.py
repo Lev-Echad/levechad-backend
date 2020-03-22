@@ -7,6 +7,8 @@ from .models import Volunteer, City, Language, VolunteerSchedule, HelpRequest, A
 
 def helper_help(pk, fullName):
     return HelpRequest.objects.get(pk=pk, full_name = fullName)
+def volunteer_obj(vol_id):
+    return Volunteer.objects.get(id=vol_id)
 
 def thanks(request):
     try:
@@ -29,6 +31,21 @@ def thanks(request):
             "status": ""
         })
 def thanks_volunteer(request):
+     try:
+        
+        vol_id = int(request.GET['vol_id'])
+        vr = volunteer_obj(vol_id)
+
+        return render(request, 'thanks_volunteer.html', {
+            "name" : vr.full_name,
+            "taz": vr.tz_number
+           
+        })
+    except Exception as e:
+        return render(request, 'thanks_volunteer.html', {
+            "taz" : " ",
+            "name": " "
+        })
  
     return render(request, 'thanks_volunteer.html')
 def homepage(request):
@@ -102,9 +119,9 @@ def schedule(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            vol_pk = request.POST.get('vol_id')
+            vol_pk = request.POST.get(int(request.POST.get('vol_id', '')))
 
-            return HttpResponseRedirect('/client/thanks_volunteer')
+            return HttpResponseRedirect('/client/thanks_volunteer?vol_id='+str(vol_pk))
 
     # if a GET (or any other method) we'll create a blank form
     else:
