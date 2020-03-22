@@ -29,8 +29,25 @@ def thanks(request):
             "status": ""
         })
 def thanks_volunteer(request):
-   return render(request, 'thanks_volunteer.html')
+ try:
+        
+        pk = request.GET['pk']
+        vol = Volunteer.objects.get(pk = pk)
+
+       
+
+        return render(request, 'thanks_volunteer.html', {
+            "taz" : vol.tz_number,
+            "name" : vol.full_name
+            
+          
            
+        })
+    except Exception as e:
+        return render(request, 'thanks_volunteer.html', {
+            "taz" : " ",
+            "name" : " "
+        })           
 def homepage(request):
     context = {
         "numbers": {
@@ -102,8 +119,9 @@ def schedule(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
+            vol_pk = request.POST.get('vol_id')
 
-            return HttpResponseRedirect('/client/thanks_volunteer')
+            return HttpResponseRedirect('/client/thanks_volunteer?pk=' + str(vol_pk)')
 
     # if a GET (or any other method) we'll create a blank form
     else:
