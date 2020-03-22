@@ -201,8 +201,10 @@ def show_all_help_request(request, page = 1):
         something_mark = True
         type_qs = qs.filter(type__in=type)
     if len(get_mandatory_areas(request)) != 0:
+        
         area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
-   
+    with open("templog.log", "wb") as file_obj:
+            file_obj.write("%s\n%s" % repr(areas_qs), repr(areas))
     if len(areas) != 0 and not '' in areas:
         with open("templog.log", "wb") as file_obj:
             file_obj.write("%s\n%s" % repr(areas_qs), repr(areas))
