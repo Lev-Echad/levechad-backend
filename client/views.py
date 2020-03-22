@@ -31,22 +31,7 @@ def thanks(request):
             "status": ""
         })
 def thanks_volunteer(request):
-     try:
-        
-        vol_id = int(request.GET['vol_id'])
-        vr = volunteer_obj(vol_id)
 
-        return render(request, 'thanks_volunteer.html', {
-            "name" : vr.full_name,
-            "taz": vr.tz_number
-           
-        })
-    except Exception as e:
-        return render(request, 'thanks_volunteer.html', {
-            "taz" : " ",
-            "name": " "
-        })
- 
     return render(request, 'thanks_volunteer.html')
 def homepage(request):
     context = {
@@ -121,7 +106,7 @@ def schedule(request):
             # redirect to a new URL:
             vol_pk = request.POST.get(int(request.POST.get('vol_id', '')))
 
-            return HttpResponseRedirect('/client/thanks_volunteer?vol_id='+str(vol_pk))
+            return HttpResponseRedirect('/client/thanks_volunteer')
 
     # if a GET (or any other method) we'll create a blank form
     else:
