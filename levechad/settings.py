@@ -113,6 +113,10 @@ LOGGING = {
         },
     },
     'loggers': {
+        'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+        },
         'django': {
             'handlers': ['file'],
             'level': 'DEBUG',
