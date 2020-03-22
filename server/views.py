@@ -5,6 +5,7 @@ from django.db.models import F
 from django.core.paginator import Paginator
 import datetime
 from datetime import  time
+import logging
 
 RESULTS_IN_PAGE = 50
 
