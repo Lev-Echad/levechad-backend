@@ -5,7 +5,6 @@ from django.db.models import F
 from django.core.paginator import Paginator
 import datetime
 from datetime import  time
-import logging
 
 RESULTS_IN_PAGE = 50
 
@@ -201,7 +200,6 @@ def show_all_help_request(request, page = 1):
         type_qs = qs.filter(type__in=type)
     if len(get_mandatory_areas(request)) != 0:
         area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
-    logging.getLogger("django").debug("type(area_qs)=%s type areas=%s areas='%s'", type(areas_qs), type(areas), repr(areas))
     if len(areas) != 0 and not '' in areas:
         something_mark = True
         area_qs = area_qs.filter(area__name__in=areas)
