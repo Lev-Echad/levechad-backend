@@ -121,7 +121,7 @@ def schedule(request):
             # redirect to a new URL:
             vol_pk = request.POST.get('vol_id')
 
-            return HttpResponseRedirect('/client/thanks_volunteer?pk=' + str(vol_pk))
+            return HttpResponseRedirect('/client/thanks_volunteer')
 
     # if a GET (or any other method) we'll create a blank form
     else:
