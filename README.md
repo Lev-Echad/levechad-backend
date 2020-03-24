@@ -11,6 +11,7 @@ How to use
 To run the server, use the following function:
 
     pip install -r requirements.txt
+    python manage.py collectstatic
     python manage.py runserver
 
 To add admin user and see the databases:
