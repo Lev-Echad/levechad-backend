@@ -4,19 +4,19 @@ from client.models import Volunteer, HelpRequest, Area
 from django.db.models import F
 from django.core.paginator import Paginator
 import datetime
-from datetime import  time
-
-
+from datetime import time
 
 RESULTS_IN_PAGE = 50
+
 
 def is_time_between(begin_time, end_time, check_time=None):
     # If check time is not given, default to current UTC time
     check_time = check_time or datetime.datetime.utcnow().time()
     if begin_time < end_time:
         return check_time >= begin_time and check_time <= end_time
-    else: # crosses midnight
+    else:  # crosses midnight
         return check_time >= begin_time or check_time <= end_time
+
 
 def get_mandatory_areas(request):
     mandatory_areas = []
@@ -30,6 +30,7 @@ def get_mandatory_areas(request):
 
     return mandatory_areas
 
+
 @login_required
 def index(request):
     context = {
@@ -41,11 +42,14 @@ def index(request):
     }
     return render(request, 'server/server_index.html', context)
 
+
 """
 also filters by filter
 """
+
+
 @login_required
-def show_all_volunteers(request, page = 1):
+def show_all_volunteers(request, page=1):
     qs = Volunteer.objects.all().order_by('-id')
 
     # ------- filters -------
@@ -56,34 +60,29 @@ def show_all_volunteers(request, page = 1):
     search_name = request.GET.getlist('searchname')
     something_mark = False
 
-    area_qs=Volunteer.objects.all().none()
-    language_qs=Volunteer.objects.all().none()
-    availability_qs=Volunteer.objects.all().all()
+    area_qs = Volunteer.objects.all().none()
+    language_qs = Volunteer.objects.all().none()
+    availability_qs = Volunteer.objects.all().all()
 
     area_qs = qs
     if len(get_mandatory_areas(request)) != 0:
         area_qs = qs.filter(areas__name__in=get_mandatory_areas(request))
-   
 
     if len(areas) != 0 and not '' in areas:
         something_mark = True
         area_qs = area_qs.filter(areas__name__in=areas)
 
-
     if len(lans) != 0 and not '' in lans:
         something_mark = True
         language_qs = qs.filter(languages__name__in=lans)
-    
+
     if len(guidings) != 0:
         something_mark = True
-        qs = qs.filter(guiding = True)
-        
+        qs = qs.filter(guiding=True)
+
     if len(search_name) != 0:
         something_mark = True
-        qs = qs.filter(full_name = search_name[0])
-    
-    
-
+        qs = qs.filter(full_name=search_name[0])
 
     # --------- check time now --------
     now = datetime.datetime.now()
@@ -95,53 +94,46 @@ def show_all_volunteers(request, page = 1):
     # check option 1
     if is_time_between(time(7, 00), time(15, 00)):
         filter = "schedule__" + now_day + "__contains"
-        availability_qs = qs.filter(**{filter:1})
+        availability_qs = qs.filter(**{filter: 1})
 
     # check option 2
     elif is_time_between(time(15, 00), time(23, 00)):
         filter = "schedule__" + now_day + "__contains"
-        availability_qs = qs.filter(**{filter:2})
+        availability_qs = qs.filter(**{filter: 2})
 
 
     # check option 3 before midnight
     elif is_time_between(time(23, 00), time(00, 00)):
         filter = "schedule__" + now_day + "__contains"
-        availability_qs = qs.filter(**{filter:3})
+        availability_qs = qs.filter(**{filter: 3})
 
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
         filter = "schedule__" + yesterday_day + "__contains"
-        availability_qs = qs.filter(**{filter:3})
-
+        availability_qs = qs.filter(**{filter: 3})
 
     availability_now_id = []
     if availability_qs != []:
         for volu in availability_qs:
             availability_now_id.append(volu.id)
 
-
-
-
     if len(availability) == 0:
         availability_qs = Volunteer.objects.all().all().order_by('-id')
-
 
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
 
-#     guidings1 = request.GET.getlist('guiding')
-
+    #     guidings1 = request.GET.getlist('guiding')
 
     # if there were no matches display all and there are people available
     if len(match_qs) == 0 and (not something_mark):
         match_qs = Volunteer.objects.all().order_by('-id')
 
-#     if len(guidings1) != 0:
-#         match_qs = match_qs.filter(guiding=True)
+    #     if len(guidings1) != 0:
+    #         match_qs = match_qs.filter(guiding=True)
 
     availability_qs = (availability_qs)
     match_qs = match_qs.intersection(availability_qs)
-
 
     # ----- orders -----
     if 'field' in request.GET:
@@ -149,32 +141,32 @@ def show_all_volunteers(request, page = 1):
         field = "-" + field
         match_qs = match_qs.order_by(field)
 
-
-    #----- check for each volunterr how much times he apper
+    # ----- check for each volunterr how much times he apper
     appers_list = []
     for volu in match_qs:
         appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
 
     # make match qs to tuple
     final_data = []
-    for i in range (0, len(match_qs)):
+    for i in range(0, len(match_qs)):
         final_data.append((match_qs[i], appers_list[i]))
 
     paginator = Paginator(final_data, RESULTS_IN_PAGE)
 
     final_data = paginator.page(page)
 
-    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page, 'num_pages': paginator.num_pages}
+    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
+               'num_pages': paginator.num_pages}
     return render(request, 'server/volunteer_table.html', context)
 
 
-    
 """
 also filters by filter
 """
+
+
 @login_required
-def show_all_help_request(request, page = 1):
-    
+def show_all_help_request(request, page=1):
     qs = HelpRequest.objects.all().order_by('-id')
 
     statuses = request.GET.getlist('status')
@@ -182,42 +174,29 @@ def show_all_help_request(request, page = 1):
     areas = request.GET.getlist('area')
     search_name = request.GET.getlist('search_name')
 
-
-
     something_mark = False
 
-    status_qs =HelpRequest.objects.none()
+    status_qs = HelpRequest.objects.none()
     type_qs = HelpRequest.objects.none()
     area_qs = HelpRequest.objects.all().none()
-    
-    
-   
-    
+
     if len(statuses) != 0 and not '' in statuses:
         something_mark = True
-        status_qs = qs.filter(status = statuses)
-        
+        status_qs = qs.filter(status=statuses)
+
     if len(type) != 0 and not '' in type:
         something_mark = True
         type_qs = qs.filter(type__in=type)
     if len(get_mandatory_areas(request)) != 0:
-        
         area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
-   
+
     if len(areas) != 0 and not '' in areas:
-   
         something_mark = True
         area_qs = area_qs.filter(area__name__in=areas)
-        
-    
+
     if len(search_name) != 0:
         something_mark = True
-        qs = qs.filter(full_name = search_name[0])
-        
- 
-    
-
-    
+        qs = qs.filter(full_name=search_name[0])
 
     # union matchings from both categoties
     match_qs = status_qs.union(type_qs, area_qs)
@@ -225,11 +204,6 @@ def show_all_help_request(request, page = 1):
     # if there were no matches display all
     if len(match_qs) == 0 and (not something_mark):
         match_qs = HelpRequest.objects.all().order_by('-id')
-
-
-  
-        
-  
 
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
     match_qs = paginator.page(page)
@@ -241,17 +215,18 @@ def show_all_help_request(request, page = 1):
 """
 also filters by filter
 """
+
+
 @login_required
 def order_help_request(request):
     qs = HelpRequest.objects.all()
     statuses = request.POST.getlist('status')
     type = request.POST.getlist('type')
 
-
-    status_qs =HelpRequest.objects.none()
+    status_qs = HelpRequest.objects.none()
     type_qs = HelpRequest.objects.none()
 
-    if len(statuses) != 0 :
+    if len(statuses) != 0:
         status_qs = qs.filter(status__in=statuses)
 
     if len(type) != 0:
@@ -261,7 +236,7 @@ def order_help_request(request):
     match_qs = status_qs.union(type_qs)
 
     # if there were no matches display all
-    if len(match_qs) ==0:
+    if len(match_qs) == 0:
         match_qs = qs
 
     context = {'help_requests': match_qs}
@@ -278,7 +253,6 @@ def help_edit_stat(request, pk):
 
     if request.POST.get('user_name') is not None:
         to_edit.status_updater = request.POST.get('user_name')
-  
 
     if request.POST.get('notes') is not None:
         to_edit.notes = request.POST.get('notes')
@@ -293,10 +267,8 @@ def help_edit_stat(request, pk):
         except:
             pass
 
-
     to_edit.save()
     return redirect('show_all_help_request')
-
 
 
 @login_required
@@ -307,11 +279,11 @@ def volunteer_edit_notes(request, pk):
     to_edit.save()
     return redirect('show_all_volunteers')
 
+
 @login_required
 def delete_volunteer(request, pk):
     to_delete = Volunteer.objects.get(id=pk)
     to_delete.delete()
-    to_delete.save()
     return redirect('show_all_volunteers')
 
 
@@ -320,7 +292,7 @@ def find_closes_persons(request, pk):
     request_person = HelpRequest.objects.get(id=pk)
 
     req_city = request_person.city
-    req_x =  req_city.x
+    req_x = req_city.x
     req_y = req_city.y
 
     closes_volunteer = Volunteer.objects.all()
@@ -365,37 +337,28 @@ def find_closes_persons(request, pk):
 
     closes_volunteer = availability_qs
 
-
-
-
-
-
-    closes_volunteer = sorted(closes_volunteer, key=lambda volu: -HelpRequest.objects.filter(helping_volunteer=volu).count())
-    closes_volunteer = sorted(closes_volunteer, key=lambda volu: (volu.city.x-req_x)**2 + (volu.city.y-req_y)**2)
-
-
+    closes_volunteer = sorted(closes_volunteer,
+                              key=lambda volu: -HelpRequest.objects.filter(helping_volunteer=volu).count())
+    closes_volunteer = sorted(closes_volunteer,
+                              key=lambda volu: (volu.city.x - req_x) ** 2 + (volu.city.y - req_y) ** 2)
 
     # closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
 
-
-
     if len(closes_volunteer) > 30:
         closes_volunteer = closes_volunteer[0:29]
-
-
 
     # ----- check for each volunterr how much times he apper
     appers_list = []
     for volu in closes_volunteer:
         appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
 
-
     final_data = []
-    for i in range (0, len(closes_volunteer)):
+    for i in range(0, len(closes_volunteer)):
         tot_x = (closes_volunteer[i].city.x - request_person.city.x) ** 2
         tot_y = (closes_volunteer[i].city.y - request_person.city.y) ** 2
         tot_value = int(((tot_x + tot_y) ** 0.5) / 100)
         final_data.append((closes_volunteer[i], tot_value, appers_list[i]))
 
-    context = {'help_request': request_person, 'closes_volunteer': final_data, 'availability_now_id': availability_now_id}
+    context = {'help_request': request_person, 'closes_volunteer': final_data,
+               'availability_now_id': availability_now_id}
     return render(request, 'server/closes_volunteer.html', context)
