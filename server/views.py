@@ -4,8 +4,9 @@ from client.models import Volunteer, HelpRequest, Area
 from django.db.models import F
 from django.core.paginator import Paginator
 import datetime
-from datetime import  time
-
+from datetime import time
+from django.http import HttpResponse
+import xlwt
 
 
 RESULTS_IN_PAGE = 50
@@ -32,13 +33,23 @@ def get_mandatory_areas(request):
 
 @login_required
 def index(request):
+
+
+
     context = {
         "numbers": {
             "total_volunteers": Volunteer.objects.count(),
             "total_help_requests": HelpRequest.objects.count(),
             "solved_help_requests": HelpRequest.objects.filter(status="DONE").count()
+        },
+        "daily_numbers" : {
+            "daily_volunteers" : 12 ,
+            "daily_help" : 12,
+            "daily_solved" : 12
+
         }
     }
+
     return render(request, 'server/server_index.html', context)
 
 """
@@ -46,7 +57,7 @@ also filters by filter
 """
 @login_required
 def show_all_volunteers(request, page = 1):
-    qs = Volunteer.objects.all().order_by('-id')
+    qs = Volunteer.objects.all()
 
     # ------- filters -------
     areas = request.GET.getlist('area')
@@ -123,7 +134,7 @@ def show_all_volunteers(request, page = 1):
 
 
     if len(availability) == 0:
-        availability_qs = Volunteer.objects.all().all().order_by('-id')
+        availability_qs = Volunteer.objects.all().all()
 
 
     # union matchings from both categoties
@@ -134,7 +145,7 @@ def show_all_volunteers(request, page = 1):
 
     # if there were no matches display all and there are people available
     if len(match_qs) == 0 and (not something_mark):
-        match_qs = Volunteer.objects.all().order_by('-id')
+        match_qs = Volunteer.objects.all()
 
 #     if len(guidings1) != 0:
 #         match_qs = match_qs.filter(guiding=True)
@@ -175,7 +186,7 @@ also filters by filter
 @login_required
 def show_all_help_request(request, page = 1):
     
-    qs = HelpRequest.objects.all().order_by('-id')
+    qs = HelpRequest.objects.all()
 
     statuses = request.GET.getlist('status')
     type = request.GET.getlist('type')
@@ -224,7 +235,7 @@ def show_all_help_request(request, page = 1):
 
     # if there were no matches display all
     if len(match_qs) == 0 and (not something_mark):
-        match_qs = HelpRequest.objects.all().order_by('-id')
+        match_qs = HelpRequest.objects.all()
 
 
   
@@ -399,3 +410,62 @@ def find_closes_persons(request, pk):
 
     context = {'help_request': request_person, 'closes_volunteer': final_data, 'availability_now_id': availability_now_id}
     return render(request, 'server/closes_volunteer.html', context)
+
+def export_users_xls(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="volunteer_data.xls"'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Volunteers')
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['שם', 'תעודת זהות', 'גיל','טלפון','שפות' 'שם משפחה','איזור','עיר','אימייל','פנוי בשבת','משפחותונים','Notes', ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    rows = Volunteer.objects.all().values_list('full_name', 'tz_number', 'age', 'phone_number','areas','city','email','available_saturday','guiding','notes')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
+def export_help_xls(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="help_request_data.xls"'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('HelpRequests')
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['שם פונה', 'טלפון', 'איזור','כתובת' 'עיר','סוג פנייה','הערות','סטטוס','מתנדב שמפטל']
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    rows = HelpRequest.objects.all().values_list('full_name', 'phone_number', 'area', 'address','city','type','notes','status','helping_volunteer')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
