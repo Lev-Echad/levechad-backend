@@ -8,3 +8,5 @@ client/migrations
 server/migrations
 staticfiles/
 /venv/
+
+lev-debug.log
