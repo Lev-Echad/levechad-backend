@@ -31,6 +31,7 @@
             <th scope="col">מספר הפעמים שעזר</th>
             <th scope="col">רוצה חוגים</th>
             <th scope="col">ערוך הערות</th>
+            <th scope="col">תג מתנדב</th>
              <th scope="col">מחיקה</th>
 
 
@@ -73,6 +74,10 @@
                     {{ volunteer.notes }} <br>
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#edit_volu{{ volunteer.id }}"> ערוך</a>
                 </td>
+                     <td>
+                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#make_tag{{ volunteer.id }}">תג מתדנב</a>
+                </td>
+
                   <td>
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#delete_volunteer{{ volunteer.id }}">למחוק</a>
                 </td>
@@ -127,13 +132,36 @@
                         </div>
                       </div>
                 </div>
+         <div class="modal fade m" id="make_tag{{ volunteer.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+
+
+                         <div class = "tag" style = "position:absolute;left:35%;" id = "the_tag">
+                            <img src = "{% static 'client/tag.jpeg' %}" width = 400>
+                              <div class = "taginfo" style = "position:absolute;top:70px;right:50px;">
+                              <p> שם מתנדב: {{volunteer.full_name}} </p>
+                              <p style="margin-top:-10px;"> תעודת זהות: {{volunteer.tz_number}} </p>
+                                </div>
+                              <a id="convert" href="#" style="color:black;">הורדת תג</a>
+
+                                <div id="previewImage" style="display: none;"></div>
+
+
+                        </div>
+
+
+                        </div>
+                      </div>
+         </div>
       
         {% endfor %}
     </tbody>
 </table>
 
 <div>
-  
+
     {% if page != 1 %}
     <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
     {% endif %}
@@ -308,4 +336,29 @@
         ->
       </a>
     </div>
+<script type='text/javascript'>
+
+  $('.m').on('shown.bs.modal', function (e) {
+
+            alert("hello");
+            var element = $("#the_tag");
+            var getCanvas;
+            html2canvas(element, {
+                onrendered: function (canvas) {
+                    $("#previewImage").append(canvas);
+                    getCanvas = canvas;
+                },
+                scale: 2
+            });
+
+            $("#convert").on('click', function () {
+                var imageData = getCanvas.toDataURL("image/png");
+
+                var newData = imageData.replace(/^data:image\/png/, "data:application/octet-stream");
+                $("#convert").attr("download", "levEchadVolunteerTag.png").attr("href", newData);
+            });
+
+        });
+
+  </script>
 {% endblock %}
