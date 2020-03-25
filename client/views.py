@@ -6,7 +6,8 @@ from .models import Volunteer, City, Language, VolunteerSchedule, HelpRequest, A
 
 
 def helper_help(pk, fullName):
-    return HelpRequest.objects.get(pk=pk, full_name = fullName)
+    return HelpRequest.objects.get(pk=pk, full_name=fullName)
+
 
 def thanks(request):
     try:
@@ -17,14 +18,14 @@ def thanks(request):
         print(str(hr.status))
 
         return render(request, 'thanks.html', {
-            "id" : pk,
+            "id": pk,
             "message": "סטאטוס הבקשה שלך בLIVE",
-            "status" : str(hr.get_status_display())
-           
+            "status": str(hr.get_status_display())
+
         })
     except Exception as e:
         return render(request, 'thanks.html', {
-            "id" : " ",
+            "id": " ",
             "message": "התקשר למוקד שלנו לפרטים נוספים",
             "status": ""
         })
@@ -36,19 +37,20 @@ def thanks_volunteer(request):
 
         vr = Volunteer.objects.get(pk=vol_id)
 
-
         print(vr.full_name)
         return render(request, 'thanks_volunteer.html', {
-        "name": vr.full_name,
-        "taz": vr.tz_number
+            "name": vr.full_name,
+            "taz": vr.tz_number
 
-         })
+        })
 
     except Exception as e:
-            return render(request, 'thanks_volunteer.html', {
+        return render(request, 'thanks_volunteer.html', {
             "name": "h",
             "taz": " "
-    })
+        })
+
+
 def homepage(request):
     context = {
         "numbers": {
@@ -57,7 +59,7 @@ def homepage(request):
             "solved_help_requests": HelpRequest.objects.filter(status="DONE").count()
         }
     }
-   
+
     return render(request, 'index.html', context)
 
 
@@ -80,12 +82,14 @@ def volunteer(request):
             keep_mandatory_worker_children = False
             if answer["childrens"] == "YES":
                 keep_mandatory_worker_children = True
-            volunter_new = Volunteer(tz_number = answer["identity"], full_name=answer["full_name"],email = answer["email"], age=answer["age"],
+            volunter_new = Volunteer(tz_number=answer["identity"], full_name=answer["full_name"], email=answer["email"],
+                                     age=answer["age"],
                                      phone_number=answer["phone_number"],
                                      city=City.objects.get(name=answer["city"]), address=answer["address"],
                                      available_saturday=answer["available_on_saturday"],
                                      notes=answer["notes"], moving_way=answer["transportation"],
-                                     hearing_way=answer["hearing_way"], keep_mandatory_worker_children = keep_mandatory_worker_children, guiding=False)
+                                     hearing_way=answer["hearing_way"],
+                                     keep_mandatory_worker_children=keep_mandatory_worker_children, guiding=False)
             volunter_new.save()
             volunter_new.languages.set(languagesGot)
             volunter_new.areas.set(areasGot)
@@ -103,7 +107,6 @@ def volunteer(request):
 
 
 def schedule(request):
-    
     if request.method == 'POST':
         form = ScheduleForm(request.POST)
         # check whether it's valid:
@@ -128,7 +131,7 @@ def schedule(request):
     else:
         form = ScheduleForm()
 
-    return render(request, 'schedule.html', {'form': form, 'id':request.GET.get('vol_id', '')})
+    return render(request, 'schedule.html', {'form': form, 'id': request.GET.get('vol_id', '')})
 
 
 def shopping_help(request):
@@ -141,8 +144,10 @@ def shopping_help(request):
             answer = form.cleaned_data
             areasGot = Area.objects.all().get(name=answer["area"])
 
-            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
-                                      address = answer["address"], notes = answer["notes"], type = "BUYIN", type_text = answer["to_buy"], area=areasGot)
+            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
+                                      city=City.objects.get(name=answer["city"]),
+                                      address=answer["address"], notes=answer["notes"], type="BUYIN",
+                                      type_text=answer["to_buy"], area=areasGot)
             new_request.save()
 
             # process the data in form.cleaned_data as required
@@ -166,12 +171,14 @@ def medic_help(request):
         if form.is_valid():
             answer = form.cleaned_data
             type_text = ""
-            if(answer["need_prescription"]):
+            if (answer["need_prescription"]):
                 type_text = "\nתרופת מרשם"
 
             areasGot = Area.objects.all().get(name=answer["area"])
-            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
-                                      address = answer["address"], notes = answer["notes"], type = "MEDICI", type_text = type_text + answer["medic_name"], area=areasGot)
+            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
+                                      city=City.objects.get(name=answer["city"]),
+                                      address=answer["address"], notes=answer["notes"], type="MEDICI",
+                                      type_text=type_text + answer["medic_name"], area=areasGot)
             new_request.save()
 
             # process the data in form.cleaned_data as required
@@ -195,8 +202,10 @@ def other_help(request):
         if form.is_valid():
             answer = form.cleaned_data
             areasGot = Area.objects.all().get(name=answer["area"])
-            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
-                                      address = answer["address"], notes = answer["notes"], type = "OTHER", type_text = answer["other_need"], area=areasGot)
+            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
+                                      city=City.objects.get(name=answer["city"]),
+                                      address=answer["address"], notes=answer["notes"], type="OTHER",
+                                      type_text=answer["other_need"], area=areasGot)
             new_request.save()
 
             return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
@@ -217,8 +226,10 @@ def home_help(request):
         if form.is_valid():
             answer = form.cleaned_data
             areasGot = Area.objects.all().get(name=answer["area"])
-            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
-                                      address = answer["address"], notes = answer["notes"], type = "HOME_HEL", type_text = answer["need_text"], area=areasGot)
+            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
+                                      city=City.objects.get(name=answer["city"]),
+                                      address=answer["address"], notes=answer["notes"], type="HOME_HEL",
+                                      type_text=answer["need_text"], area=areasGot)
             new_request.save()
 
             # process the data in form.cleaned_data as required
@@ -243,8 +254,10 @@ def travel_help(request):
             answer = form.cleaned_data
             areasGot = Area.objects.all().get(name=answer["area"])
 
-            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
-                                      address = answer["address"], notes = answer["notes"], type = "TRAVEL", type_text = answer["travel_need"], area=areasGot)
+            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
+                                      city=City.objects.get(name=answer["city"]),
+                                      address=answer["address"], notes=answer["notes"], type="TRAVEL",
+                                      type_text=answer["travel_need"], area=areasGot)
             new_request.save()
 
             # process the data in form.cleaned_data as required
@@ -269,8 +282,10 @@ def phone_help(request):
             answer = form.cleaned_data
             areasGot = Area.objects.all().get(name=answer["area"])
 
-            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
-                                      address = answer["address"], notes = answer["notes"], type = "PHONE_HEL", type_text = answer["workplace_name"] + answer["workplace_need"], area=areasGot)
+            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
+                                      city=City.objects.get(name=answer["city"]),
+                                      address=answer["address"], notes=answer["notes"], type="PHONE_HEL",
+                                      type_text="", area=areasGot)
             new_request.save()
 
             # process the data in form.cleaned_data as required
@@ -295,8 +310,10 @@ def workers_help(request):
             answer = form.cleaned_data
             areasGot = Area.objects.all().get(name=answer["area"])
 
-            new_request = HelpRequest(full_name = answer["full_name"], phone_number = answer["phone_number"], city = City.objects.get(name=answer["city"]),
-                                      address = answer["address"], notes = answer["notes"], type = "WORKERS_HELP", type_text = "", area=areasGot)
+            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
+                                      city=City.objects.get(name=answer["city"]),
+                                      address=answer["address"], notes=answer["notes"], type="WORKERS_HELP",
+                                      type_text="", area=areasGot)
             new_request.save()
 
             # process the data in form.cleaned_data as required
