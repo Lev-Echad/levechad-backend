@@ -54,8 +54,7 @@ Regardless of the repository you use, you need to make sure that the local SQLit
 
 For this, run the following commands:
 
-    python manage.py makemigrations client
-    python manage.py migrate client
+    python manage.py migrate
 	
 
 Contributing
