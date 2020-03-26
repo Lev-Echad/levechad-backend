@@ -14,16 +14,22 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+ENV = os.environ.get('ENV', 'DEVELOPMENT')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'hwxh_(xq^jwzc_l4&a4=mt!cfx-(b3v5i)lkvnt)*twyfoeh@j'
+if ENV == 'DEVELOPMENT':
+    SECRET_KEY = 'MYSECRET'
+if ENV == 'PRODUCTION':
+    SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if ENV == 'DEVELOPMENT':
+    DEBUG = True
+elif ENV == 'PRODUCTION':
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -102,33 +108,33 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-LOGGING = {
-    'version': 1,
-    # Version of logging
-    'disable_existing_loggers': False,
-    #disable logging 
-    # Handlers #############################################################
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'lev-debug.log',
+if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
+    LOGGING = {
+        'version': 1,
+        # Version of logging
+        'disable_existing_loggers': False,
+        #disable logging
+        # Handlers #############################################################
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': 'lev-debug.log',
+            },
+        ########################################################################
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
         },
-########################################################################
-        'console': {
-            'class': 'logging.StreamHandler',
+        # Loggers ####################################################################
+        'loggers': {
+            'django': {
+                'handlers': ['file', 'console'],
+                'propagate': True,
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG')
+            },
         },
-    },
-    # Loggers ####################################################################
-    'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG')
-        },
-    },
-}
+    }
 
 
 # Internationalization
