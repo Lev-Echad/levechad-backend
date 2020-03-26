@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area
-from django.db.models import F
+from django.db.models import F, Q
 from django.core.paginator import Paginator
 import datetime
 from datetime import time
@@ -91,7 +91,11 @@ def show_all_volunteers(request, page=1):
 
     if len(search_name) != 0:
         something_mark = True
-        qs = qs.filter(full_name=search_name[0])
+        split_name = search_name[0].split()
+        # qs_first_names = qs.filter(first_name=split_name[0])
+        # qs_last_names = qs.filter(last_name=split_name[:-1])
+        qs = qs.filter(Q(last_name=split_name[-1]) | Q(first_name=split_name[0]))
+        #qs = qs.filter(full_name=search_name[0])
 
     # --------- check time now --------
     now = datetime.datetime.now()
@@ -387,7 +391,7 @@ def export_users_xls(request):
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
-    columns = ['שם', 'תעודת זהות', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר', 'אימייל', 'פנוי בשבת',
+    columns = ['שם','שם פרטי','שם משפחה','תעודת זהות', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר', 'אימייל', 'פנוי בשבת',
                'משפחותונים', 'Notes', ]
 
     for col_num in range(len(columns)):
@@ -396,8 +400,9 @@ def export_users_xls(request):
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = Volunteer.objects.all().values_list('full_name', 'tz_number', 'age', 'phone_number', 'areas', 'city',
-                                               'email', 'available_saturday', 'guiding', 'notes')
+    rows = Volunteer.objects.all().values_list('full_name', 'first_name', 'last_name', 'tz_number', 'age',
+                                               'phone_number', 'areas', 'city', 'email', 'available_saturday',
+                                               'guiding', 'notes')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):

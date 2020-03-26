@@ -36,10 +36,16 @@ def thanks_volunteer(request):
         vol_id = request.GET['vol_id']
 
         vr = Volunteer.objects.get(pk=vol_id)
-
-        print(vr.full_name)
+        full_name = vr.first_name + " " + vr.last_name
+        # print(vr.full_name)
+        # return render(request, 'thanks_volunteer.html', {
+        #     "name": vr.full_name,
+        #     "taz": vr.tz_number
+        #
+        # })
+        print(full_name)
         return render(request, 'thanks_volunteer.html', {
-            "name": vr.full_name,
+            "name": full_name,
             "taz": vr.tz_number
 
         })
@@ -82,7 +88,9 @@ def volunteer(request):
             keep_mandatory_worker_children = False
             if answer["childrens"] == "YES":
                 keep_mandatory_worker_children = True
-            volunter_new = Volunteer(tz_number=answer["identity"], full_name=answer["full_name"], email=answer["email"],
+            volunter_new = Volunteer(tz_number=answer["identity"], first_name=answer["first_name"],
+                                     last_name=answer["last_name"], #full_name=answer["full_name"],
+                                     email=answer["email"],
                                      age=answer["age"], organization=answer['organization'],
                                      phone_number=answer["phone_number"],
                                      city=City.objects.get(name=answer["city"]), neighborhood=answer['neighborhood'],

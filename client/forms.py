@@ -54,7 +54,9 @@ class VolunteerForm(forms.Form):
     )
 
     my_validator = RegexValidator(r"^\d+$")
-    full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    #full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     identity = forms.CharField(max_length=ID_LENGTH, validators=[my_validator])
     organization = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     age = forms.IntegerField()
@@ -84,7 +86,9 @@ class VolunteerForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
+        #self.fields['full_name'].label = "שם מלא"
+        self.fields['first_name'].label = "שם פרטי"
+        self.fields['last_name'].label = "שם משפחה"
         self.fields['identity'].label = "מספר ת.ז"
         self.fields['organization'].label = "ארגון"
         self.fields['languages'].label = "שפות שאתה דובר"

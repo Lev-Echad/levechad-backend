@@ -70,9 +70,9 @@ class Volunteer(Timestampable):
     )
 
     tz_number = models.CharField(max_length=ID_LENGTH, blank=True)
-    first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="abcdef")
+    last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="abcdef")
+    full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     age = models.IntegerField()
     areas = models.ManyToManyField(Area)
