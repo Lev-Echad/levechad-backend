@@ -22,9 +22,9 @@ Before performing the listed steps make sure that the version of python you get 
 As a first time setup, cd to the root folder of this project (should be name LevEchad) and perform the following steps:
 
 	pip install -r requirements.txt
-	python manage.py collectstatic.py
+	python manage.py collectstatic
 	python manage.py migrate
-	python manage.py setup.py
+	python setup.py
 	python manage.py runserver
 
 To add admin user and see the databases:
@@ -56,8 +56,10 @@ For this, run the following commands:
 
     python manage.py makemigrations client
     python manage.py migrate client
+	
 
 Contributing
 ------------
 The repository is open source and any contribution is appreciated !
-If you need a direct permission for branch creating / commits you can request that by creating an issue.
+
+If  any part of this guide seems not to work no your machine, you are welcome to open an issue on the subject to receive help and resolve the problem.
