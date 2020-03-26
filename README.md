@@ -27,3 +27,8 @@ To update the models, run ```git pull``` and then run the following:
     python manage.py makemigrations client
     python manage.py migrate client
 
+Contributing
+------------
+The repository is open source and any contribution is appreciated !
+you can add code by forking the repository, commit some code and create a pull request to 'develop' branch.
+If you need a direct permission for branch creating / commits you can request that by creating an issue.
