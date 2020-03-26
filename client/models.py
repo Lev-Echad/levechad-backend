@@ -3,7 +3,10 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from datetime import timedelta, date
+
 # -*- coding: utf-8 -*-
+
 
 class Timestampable(models.Model):
     created_date = models.DateTimeField(null=True, editable=False)
@@ -19,17 +22,20 @@ class Timestampable(models.Model):
         self.updated_date = timezone.now()
         return super(Timestampable, self).save(*args, **kwargs)
 
+
 class Area(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
 
     def __str__(self):
         return self.name
 
+
 class Language(models.Model):
     name = models.CharField(max_length=200, primary_key=True)
 
     def __str__(self):
         return self.name
+
 
 class City(models.Model):
     name = models.CharField(max_length=200, primary_key=True)
@@ -80,6 +86,11 @@ class Volunteer(Timestampable):
     moving_way = models.CharField(max_length=20, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=20, choices=HEARING_WAYS)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, null=True)
+
+
+class VolunteerCertificate(models.Model):
+    volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='certificates', null=False)
+    expiration_date = models.DateField(default=date.today)
 
 
 class HelpRequest(Timestampable):

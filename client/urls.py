@@ -3,20 +3,21 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.homepage, name='show_all'),
-    path('home', views.homepage, name='show_all'),
-    path('thanks', views.thanks, name='show_all'),
-    path('thanks_volunteer', views.thanks_volunteer, name='show_all'),
+    path('', views.homepage),
+    path('home', views.homepage),
+    path('thanks', views.thanks),
+    path('thanks_volunteer', views.thanks_volunteer),
 
-    path('volunteer', views.volunteer, name='show_all'),
-    path('schedule', views.schedule, name='show_all'),
+    path('volunteer', views.volunteer_view),
+    path('schedule', views.schedule),
 
-    path('get_help', views.get_help, name='show_all'),
-    path('help/home', views.home_help, name='show_all'),
-    path('help/medic', views.medic_help, name='show_all'),
-    path('help/other', views.other_help, name='show_all'),
-    path('help/phone', views.phone_help, name='show_all'),
-    path('help/shopping', views.shopping_help, name='show_all'),
-    path('help/travel', views.travel_help, name='show_all'),
-    path('help/workers', views.workers_help, name='show_all'),
+    path('get_help', views.get_help),
+    path('help/home', views.home_help),
+    path('help/medic', views.medic_help),
+    path('help/other', views.other_help),
+    path('help/phone', views.phone_help),
+    path('help/shopping', views.shopping_help),
+    path('help/travel', views.travel_help),
+    path('help/workers', views.workers_help),
+    path('volunteer_certificate/<int:pk>', views.volunteer_certificate_view, name='volunteer_certificate'),
 ]
