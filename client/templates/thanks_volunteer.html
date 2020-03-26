@@ -11,7 +11,7 @@
 <br><br>
 
 <strong><h3>תג זה הינו הכרחי עבור ביצוע ההתנדבות - שמור את התג בטלפון שלך</h3></strong>
-<div class = "tag" style = "position:absolute;left:35%;" id = "the_tag">
+<div class = "tag" style = "position:absolute;left:35%;visibility: hidden" id = "the_tag">
 <img src = "{% static 'client/tag.jpeg' %}" width = 400>
   <div class = "taginfo" style = "position:absolute;top:70px;right:50px;">
   <p> שם מתנדב: {{name}} </p>
@@ -25,7 +25,6 @@
 
 <script type='text/javascript'>
    $(document).ready(function () {
-
             var element = $("#the_tag");
             var w = element.width();
             var h = element.height();
@@ -36,7 +35,6 @@
             '-ms-transform': 'scale(3)',
             '-webkit-transform': 'scale(3)' });
 
-
             html2canvas(element, {
                 onrendered: function (canvas) {
                     element.css({
@@ -45,6 +43,9 @@
                         '-webkit-transform': '' }
                     );
 
+                    $("#the_tag").css ({
+                      "visibility": "visible"
+                    })
                     $("#previewImage").append(canvas);
                     getCanvas = canvas;
                 },
