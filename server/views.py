@@ -154,7 +154,7 @@ def show_all_volunteers(request, page=1):
         field = "-" + field
         match_qs = match_qs.order_by(field)
 
-    # ----- check for each volunterr how much times he apper
+    # ----- check for each volunteקr how much times he apper
     appers_list = []
     for volu in match_qs:
         appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
@@ -391,7 +391,7 @@ def export_users_xls(request):
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
-    columns = ['שם','שם פרטי','שם משפחה','תעודת זהות', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר', 'אימייל', 'פנוי בשבת',
+    columns = ['שם','שם פרטי','שם משפחה','תעודת זהות', 'סוג', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר', 'אימייל', 'פנוי בשבת',
                'משפחותונים', 'Notes', ]
 
     for col_num in range(len(columns)):
@@ -400,7 +400,7 @@ def export_users_xls(request):
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = Volunteer.objects.all().values_list('full_name', 'first_name', 'last_name', 'tz_number', 'age',
+    rows = Volunteer.objects.all().values_list('full_name', 'first_name', 'last_name', 'tz_number', 'volunteer_type', 'age',
                                                'phone_number', 'areas', 'city', 'email', 'available_saturday',
                                                'guiding', 'notes')
     for row in rows:

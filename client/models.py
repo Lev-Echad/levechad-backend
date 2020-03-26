@@ -68,6 +68,15 @@ class Volunteer(Timestampable):
         ("RAD_TV", "רדיו וטלוויזיה"),
         ("OTHR", "אחר")
     )
+    TYPES = (
+        ("NIGHBORHOOD_COORDINATOR", "רכז שכונה"),
+        ("CITY_COORDINATOR", "רכז עיר"),
+        ("STAFF", "מטה"),
+        ("HAMAL", "חמל"),
+        ("PROJECT", "פרויקט"),
+        ("CHILD_CARE", "משפחתון"),
+        ("MISSIONS", "משימות")
+    )
 
     tz_number = models.CharField(max_length=ID_LENGTH, blank=True)
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="abcdef")
@@ -75,6 +84,7 @@ class Volunteer(Timestampable):
     full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     age = models.IntegerField()
+    volunteer_type = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, choices=TYPES, default="MISSIONS")
     areas = models.ManyToManyField(Area)
     languages = models.ManyToManyField(Language)
     phone_number = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)

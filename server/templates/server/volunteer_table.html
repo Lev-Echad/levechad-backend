@@ -19,6 +19,7 @@
             <th scope="col">שם מלא</th>
             <th scope="col">שם פרטי</th>
             <th scope="col">שם משפחה</th>
+            <th scope="col">סוג</th>
             <th scope="col">גיל</th>
             <th scope="col">אזור</th>
             <th scope="col">שפה</th>
@@ -46,6 +47,7 @@
                 <td>{{ volunteer.full_name }}</td>
                 <td>{{ volunteer.first_name }}</td>
                 <td>{{ volunteer.last_name }}</td>
+                <td>{{ volunteer.get_volunteer_type_display }}</td>
                 <td>{{ volunteer.age }}</td>
                 <td>
                     {% for area in volunteer.areas.all %}
