@@ -5,6 +5,5 @@ db.sqlite3
 .idea/
 .idea/workspace.xml
 staticfiles/
-/venv/
-
+venv/
 lev-debug.log
