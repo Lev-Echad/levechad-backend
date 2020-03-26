@@ -14,7 +14,7 @@ def helper_help(pk, fullName):
     return HelpRequest.objects.get(pk=pk, full_name=fullName)
 
 
-def volunteer_certificate_view(request, pk):
+def volunteer_certificate_image_view(request, pk):
     volunteer_certificate = VolunteerCertificate.objects.get(id=pk)
     volunteer = volunteer_certificate.volunteer
     tag_filename = finders.find('client/tag.png')
@@ -183,6 +183,27 @@ def shopping_help(request):
         form = ShoppingForm()
 
     return render(request, 'help_pages/shopping.html', {'form': form})
+
+
+def get_certificate_view(request):
+    context = {'form': GetCertificateForm()}
+    if request.method == 'POST':
+        form = GetCertificateForm(request.POST)
+        if form.is_valid():
+            # TODO: change to 'get' instead of 'first' after fixing #50
+            volunteer = Volunteer.objects.filter(tz_number=form['tz_number'].data).first()
+            if volunteer is not None:
+                active_certificate = volunteer.certificates.filter(expiration_date__gte=datetime.date.today()).first()
+                if active_certificate is not None:
+                    context['certificate_id'] = active_certificate.id
+                else:
+                    context['error'] = 'לא נמצאה תעודה בתוקף!'
+            else:
+                context['error'] = 'מתנדב לא נמצא!'
+        else:
+            context['error'] = 'יש למלא את השדות כנדרש!'
+
+    return render(request, 'get_certificate.html', context=context)
 
 
 def medic_help(request):

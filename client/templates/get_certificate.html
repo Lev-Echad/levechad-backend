@@ -1,0 +1,21 @@
+{% extends "template.html" %}
+{% load bootstrap %}
+
+{% block title %}לב אחד - התנדב{% endblock %}
+
+
+{% block body %}
+    {% if certificate_id is not None %}
+        <h3>תג זה הינו הכרחי עבור ביצוע ההתנדבות - שמור את התג בטלפון שלך</h3>
+        <img src="{% url 'volunteer_certificate' pk=certificate_id %}" alt="volunteer tag" width="400" />
+        <br />
+        <a href="{% url 'volunteer_certificate' pk=certificate_id %}" download>הורדת תג</a>
+    {% else %}
+        <a style="color: red">{{ error }}</a>
+        <form action="{% url 'client_get_certificate' %}" method="post">
+            {% csrf_token %}
+            {{ form|bootstrap }}
+            <input type="submit" class="btn btn-danger" value="חפש תעודה">
+        </form>
+    {% endif %}
+{% endblock %}
