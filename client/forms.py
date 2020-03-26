@@ -1,7 +1,7 @@
 from django import forms
 import json
 from django.core.validators import RegexValidator
-from client.models import Language
+from client.models import Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
 
 FIELD_NAME_MAPPING = {
 }
@@ -54,22 +54,26 @@ class VolunteerForm(forms.Form):
     )
 
     my_validator = RegexValidator(r"^\d+$")
-    full_name = forms.CharField(max_length=200)
-    identity = forms.CharField(max_length=9, validators=[my_validator])
+    full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    identity = forms.CharField(max_length=ID_LENGTH, validators=[my_validator])
+    organization = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     age = forms.IntegerField()
-    area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
+    area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
     languages = forms.MultipleChoiceField(choices = get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
-    phone_number = forms.CharField(max_length=200)
-    email = forms.CharField(max_length=200)
-    city = forms.ChoiceField(choices = CITIES)
-    address = forms.CharField(max_length=200)
+    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    email = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    city = forms.ChoiceField(choices=CITIES)
+    neighborhood = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
+    address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     available_on_saturday = forms.BooleanField(required=False)
-    notes = forms.CharField(max_length=200)
+    notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
     hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
     area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
     childrens = forms.ChoiceField(choices=BOOL)
     chamal = forms.ChoiceField(choices=BOOL)
+
+
 
     no_corona1 = forms.BooleanField()
     no_corona2 = forms.BooleanField()
@@ -82,30 +86,32 @@ class VolunteerForm(forms.Form):
         super(forms.Form, self).__init__(*args, **kwargs)
         self.fields['full_name'].label = "שם מלא"
         self.fields['identity'].label = "מספר ת.ז"
-        self.fields['area'].label = "איזור"
+        self.fields['organization'].label = "ארגון"
         self.fields['languages'].label = "שפות שאתה דובר"
+        self.fields['age'].label = "גיל"
         self.fields['phone_number'].label = "מספר פלאפון"
         self.fields['email'].label = "כתובת אימייל"
+        self.fields['area'].label = "איזור"
         self.fields['city'].label = "עיר מגורים"
+        self.fields['neighborhood'].label = "שכונה"
         self.fields['address'].label = "כתובת מגורים"
         self.fields['available_on_saturday'].label = "האם זמין בשבת"
         self.fields['notes'].label = "הערות"
-        self.fields['age'].label = "גיל"
         self.fields['transportation'].label = "דרכי התניידות"
         self.fields['hearing_way'].label = "איך שמעת עלינו"
+
+
+
         self.fields['no_corona1'].label = "אני מאשר\ת כי לא חזרתי מחו''ל ב-14 הימים האחרונים"
         self.fields['no_corona2'].label = "אני מאשר\ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
         self.fields['no_corona3'].label = "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
-
         self.fields['no_corona4'].label = "אני מאשר\ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
 
         self.fields['childrens'].label = (
             "האם את\ה מעוניינ\ת לסייע לעובדים חיוניים (מסגרות חיוניות לילדי צוות רפואי)? - עדיפות ל-3 ימי התנדבות.  "
-           
         )
         self.fields['chamal'].label = (
             " ?האם אתה מתנדב חמ''ל"
-           
         )
 
 
@@ -148,12 +154,12 @@ class BaseHelpForm(forms.Form):
     )"""
 
     my_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
-    full_name = forms.CharField(max_length=200)
-    phone_number = forms.CharField(max_length=200, required=True, validators=[my_validator])
+    full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[my_validator])
     area = forms.ChoiceField(choices = AREAS)
     city = forms.ChoiceField(choices = CITIES)
-    address = forms.CharField(max_length=200)
-    notes = forms.CharField(max_length=200, required=False)
+    address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     #type = forms.ChoiceField(choices=TYPES)
     #type_text = forms.CharField(max_length=5000)
 
