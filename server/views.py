@@ -275,8 +275,10 @@ def help_edit_stat(request, pk):
         # check if this volunteer exist
         try:
             volunteer_to_add = Volunteer.objects.get(id=volunteer_id)
+            # adding new certificate
+            volunteer_to_add.get_or_generate_valid_certificate()
             to_edit.helping_volunteer = volunteer_to_add
-        except:
+        except Volunteer.DoesNotExist:
             pass
 
     to_edit.save()

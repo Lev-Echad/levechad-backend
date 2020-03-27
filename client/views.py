@@ -118,7 +118,7 @@ def volunteer_view(request):
             volunter_new.save()
 
             # creating volunteer certificate
-            VolunteerCertificate.objects.create(volunteer_id=volunter_new.id)
+            volunter_new.get_or_generate_valid_certificate()
 
             # process the data in form.cleaned_data as required
             # ...

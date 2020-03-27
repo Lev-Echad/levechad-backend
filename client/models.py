@@ -83,6 +83,13 @@ class Volunteer(Timestampable):
         ("MISSIONS", "משימות")
     )
 
+    def get_or_generate_valid_certificate(self):
+        certificate = self.get_active_certificates().first()
+        if certificate is None:
+            certificate = VolunteerCertificate.objects.create(volunteer_id=self.id)
+
+        return certificate
+
     def get_active_certificates(self):
         return self.certificates.filter(expiration_date__gte=date.today())
 
