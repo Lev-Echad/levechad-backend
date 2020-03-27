@@ -54,7 +54,6 @@ class VolunteerForm(forms.Form):
     )
 
     my_validator = RegexValidator(r"^\d+$")
-    #full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     identity = forms.CharField(max_length=ID_LENGTH, validators=[my_validator])
