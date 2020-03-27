@@ -13,12 +13,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='volunteer',
             name='first_name',
-            field=models.CharField(default='abcdef', max_length=200),
+            field=models.CharField(default='', max_length=200),
         ),
         migrations.AddField(
             model_name='volunteer',
             name='last_name',
-            field=models.CharField(default='abcdef', max_length=200),
+            field=models.CharField(default='', max_length=200),
         ),
         migrations.AddField(
             model_name='volunteer',

@@ -6,6 +6,8 @@ django-mathfilters==1.0.0
 gunicorn==20.0.4
 numpy==1.18.2
 pandas==1.0.3
+Pillow==7.0.0
+python-bidi==0.4.2
 python-dateutil==2.8.1
 pytz==2019.3
 six==1.14.0

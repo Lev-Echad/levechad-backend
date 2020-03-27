@@ -5,67 +5,14 @@
 
 
 {% block body %}
-<h1>תודה רבה מתנדב יקר!</h1>
-<h2>אנחנו מעבדים את הבקשה</h2>
+    <h1>תודה רבה מתנדב יקר!</h1>
+    <h2>אנחנו מעבדים את הבקשה</h2>
 
-<br><br>
-
-<strong><h3>תג זה הינו הכרחי עבור ביצוע ההתנדבות - שמור את התג בטלפון שלך</h3></strong>
-<div class = "tag" style = "position:absolute;left:35%;" id = "the_tag">
-<img src = "{% static 'client/tag.jpeg' %}" width = 400>
-  <div class = "taginfo" style = "position:absolute;top:70px;right:50px;">
-  <p> שם מתנדב: {{name}} </p>
-  <p style="margin-top:-10px;"> תעודת זהות: {{taz}} </p>
-    </div>
-
-</div>
-    <a id="convert" href="#">הורדת תג</a>
-
-<div id="previewImage" style="display: none;"></div>
-
-<script type='text/javascript'>
-   $(document).ready(function () {
-
-            var element = $("#the_tag");
-            var w = element.width();
-            var h = element.height();
-            var getCanvas;
-
-            element.css({
-            'transform': 'scale(3)',
-            '-ms-transform': 'scale(3)',
-            '-webkit-transform': 'scale(3)' });
-
-
-            html2canvas(element, {
-                onrendered: function (canvas) {
-                    element.css({
-                        'transform': '',
-                        '-ms-transform': '',
-                        '-webkit-transform': '' }
-                    );
-
-                    $("#previewImage").append(canvas);
-                    getCanvas = canvas;
-                },
-                scale: 2,
-                width: w*3,
-                height: h*3
-
-            });
-
-
-
-
-            $("#convert").on('click', function () {
-                var imageData = getCanvas.toDataURL("image/png");
-
-                var newData = imageData.replace(/^data:image\/png/, "data:application/octet-stream");
-                $("#convert").attr("download", "levEchadVolunteer.png").attr("href", newData);
-            });
-        });
-
-  </script>
+    <br><br>
+    <h3>תג זה הינו הכרחי עבור ביצוע ההתנדבות - שמור את התג בטלפון שלך</h3>
+    <img src="{% url 'volunteer_certificate' pk=certificate_id %}" alt="volunteer tag" width="400" />
+    <br />
+    <a href="{% url 'volunteer_certificate' pk=certificate_id %}" download>הורדת תג</a>
 {% endblock %}
 
 

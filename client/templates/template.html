@@ -1,7 +1,7 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html>
+<html lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,13 +12,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
-    <script src = "html2canvas.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="https://files.codepedia.info/files/uploads/iScripts/html2canvas.js"></script>
     <link
             rel="stylesheet"
             href="https://cdn.rtlcss.com/bootstrap/v4.2.1/css/bootstrap.min.css"
@@ -34,7 +32,7 @@
         <div class="back">
             <nav class="navbar navbar-expand-lg navbar-light">
 
-                <a class="navbar-brand" href="/client/home">
+                <a class="navbar-brand" href="{% url 'client_home' %}">
                     <img class="logo" src="{% static 'client/logo.png' %}" alt="My image">
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -45,13 +43,16 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto right">
                         <li class="nav-item">
-                            <a class="nav-link" href="/client/home">דף הבית</a>
+                            <a class="nav-link" href="{% url 'client_home' %}">דף הבית</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/client/get_help">בקשת עזרה</a>
+                            <a class="nav-link" href="{% url 'client_get_help' %}">בקשת עזרה</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/client/volunteer">התנדבות</a>
+                            <a class="nav-link" href="{% url 'client_volunteer' %}">התנדבות</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'client_get_certificate' %}">מתנדב רשום לקבלת תעודה</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"

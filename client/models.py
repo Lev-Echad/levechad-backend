@@ -3,6 +3,8 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from datetime import timedelta, date
+
 # -*- coding: utf-8 -*-
 
 DEFAULT_MAX_FIELD_LENGTH = 200
@@ -24,17 +26,20 @@ class Timestampable(models.Model):
         self.updated_date = timezone.now()
         return super(Timestampable, self).save(*args, **kwargs)
 
+
 class Area(models.Model):
     name = models.CharField(max_length=SHORT_FIELD_LENGTH, primary_key=True)
 
     def __str__(self):
         return self.name
 
+
 class Language(models.Model):
     name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, primary_key=True)
 
     def __str__(self):
         return self.name
+
 
 class City(models.Model):
     name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, primary_key=True)
@@ -101,6 +106,9 @@ class Volunteer(Timestampable):
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, null=True)
 
 
+class VolunteerCertificate(models.Model):
+    volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='certificates', null=False)
+    expiration_date = models.DateField(default=date.today)
 
 
 class HelpRequest(Timestampable):

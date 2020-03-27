@@ -114,6 +114,13 @@ class VolunteerForm(forms.Form):
         )
 
 
+class GetCertificateForm(forms.Form):
+    tz_number = forms.CharField(max_length=9, validators=[RegexValidator(r"^\d+$")], required=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tz_number'].label = 'אנא הזן תעודת זהות'
+
 class ScheduleForm(forms.Form):
     TIMES = (
         ("1", "בוקר"),
