@@ -27,7 +27,7 @@ def volunteer_certificate_image_view(request, pk):
         black = (3, 8, 12)
 
         lines_to_insert = [
-            f'שם מתנדב: {volunteer.full_name}',
+            f'שם מתנדב: {volunteer.first_name} + " " + {volunteer.last_name}',
             f'תעודת זהות: {volunteer.tz_number}',
             f'תוקף התעודה: {volunteer_certificate.expiration_date}',
             f'מספר תעודה: {volunteer_certificate.id}',
