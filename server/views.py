@@ -95,7 +95,6 @@ def show_all_volunteers(request, page=1):
         # qs_first_names = qs.filter(first_name=split_name[0])
         # qs_last_names = qs.filter(last_name=split_name[:-1])
         qs = qs.filter(Q(last_name=split_name[-1]) | Q(first_name=split_name[0]))
-        #qs = qs.filter(full_name=search_name[0])
 
     # --------- check time now --------
     now = datetime.datetime.now()
