@@ -92,7 +92,7 @@ def show_all_volunteers(request, page=1):
     if len(search_name) != 0:
         something_mark = True
         split_name = search_name[0].split()
-        qs = qs.filter(Q(last_name=split_name[-1]) | Q(first_name=split_name[0]))
+        qs = qs.filter(Q(last_name=' '.join(split_name[1:])) | Q(first_name=split_name[0]))
 
     # --------- check time now --------
     now = datetime.datetime.now()
