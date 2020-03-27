@@ -69,7 +69,7 @@ def thanks_volunteer(request):
     volunteer_certificate = volunteer.certificates.filter(expiration_date__gte=datetime.date.today())[0]
 
     return render(request, 'thanks_volunteer.html', {
-        "name": volunteer.first_name + " " + volunteer.last_name,
+        "name": f'{volunteer.first_name} {volunteer.last_name}',
         "certificate_id": volunteer_certificate.id
     })
 
@@ -101,16 +101,18 @@ def volunteer_view(request):
             keep_mandatory_worker_children = False
             if answer["childrens"] == "YES":
                 keep_mandatory_worker_children = True
-            volunter_new = Volunteer.objects.create(
-                tz_number=answer["identity"], full_name=answer["full_name"], email=answer["email"],
-                age=answer["age"],
-                phone_number=answer["phone_number"],
-                city=City.objects.get(name=answer["city"]), address=answer["address"],
-                available_saturday=answer["available_on_saturday"],
-                notes=answer["notes"], moving_way=answer["transportation"],
-                hearing_way=answer["hearing_way"],
-                keep_mandatory_worker_children=keep_mandatory_worker_children, guiding=False
-            )
+                
+            volunter_new = Volunteer.objects.create(tz_number=answer["identity"], first_name=answer["first_name"],
+                                     last_name=answer["last_name"],
+                                     email=answer["email"],
+                                     age=answer["age"], organization=answer['organization'],
+                                     phone_number=answer["phone_number"],
+                                     city=City.objects.get(name=answer["city"]), neighborhood=answer['neighborhood'],
+                                     address=answer["address"],
+                                     available_saturday=answer["available_on_saturday"],
+                                     notes=answer["notes"], moving_way=answer["transportation"],
+                                     hearing_way=answer["hearing_way"],
+                                     keep_mandatory_worker_children=keep_mandatory_worker_children, guiding=False)
             volunter_new.languages.set(languagesGot)
             volunter_new.areas.set(areasGot)
             volunter_new.save()
