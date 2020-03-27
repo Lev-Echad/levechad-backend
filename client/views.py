@@ -89,7 +89,7 @@ def volunteer(request):
             if answer["childrens"] == "YES":
                 keep_mandatory_worker_children = True
             volunter_new = Volunteer(tz_number=answer["identity"], first_name=answer["first_name"],
-                                     last_name=answer["last_name"], #full_name=answer["full_name"],
+                                     last_name=answer["last_name"],
                                      email=answer["email"],
                                      age=answer["age"], organization=answer['organization'],
                                      phone_number=answer["phone_number"],
