@@ -101,9 +101,6 @@ class VolunteerForm(forms.Form):
         self.fields['notes'].label = "הערות"
         self.fields['transportation'].label = "דרכי התניידות"
         self.fields['hearing_way'].label = "איך שמעת עלינו"
-
-
-
         self.fields['no_corona1'].label = "אני מאשר\ת כי לא חזרתי מחו''ל ב-14 הימים האחרונים"
         self.fields['no_corona2'].label = "אני מאשר\ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
         self.fields['no_corona3'].label = "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
