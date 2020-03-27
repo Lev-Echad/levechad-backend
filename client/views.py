@@ -37,12 +37,6 @@ def thanks_volunteer(request):
 
         vr = Volunteer.objects.get(pk=vol_id)
         full_name = vr.first_name + " " + vr.last_name
-        # print(vr.full_name)
-        # return render(request, 'thanks_volunteer.html', {
-        #     "name": vr.full_name,
-        #     "taz": vr.tz_number
-        #
-        # })
         print(full_name)
         return render(request, 'thanks_volunteer.html', {
             "name": full_name,
