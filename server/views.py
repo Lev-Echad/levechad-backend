@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area
-from django.db.models import F
+from django.db.models import F, Q
 from django.core.paginator import Paginator
 import datetime
 from datetime import time
@@ -91,7 +91,8 @@ def show_all_volunteers(request, page=1):
 
     if len(search_name) != 0:
         something_mark = True
-        qs = qs.filter(full_name=search_name[0])
+        split_name = search_name[0].split()
+        qs = qs.filter(Q(last_name=split_name[-1]) | Q(first_name=split_name[0]))
 
     # --------- check time now --------
     now = datetime.datetime.now()
@@ -150,7 +151,7 @@ def show_all_volunteers(request, page=1):
         field = "-" + field
         match_qs = match_qs.order_by(field)
 
-    # ----- check for each volunterr how much times he apper
+    # ----- check for each volunteer how much times he apper
     appers_list = []
     for volu in match_qs:
         appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
@@ -387,7 +388,7 @@ def export_users_xls(request):
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
-    columns = ['שם', 'תעודת זהות', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר', 'אימייל', 'פנוי בשבת',
+    columns = ['שם','שם פרטי','שם משפחה','תעודת זהות', 'סוג', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר', 'אימייל', 'פנוי בשבת',
                'משפחותונים', 'Notes', ]
 
     for col_num in range(len(columns)):
@@ -396,8 +397,9 @@ def export_users_xls(request):
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = Volunteer.objects.all().values_list('full_name', 'tz_number', 'age', 'phone_number', 'areas', 'city',
-                                               'email', 'available_saturday', 'guiding', 'notes')
+    rows = Volunteer.objects.all().values_list('full_name', 'first_name', 'last_name', 'tz_number', 'volunteer_type', 'age',
+                                               'phone_number', 'areas', 'city', 'email', 'available_saturday',
+                                               'guiding', 'notes')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):

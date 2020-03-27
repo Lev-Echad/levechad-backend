@@ -7,7 +7,7 @@
 
 {% block body %}
 <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת מתנדבים
-<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm">ערוך</a>
+<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm">סינון</a>
 <a href="{% url 'export_users_xls' %}">ייצוא מידע לאקסל</a>
 
 </p>
@@ -17,6 +17,9 @@
         <tr>
             <th scope="col">#</th>
             <th scope="col">שם מלא</th>
+            <th scope="col">שם פרטי</th>
+            <th scope="col">שם משפחה</th>
+            <th scope="col">סוג</th>
             <th scope="col">גיל</th>
             <th scope="col">אזור</th>
             <th scope="col">שפה</th>
@@ -42,6 +45,9 @@
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
+                <td>{{ volunteer.first_name }}</td>
+                <td>{{ volunteer.last_name }}</td>
+                <td>{{ volunteer.get_volunteer_type_display }}</td>
                 <td>{{ volunteer.age }}</td>
                 <td>
                     {% for area in volunteer.areas.all %}
@@ -142,6 +148,8 @@
                             <img src = "{% static 'client/tag.jpeg' %}" width = 400>
                               <div class = "taginfo" style = "position:absolute;top:70px;right:50px;">
                               <p> שם מתנדב: {{volunteer.full_name}} </p>
+                              <p> שם פרטי מתנדב: {{volunteer.first_name}} </p>
+                              <p> שם משפחה מתנדב: {{volunteer.last_name}} </p>
                               <p style="margin-top:-10px;"> תעודת זהות: {{volunteer.tz_number}} </p>
                                 </div>
                               <a id="convert" href="#" style="color:black;">הורדת תג</a>
