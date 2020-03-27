@@ -69,7 +69,7 @@ def thanks_volunteer(request):
     volunteer_certificate = volunteer.certificates.filter(expiration_date__gte=datetime.date.today())[0]
 
     return render(request, 'thanks_volunteer.html', {
-        "name": volunteer.full_name,
+        "name": volunteer.first_name + " " + volunteer.last_name,
         "certificate_id": volunteer_certificate.id
     })
 
