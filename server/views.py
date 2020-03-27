@@ -154,7 +154,7 @@ def show_all_volunteers(request, page=1):
         field = "-" + field
         match_qs = match_qs.order_by(field)
 
-    # ----- check for each volunteקr how much times he apper
+    # ----- check for each volunteer how much times he apper
     appers_list = []
     for volu in match_qs:
         appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
