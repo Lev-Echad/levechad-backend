@@ -79,8 +79,8 @@ class Volunteer(Timestampable):
     )
 
     tz_number = models.CharField(max_length=ID_LENGTH, blank=True)
-    first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="abcdef")
-    last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="abcdef")
+    first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
+    last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     age = models.IntegerField()
