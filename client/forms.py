@@ -85,7 +85,6 @@ class VolunteerForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
-        #self.fields['full_name'].label = "שם מלא"
         self.fields['first_name'].label = "שם פרטי"
         self.fields['last_name'].label = "שם משפחה"
         self.fields['identity'].label = "מספר ת.ז"
