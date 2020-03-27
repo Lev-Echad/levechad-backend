@@ -88,6 +88,8 @@
                        data-target="#make_tag{{ volunteer.id }}">תג מתדנב</a>
                     {% else %}
                         לא נמצא תג מתנדב!
+                        <br />
+                        <a href="{% url 'create_volunteer_certificate' volunteer_id=volunteer.id %}">צור</a>
                     {% endif %}
                 </td>
 

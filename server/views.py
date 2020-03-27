@@ -5,7 +5,7 @@ from django.db.models import F, Q
 from django.core.paginator import Paginator
 import datetime
 from datetime import time
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 import xlwt
 
 RESULTS_IN_PAGE = 50
@@ -411,6 +411,17 @@ def export_users_xls(request):
 
     wb.save(response)
     return response
+
+
+@login_required
+def create_volunteer_certificate(request, volunteer_id):
+    try:
+        volunteer = Volunteer.objects.get(id=volunteer_id)
+        certificate = volunteer.get_or_generate_valid_certificate()
+    except Volunteer.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    return JsonResponse({'certificate_id': certificate.id})
 
 
 def export_help_xls(request):
