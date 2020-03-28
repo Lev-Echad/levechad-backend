@@ -67,7 +67,7 @@ class VolunteerForm(forms.Form):
     neighborhood = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     available_on_saturday = forms.BooleanField(required=False)
-    notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
     hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
     area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())

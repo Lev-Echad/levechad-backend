@@ -110,7 +110,7 @@ class Volunteer(Timestampable):
     available_saturday = models.BooleanField()
     keep_mandatory_worker_children = models.BooleanField(default=False)
     guiding = models.BooleanField()
-    notes = models.CharField(max_length=5000)
+    notes = models.CharField(max_length=5000, blank=True)
     moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, null=True)
