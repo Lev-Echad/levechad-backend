@@ -37,8 +37,15 @@ def get_mandatory_areas(request):
 def index(request):
     now = datetime.datetime.now()
 
-    last_7am = datetime.datetime(now.year, now.month, now.day - (1 if now.hour < 7 else 0), 7, 0, 0)
+    last_7am = datetime.datetime(now.year, now.month, now.day, 7, 0, 0)
+    # If current time is before 7AM, get results for time since last 7AM (yesterday)
+    if last_7am > now:
+        last_7am = last_7am - datetime.timedelta(days=1)
     next_7am = last_7am + datetime.timedelta(days=1)
+
+    # Filter requests by creation time.
+    creation_timerange_filter = Q(created_date__range=(last_7am, next_7am))
+
     context = {
         "numbers": {
             "total_volunteers": Volunteer.objects.count(),
@@ -47,14 +54,9 @@ def index(request):
         },
         "daily_numbers": {
             "daily_volunteers": Volunteer.objects.filter(
-                Q(created_date__range=(last_7am,
-                                       next_7am))).count(),  # Tomorrow
-            "daily_help": HelpRequest.objects.filter(
-                Q(created_date__range=(last_7am,
-                                       next_7am))).count(),  # Tomorrow
-            "daily_solved": HelpRequest.objects.filter(Q(created_date__range=(last_7am,
-                                                                              next_7am)),
-                                                       status="DONE").count()
+                creation_timerange_filter).count(),  # Tomorrow
+            "daily_help": HelpRequest.objects.filter(creation_timerange_filter).count(),
+            "daily_solved": HelpRequest.objects.filter(creation_timerange_filter, status="DONE").count()
 
         }
     }
