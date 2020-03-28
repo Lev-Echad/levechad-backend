@@ -62,7 +62,7 @@ class VolunteerForm(forms.Form):
     area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
     languages = forms.MultipleChoiceField(choices = get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    email = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    email = forms.EmailField()
     city = forms.ChoiceField(choices=CITIES)
     neighborhood = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
