@@ -421,7 +421,7 @@ def create_volunteer_certificate(request, volunteer_id):
     except Volunteer.DoesNotExist:
         return HttpResponseBadRequest()
 
-    return JsonResponse({'certificate_id': certificate.id})
+    return redirect('volunteer_certificate', pk=certificate.id)
 
 
 def export_help_xls(request):
