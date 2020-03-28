@@ -4,13 +4,13 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from datetime import timedelta, date
-
 # -*- coding: utf-8 -*-
 
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
 ID_LENGTH = 11
 DAY_NAME_LENGTH = 3
+
 
 class Timestampable(models.Model):
     created_date = models.DateTimeField(null=True, editable=False)
@@ -82,6 +82,16 @@ class Volunteer(Timestampable):
         ("CHILD_CARE", "משפחתון"),
         ("MISSIONS", "משימות")
     )
+
+    def get_or_generate_valid_certificate(self):
+        certificate = self.get_active_certificates().first()
+        if certificate is None:
+            certificate = VolunteerCertificate.objects.create(volunteer_id=self.id)
+
+        return certificate
+
+    def get_active_certificates(self):
+        return self.certificates.filter(expiration_date__gte=date.today())
 
     tz_number = models.CharField(max_length=ID_LENGTH, blank=True)
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")

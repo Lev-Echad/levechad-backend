@@ -42,7 +42,7 @@
                 <tr bgcolor="#ff6347">
             {% endif %}
                 <th scope="row">{{ help_request.id }}</th>
-                <td>{{ help_request.full_name }}</td>
+                <td>{{ help_request.helping_volunteer.first_name }} {{ help_request.helping_volunteer.last_name }}</td>
                 <td>{{ help_request.phone_number }}</td>
                 <td>
                     {{ help_request.area }}
@@ -56,7 +56,7 @@
                 <td>{{ help_request.get_status_display }}</td>
                 <td>{{ help_request.status_updater }}</td>
                 {% if help_request.helping_volunteer %}
-                    <td>{{ help_request.helping_volunteer.full_name }} - {{ help_request.helping_volunteer.id }}</td>
+                    <td>{{ help_request.helping_volunteer.first_name }} {{ help_request.helping_volunteer.last_name }} - {{ help_request.helping_volunteer.id }}</td>
                 {% else %}
                     <td></td>
                 {% endif %}
@@ -151,7 +151,8 @@
     <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">שם מלא</th>
+            <th scope="col">שם פרטי</th>
+            <th scope="col">שם משפחה</th>
             <th scope="col">גיל</th>
             <th scope="col">אזור</th>
             <th scope="col">שפה</th>
@@ -170,7 +171,8 @@
         {% for volunteer, distance, num_of_time in closes_volunteer %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
-                <td>{{ volunteer.full_name }}</td>
+                <td>{{ volunteer.first_name }}</td>
+                <td>{{ volunteer.last_name }}</td>
                 <td>{{ volunteer.age }}</td>
                 <td>
                     {% for area in volunteer.areas.all %}
@@ -196,7 +198,7 @@
                 </td>
                 <td>{{ distance }} ק"מ</td>
                 <td>{{ num_of_time }}</td>
-                <td><a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#choose_volu{{ volunteer.id }}">נבחר</a></td>
+                <td><a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#choose_volu{{ volunteer.id }}">בחר</a></td>
             </tr>
 
 

@@ -66,7 +66,7 @@ def thanks(request):
 def thanks_volunteer(request):
     volunteer_id = request.GET['vol_id']
     volunteer = Volunteer.objects.get(id=volunteer_id)
-    volunteer_certificate = volunteer.certificates.filter(expiration_date__gte=datetime.date.today())[0]
+    volunteer_certificate = volunteer.get_active_certificates().first()
 
     return render(request, 'thanks_volunteer.html', {
         "name": f'{volunteer.first_name} {volunteer.last_name}',
@@ -118,7 +118,7 @@ def volunteer_view(request):
             volunter_new.save()
 
             # creating volunteer certificate
-            VolunteerCertificate.objects.create(volunteer_id=volunter_new.id)
+            volunter_new.get_or_generate_valid_certificate()
 
             # process the data in form.cleaned_data as required
             # ...
@@ -195,7 +195,7 @@ def get_certificate_view(request):
             # TODO: change to 'get' instead of 'first' after fixing #50
             volunteer = Volunteer.objects.filter(tz_number=form['tz_number'].data).first()
             if volunteer is not None:
-                active_certificate = volunteer.certificates.filter(expiration_date__gte=datetime.date.today()).first()
+                active_certificate = volunteer.get_active_certificates().first()
                 if active_certificate is not None:
                     context['certificate_id'] = active_certificate.id
                 else:
