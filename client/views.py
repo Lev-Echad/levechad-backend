@@ -17,7 +17,7 @@ def helper_help(pk, fullName):
 def volunteer_certificate_image_view(request, pk):
     volunteer_certificate = VolunteerCertificate.objects.get(id=pk)
     volunteer = volunteer_certificate.volunteer
-    tag_filename = finders.find('client/tag.png')
+    tag_filename = finders.find('client/tag.jpeg')
     photo = None
     try:
         photo = Image.open(tag_filename)
