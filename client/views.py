@@ -18,11 +18,12 @@ def volunteer_certificate_image_view(request, pk):
     volunteer_certificate = VolunteerCertificate.objects.get(id=pk)
     volunteer = volunteer_certificate.volunteer
     tag_filename = finders.find('client/tag.jpeg')
+    font_filename = finders.find('client/fonts/BN Amnesia.ttf')
     photo = None
     try:
         photo = Image.open(tag_filename)
         drawing = ImageDraw.Draw(photo)
-        font = ImageFont.truetype('arial', size=40)
+        font = ImageFont.truetype(font_filename, size=40)
 
         black = (3, 8, 12)
 
