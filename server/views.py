@@ -4,8 +4,8 @@ from client.models import Volunteer, HelpRequest, Area
 from django.db.models import F, Q
 from django.core.paginator import Paginator
 import datetime
-from datetime import time
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
+from datetime import time, date
+from django.http import HttpResponse, HttpResponseBadRequest
 import xlwt
 
 RESULTS_IN_PAGE = 50
@@ -35,6 +35,17 @@ def get_mandatory_areas(request):
 
 @login_required
 def index(request):
+    now = datetime.datetime.now()
+
+    last_7am = datetime.datetime(now.year, now.month, now.day, 7, 0, 0)
+    # If current time is before 7AM, get results for time since last 7AM (yesterday)
+    if last_7am > now:
+        last_7am = last_7am - datetime.timedelta(days=1)
+    next_7am = last_7am + datetime.timedelta(days=1)
+
+    # Filter requests by creation time.
+    creation_timerange_filter = Q(created_date__range=(last_7am, next_7am))
+
     context = {
         "numbers": {
             "total_volunteers": Volunteer.objects.count(),
@@ -42,9 +53,10 @@ def index(request):
             "solved_help_requests": HelpRequest.objects.filter(status="DONE").count()
         },
         "daily_numbers": {
-            "daily_volunteers": 12,
-            "daily_help": 12,
-            "daily_solved": 12
+            "daily_volunteers": Volunteer.objects.filter(
+                creation_timerange_filter).count(),  # Tomorrow
+            "daily_help": HelpRequest.objects.filter(creation_timerange_filter).count(),
+            "daily_solved": HelpRequest.objects.filter(creation_timerange_filter, status="DONE").count()
 
         }
     }
@@ -392,7 +404,8 @@ def export_users_xls(request):
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
-    columns = ['שם','שם פרטי','שם משפחה','תעודת זהות', 'סוג', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר', 'אימייל', 'פנוי בשבת',
+    columns = ['שם', 'שם פרטי', 'שם משפחה', 'תעודת זהות', 'סוג', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר',
+               'אימייל', 'פנוי בשבת',
                'משפחותונים', 'Notes', ]
 
     for col_num in range(len(columns)):
@@ -401,7 +414,8 @@ def export_users_xls(request):
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = Volunteer.objects.all().values_list('full_name', 'first_name', 'last_name', 'tz_number', 'volunteer_type', 'age',
+    rows = Volunteer.objects.all().values_list('full_name', 'first_name', 'last_name', 'tz_number', 'volunteer_type',
+                                               'age',
                                                'phone_number', 'areas', 'city', 'email', 'available_saturday',
                                                'guiding', 'notes')
     for row in rows:
