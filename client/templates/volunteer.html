@@ -30,9 +30,9 @@
       
         </p>
 </div>
-<form action="/client/volunteer" method="post">
+<form action="{% url 'client_volunteer' %}" method="post">
     {% csrf_token %}
     {{ form|bootstrap }}
-    <input type="submit" value="Submit">
+    <input type="submit" value="הרשם" class="btn btn-danger">
 </form>
 {% endblock %}

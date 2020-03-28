@@ -46,7 +46,7 @@
                 <tr bgcolor="#ff6347">
             {% endif %}
                 <th scope="row">{{ help_request.id }}</th>
-                <td>{{ help_request.full_name }}</td>
+                <td>{{ help_request.first_name }} {{ help_request.last_name }}</td>
                 <td>{{ help_request.phone_number }}</td>
                 <td>
                     {{ help_request.area }}
@@ -61,7 +61,7 @@
                 <td>{{ help_request.get_status_display }}</td>
                 <td>{{ help_request.status_updater }}</td>
                 {% if help_request.helping_volunteer %}
-                    <td>{{ help_request.helping_volunteer.full_name }} - {{ help_request.helping_volunteer.id }}</td>
+                    <td>{{ help_request.helping_volunteer.first_name }} {{ help_request.helping_volunteer.last_name }} - {{ help_request.helping_volunteer.id }}</td>
                 {% else %}
                     <td></td>
                 {% endif %}

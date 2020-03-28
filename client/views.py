@@ -1,12 +1,45 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
 from .forms import *
-from .models import Volunteer, City, Language, VolunteerSchedule, HelpRequest, Area
+from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
+from django.contrib.staticfiles import finders
+from PIL import Image, ImageDraw, ImageFont
+import io
+from bidi.algorithm import get_display
+import datetime
 
 
 def helper_help(pk, fullName):
     return HelpRequest.objects.get(pk=pk, full_name=fullName)
+
+
+def volunteer_certificate_image_view(request, pk):
+    volunteer_certificate = VolunteerCertificate.objects.get(id=pk)
+    volunteer = volunteer_certificate.volunteer
+    tag_filename = finders.find('client/tag.jpeg')
+    photo = None
+    try:
+        photo = Image.open(tag_filename)
+        drawing = ImageDraw.Draw(photo)
+        font = ImageFont.truetype('arial', size=40)
+
+        black = (3, 8, 12)
+
+        lines_to_insert = [
+            f'שם מתנדב: {volunteer.first_name} {volunteer.last_name}',
+            f'תעודת זהות: {volunteer.tz_number}',
+            f'תוקף התעודה: {volunteer_certificate.expiration_date}',
+            f'מספר תעודה: {volunteer_certificate.id}',
+        ]
+
+        drawing.text((700, 200), get_display('\n'.join(lines_to_insert)), fill=black, font=font, align='right')
+        with io.BytesIO() as output:
+            photo.save(output, format='png')
+            return HttpResponse(output.getvalue(), content_type='image/png')
+    finally:
+        if photo is not None:
+            photo.close()
 
 
 def thanks(request):
@@ -15,7 +48,6 @@ def thanks(request):
         pk = request.GET['pk']
 
         hr = helper_help(pk, username)
-        print(str(hr.status))
 
         return render(request, 'thanks.html', {
             "id": pk,
@@ -32,23 +64,14 @@ def thanks(request):
 
 
 def thanks_volunteer(request):
-    try:
-        vol_id = request.GET['vol_id']
+    volunteer_id = request.GET['vol_id']
+    volunteer = Volunteer.objects.get(id=volunteer_id)
+    volunteer_certificate = volunteer.get_active_certificates().first()
 
-        vr = Volunteer.objects.get(pk=vol_id)
-
-        print(vr.full_name)
-        return render(request, 'thanks_volunteer.html', {
-            "name": vr.full_name,
-            "taz": vr.tz_number
-
-        })
-
-    except Exception as e:
-        return render(request, 'thanks_volunteer.html', {
-            "name": "h",
-            "taz": " "
-        })
+    return render(request, 'thanks_volunteer.html', {
+        "name": f'{volunteer.first_name} {volunteer.last_name}',
+        "certificate_id": volunteer_certificate.id
+    })
 
 
 def homepage(request):
@@ -63,15 +86,11 @@ def homepage(request):
     return render(request, 'index.html', context)
 
 
-def donation(request):
-    return render(request, 'donation.html', {})
-
-
 def get_help(request):
     return render(request, 'get_help.html', {})
 
 
-def volunteer(request):
+def volunteer_view(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         form = VolunteerForm(request.POST)
@@ -82,18 +101,24 @@ def volunteer(request):
             keep_mandatory_worker_children = False
             if answer["childrens"] == "YES":
                 keep_mandatory_worker_children = True
-            volunter_new = Volunteer(tz_number=answer["identity"], full_name=answer["full_name"], email=answer["email"],
-                                     age=answer["age"],
+                
+            volunter_new = Volunteer.objects.create(tz_number=answer["identity"], first_name=answer["first_name"],
+                                     last_name=answer["last_name"],
+                                     email=answer["email"],
+                                     age=answer["age"], organization=answer['organization'],
                                      phone_number=answer["phone_number"],
-                                     city=City.objects.get(name=answer["city"]), address=answer["address"],
+                                     city=City.objects.get(name=answer["city"]), neighborhood=answer['neighborhood'],
+                                     address=answer["address"],
                                      available_saturday=answer["available_on_saturday"],
                                      notes=answer["notes"], moving_way=answer["transportation"],
                                      hearing_way=answer["hearing_way"],
                                      keep_mandatory_worker_children=keep_mandatory_worker_children, guiding=False)
-            volunter_new.save()
             volunter_new.languages.set(languagesGot)
             volunter_new.areas.set(areasGot)
             volunter_new.save()
+
+            # creating volunteer certificate
+            volunter_new.get_or_generate_valid_certificate()
 
             # process the data in form.cleaned_data as required
             # ...
@@ -160,6 +185,27 @@ def shopping_help(request):
         form = ShoppingForm()
 
     return render(request, 'help_pages/shopping.html', {'form': form})
+
+
+def get_certificate_view(request):
+    context = {'form': GetCertificateForm()}
+    if request.method == 'POST':
+        form = GetCertificateForm(request.POST)
+        if form.is_valid():
+            # TODO: change to 'get' instead of 'first' after fixing #50
+            volunteer = Volunteer.objects.filter(tz_number=form['tz_number'].data).first()
+            if volunteer is not None:
+                active_certificate = volunteer.get_active_certificates().first()
+                if active_certificate is not None:
+                    context['certificate_id'] = active_certificate.id
+                else:
+                    context['error'] = 'לא נמצאה תעודה בתוקף!'
+            else:
+                context['error'] = 'מתנדב לא נמצא!'
+        else:
+            context['error'] = 'יש למלא את השדות כנדרש!'
+
+    return render(request, 'get_certificate.html', context=context)
 
 
 def medic_help(request):

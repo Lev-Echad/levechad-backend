@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area
-from django.db.models import F
+from django.db.models import F, Q
 from django.core.paginator import Paginator
 import datetime
-from datetime import time
-from django.http import HttpResponse
+from datetime import time, date
+from django.http import HttpResponse, HttpResponseBadRequest
 import xlwt
 
 RESULTS_IN_PAGE = 50
@@ -35,6 +35,17 @@ def get_mandatory_areas(request):
 
 @login_required
 def index(request):
+    now = datetime.datetime.now()
+
+    last_7am = datetime.datetime(now.year, now.month, now.day, 7, 0, 0)
+    # If current time is before 7AM, get results for time since last 7AM (yesterday)
+    if last_7am > now:
+        last_7am = last_7am - datetime.timedelta(days=1)
+    next_7am = last_7am + datetime.timedelta(days=1)
+
+    # Filter requests by creation time.
+    creation_timerange_filter = Q(created_date__range=(last_7am, next_7am))
+
     context = {
         "numbers": {
             "total_volunteers": Volunteer.objects.count(),
@@ -42,9 +53,10 @@ def index(request):
             "solved_help_requests": HelpRequest.objects.filter(status="DONE").count()
         },
         "daily_numbers": {
-            "daily_volunteers": 12,
-            "daily_help": 12,
-            "daily_solved": 12
+            "daily_volunteers": Volunteer.objects.filter(
+                creation_timerange_filter).count(),  # Tomorrow
+            "daily_help": HelpRequest.objects.filter(creation_timerange_filter).count(),
+            "daily_solved": HelpRequest.objects.filter(creation_timerange_filter, status="DONE").count()
 
         }
     }
@@ -77,11 +89,11 @@ def show_all_volunteers(request, page=1):
     if len(get_mandatory_areas(request)) != 0:
         area_qs = qs.filter(areas__name__in=get_mandatory_areas(request))
 
-    if len(areas) != 0 and not '' in areas:
+    if len(areas) != 0 and '' not in areas:
         something_mark = True
         area_qs = area_qs.filter(areas__name__in=areas)
 
-    if len(lans) != 0 and not '' in lans:
+    if len(lans) != 0 and '' not in lans:
         something_mark = True
         language_qs = qs.filter(languages__name__in=lans)
 
@@ -91,7 +103,8 @@ def show_all_volunteers(request, page=1):
 
     if len(search_name) != 0:
         something_mark = True
-        qs = qs.filter(full_name=search_name[0])
+        split_name = search_name[0].split()
+        qs = qs.filter(Q(last_name=' '.join(split_name[1:])) | Q(first_name=split_name[0]))
 
     # --------- check time now --------
     now = datetime.datetime.now()
@@ -102,29 +115,29 @@ def show_all_volunteers(request, page=1):
 
     # check option 1
     if is_time_between(time(7, 00), time(15, 00)):
-        filter = "schedule__" + now_day + "__contains"
-        availability_qs = qs.filter(**{filter: 1})
+        schedule_filter = "schedule__" + now_day + "__contains"
+        availability_qs = qs.filter(**{schedule_filter: 1})
 
     # check option 2
     elif is_time_between(time(15, 00), time(23, 00)):
-        filter = "schedule__" + now_day + "__contains"
-        availability_qs = qs.filter(**{filter: 2})
+        schedule_filter = "schedule__" + now_day + "__contains"
+        availability_qs = qs.filter(**{schedule_filter: 2})
 
 
     # check option 3 before midnight
     elif is_time_between(time(23, 00), time(00, 00)):
-        filter = "schedule__" + now_day + "__contains"
-        availability_qs = qs.filter(**{filter: 3})
+        schedule_filter = "schedule__" + now_day + "__contains"
+        availability_qs = qs.filter(**{schedule_filter: 3})
 
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
-        filter = "schedule__" + yesterday_day + "__contains"
-        availability_qs = qs.filter(**{filter: 3})
+        schedule_filter = "schedule__" + yesterday_day + "__contains"
+        availability_qs = qs.filter(**{schedule_filter: 3})
 
     availability_now_id = []
     if availability_qs != []:
-        for volu in availability_qs:
-            availability_now_id.append(volu.id)
+        for volunteer in availability_qs:
+            availability_now_id.append(volunteer.id)
 
     if len(availability) == 0:
         availability_qs = Volunteer.objects.all().all()
@@ -132,14 +145,9 @@ def show_all_volunteers(request, page=1):
     # union matchings from both categoties
     match_qs = area_qs.union(language_qs)
 
-    #     guidings1 = request.GET.getlist('guiding')
-
     # if there were no matches display all and there are people available
     if len(match_qs) == 0 and (not something_mark):
         match_qs = Volunteer.objects.all()
-
-    #     if len(guidings1) != 0:
-    #         match_qs = match_qs.filter(guiding=True)
 
     availability_qs = (availability_qs)
     match_qs = match_qs.intersection(availability_qs)
@@ -150,15 +158,22 @@ def show_all_volunteers(request, page=1):
         field = "-" + field
         match_qs = match_qs.order_by(field)
 
-    # ----- check for each volunterr how much times he apper
+    # ----- check for each volunteer how much times he apper
     appers_list = []
-    for volu in match_qs:
-        appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
+    valid_certificates = []
+    for volunteer in match_qs:
+        appers_list.append(HelpRequest.objects.filter(helping_volunteer=volunteer).count())
+        volunteer.get_active_certificates()
+        valid_certificate = volunteer.get_active_certificates().first()
+        if valid_certificate is not None:
+            valid_certificates.append(valid_certificate.id)
+        else:
+            valid_certificates.append(-1)
 
     # make match qs to tuple
     final_data = []
     for i in range(0, len(match_qs)):
-        final_data.append((match_qs[i], appers_list[i]))
+        final_data.append((match_qs[i], appers_list[i], valid_certificates[i]))
 
     paginator = Paginator(final_data, RESULTS_IN_PAGE)
 
@@ -272,8 +287,10 @@ def help_edit_stat(request, pk):
         # check if this volunteer exist
         try:
             volunteer_to_add = Volunteer.objects.get(id=volunteer_id)
+            # adding new certificate
+            volunteer_to_add.get_or_generate_valid_certificate()
             to_edit.helping_volunteer = volunteer_to_add
-        except:
+        except Volunteer.DoesNotExist:
             pass
 
     to_edit.save()
@@ -387,7 +404,8 @@ def export_users_xls(request):
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
-    columns = ['שם', 'תעודת זהות', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר', 'אימייל', 'פנוי בשבת',
+    columns = ['שם', 'שם פרטי', 'שם משפחה', 'תעודת זהות', 'סוג', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר',
+               'אימייל', 'פנוי בשבת',
                'משפחותונים', 'Notes', ]
 
     for col_num in range(len(columns)):
@@ -396,8 +414,10 @@ def export_users_xls(request):
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = Volunteer.objects.all().values_list('full_name', 'tz_number', 'age', 'phone_number', 'areas', 'city',
-                                               'email', 'available_saturday', 'guiding', 'notes')
+    rows = Volunteer.objects.all().values_list('full_name', 'first_name', 'last_name', 'tz_number', 'volunteer_type',
+                                               'age',
+                                               'phone_number', 'areas', 'city', 'email', 'available_saturday',
+                                               'guiding', 'notes')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):
@@ -405,6 +425,17 @@ def export_users_xls(request):
 
     wb.save(response)
     return response
+
+
+@login_required
+def create_volunteer_certificate(request, volunteer_id):
+    try:
+        volunteer = Volunteer.objects.get(id=volunteer_id)
+        certificate = volunteer.get_or_generate_valid_certificate()
+    except Volunteer.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    return redirect('volunteer_certificate', pk=certificate.id)
 
 
 def export_help_xls(request):

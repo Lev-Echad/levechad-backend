@@ -6,22 +6,26 @@
 {% block title %}לב אחד - מתנדבים קרובים לבקשה{% endblock %}
 
 {% block body %}
-<p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת מתנדבים
-<a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm">ערוך</a>
-<a href="{% url 'export_users_xls' %}">ייצוא מידע לאקסל</a>
+    <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת מתנדבים
+        <a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal"
+           data-target="#modalLoginForm">סינון</a>
+        <a href="{% url 'export_users_xls' %}">ייצוא מידע לאקסל</a>
 
-</p>
+    </p>
 
-<table class="table table-hover table-bordered text-center">
-    <thead>
+    <table class="table table-hover table-bordered text-center">
+        <thead>
         <tr>
             <th scope="col">#</th>
             <th scope="col">שם מלא</th>
+            <th scope="col">שם פרטי</th>
+            <th scope="col">שם משפחה</th>
+            <th scope="col">סוג</th>
             <th scope="col">גיל</th>
             <th scope="col">אזור</th>
             <th scope="col">שפה</th>
             <th scope="col">מספר טלפון</th>
-             <th scope="col">כתובת מייל</th>
+            <th scope="col">כתובת מייל</th>
             <th scope="col">תעודת זהות</th>
             <th scope="col">הערות</th>
             <th scope="col">עיר</th>
@@ -31,16 +35,20 @@
             <th scope="col">מספר הפעמים שעזר</th>
             <th scope="col">רוצה חוגים</th>
             <th scope="col">ערוך הערות</th>
-             <th scope="col">מחיקה</th>
+            <th scope="col">תג מתנדב</th>
+            <th scope="col">מחיקה</th>
 
 
         </tr>
-    </thead>
-    <tbody>
-        {% for volunteer, num_of_appers in volunteer_data %}
+        </thead>
+        <tbody>
+        {% for volunteer, num_of_appers, certificate_id in volunteer_data %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
+                <td>{{ volunteer.first_name }}</td>
+                <td>{{ volunteer.last_name }}</td>
+                <td>{{ volunteer.get_volunteer_type_display }}</td>
                 <td>{{ volunteer.age }}</td>
                 <td>
                     {% for area in volunteer.areas.all %}
@@ -53,8 +61,8 @@
                     {% endfor %}
                 </td>
                 <td>{{ volunteer.phone_number }}</td>
-                 <td>{{ volunteer.email }}</td>
-                 <td>{{ volunteer.tz_number }}</td>
+                <td>{{ volunteer.email }}</td>
+                <td>{{ volunteer.tz_number }}</td>
                 <td>{{ volunteer.notes }}</td>
                 <td>{{ volunteer.city }}</td>
                 <td>{{ volunteer.address }}</td>
@@ -71,241 +79,315 @@
 
                 <td>
                     {{ volunteer.notes }} <br>
-                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#edit_volu{{ volunteer.id }}"> ערוך</a>
+                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal"
+                       data-target="#edit_volu{{ volunteer.id }}"> ערוך</a>
                 </td>
-                  <td>
-                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#delete_volunteer{{ volunteer.id }}">למחוק</a>
+                <td>
+                    {% if certificate_id != -1 %}
+                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal"
+                       data-target="#make_tag{{ volunteer.id }}">תג מתדנב</a>
+                    {% else %}
+                        לא נמצא תג מתנדב!
+                        <br />
+                        <a href="{% url 'create_volunteer_certificate' volunteer_id=volunteer.id %}">צור</a>
+                    {% endif %}
                 </td>
-             
+
+                <td>
+                    <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal"
+                       data-target="#delete_volunteer{{ volunteer.id }}">למחוק</a>
+                </td>
+
             </tr>
 
 
-            <div class="modal fade" id="edit_volu{{ volunteer.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-                      aria-hidden="true">
-                      <div class="modal-dialog" role="document">
-                        <div class="modal-content">
+            <div class="modal fade" id="edit_volu{{ volunteer.id }}" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
 
 
-                         <form method="post" action="{% url 'volunteer_edit_notes' volunteer.id %}">
-                              {% csrf_token %}
-                              <div class="modal-header">
+                        <form method="post" action="{% url 'volunteer_edit_notes' volunteer.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">עריכה</h4>
-                              </div>
-                              <div class="modal-body mx-3">
-                                  <div class="right">
-                                        <h5><u>שינוי הערות מתנדב</u></h5>
+                            </div>
+                            <div class="modal-body mx-3">
+                                <div class="right">
+                                    <h5><u>שינוי הערות מתנדב</u></h5>
 
 
-                                        <div>
-                                            <label for="notes">הערה:</label>
-                                            <input type="text" name="notes" id="notes" value='{{ volunteer.notes }}'>
-                                        </div>
+                                    <div>
+                                        <label for="notes">הערה:</label>
+                                        <input type="text" name="notes" id="notes" value='{{ volunteer.notes }}'>
                                     </div>
+                                </div>
 
-                                  </div>
-                              <div class="modal-footer d-flex justify-content-center">
+                            </div>
+                            <div class="modal-footer d-flex justify-content-center">
                                 <button type="submit" class="btn btn-default">שמור שינויים</button>
-                              </div>
-                          </form>
-                        </div>
-                      </div>
-                </div>
-        <div class="modal fade" id="delete_volunteer{{ volunteer.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-                      aria-hidden="true">
-                      <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-
-
-                         <form method="post" action="{% url 'delete_volunteer' volunteer.id %}">
-                              {% csrf_token %}
-                             
-                              
-                              <div class="modal-footer d-flex justify-content-center">
-                                <button type="submit" class="btn btn-default">מחיקה מהמאגר</button>
-                              </div>
-                          </form>
-                        </div>
-                      </div>
-                </div>
-      
-        {% endfor %}
-    </tbody>
-</table>
-
-<div>
-  
-    {% if page != 1 %}
-    <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
-    {% endif %}
-    &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
-    {% if not page == num_pages %}
-    <a href="{% url 'show_all_volunteers' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
-    {% endif %}
-    {% if page == 1 %}
-    <a href="{% url 'show_all_volunteers' %}/{{ page|add:39 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אחרון</a>
-        <a href="{% url 'show_all_volunteers' %}/{{ page|add:20 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-    {% endif %}
-     {% if page == 41 %}
-    <a href="{% url 'show_all_volunteers' %}/{{ page|add:-40 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;">עמוד ראשון</a>
-        <a href="{% url 'show_all_volunteers' %}/{{ page|add:-20 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-    
-    {% endif %}
-    
-   
-    
-    
-</div>
-
-                    <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-                      aria-hidden="true">
-                      <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-
-
-                            <form method="get" action="{% url 'show_all_volunteers' %}">
-                              <div class="modal-header text-center">
-                                <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
-                              </div>
-                              <div class="modal-body mx-3">
-
-{#                               increas?#}
-                                <div>
-                                    <p class="h5"><u>בחר אזורים להצגה</u></p>
-
-
-                                    <div>
-                                        <label for="area">הכל</label>
-                                        <input type="checkbox" name="area" id="area" value=>
-                                    </div>
-                                    <div>
-                                        <label for="area">צפון</label>
-                                        <input type="checkbox" name="area" id="area" value='צפון'>
-                                    </div>
-
-                                    <div>
-                                        <label for="area">ירושלים והסביבה</label>
-                                        <input type="checkbox" name="area" id="area" value='ירושלים והסביבה'>
-                                    </div>
-
-                                    <div>
-                                        <label for="area">מרכז</label>
-                                        <input type="checkbox" name="area" id="area" value='מרכז'>
-                                    </div>
-
-                                    <div>
-                                        <label for="area">יהודה ושומרון</label>
-                                        <input type="checkbox" name="area" id="area" value='יהודה ושומרון'>
-                                    </div>
-                                    <div>
-                                        <label for="area">דרום</label>
-                                        <input type="checkbox" name="area" id="area" value='דרום'>
-                                    </div>
-                                    <div>
-                                        <label for="area">סיוע טלפוני</label>
-                                        <input type="checkbox" name="area" id="area" value='סיוע טלפוני'>
-                                    </div>
-
-                                </div>
-                                  <div>
-
-                                        <p class="h5"><u>בחר שפה</u></p>
-                                      <div>
-                                        <label for="area">הכל</label>
-                                        <input type="checkbox" name="area" id="area" value=>
-                                    </div>
-                                      <div>
-                                        <label for="language">עברית</label>
-                                        <input type="checkbox" name="language" id="language" value='עברית'>
-                                    </div>
-
-
-                                    <div>
-                                        <label for="language">אנגלית</label>
-                                        <input type="checkbox" name="language" id="language" value='אנגלית'>
-                                    </div>
-
-                                    <div>
-                                        <label for="language">רוסית</label>
-                                        <input type="checkbox" name="language" id="language" value='רוסית'>
-                                    </div>
-
-                                    <div>
-                                        <label for="language">צרפתית</label>
-                                        <input type="checkbox" name="language" id="language" value='צרפתית'>
-                                    </div>
-
-                                    <div>
-                                        <label for="language">ערבית</label>
-                                        <input type="checkbox" name="language" id="language" value='ערבית'>
-                                    </div>
-
-                                    <div>
-                                        <label for="language">אחר</label>
-                                        <input type="checkbox" name="language" id="language" value='אחר'>
-                                    </div>
-                                </div>
-
-
-                                <div>
-                                    <p class="h5"><u>בחר את השדה שאתה מעוניין למיין לפיו</u></p>
-                                </div>
-                                    <div>
-                                        <label for="field">שם</label>
-                                        <input type="radio" name="field" id="field" value='full_name'>
-                                    </div>
-                                    <div>
-                                        <label for="field">עיר</label>
-                                        <input type="radio" name="field" id="field" value='city'>
-                                    </div>
-                                    <div>
-                                        <label for="field">גיל</label>
-                                        <input type="radio" name="field" id="field" value='age'>
-                                    </div>
-                                    <div>
-                                        <label for="field">דרכי התניידות</label>
-                                        <input type="radio" name="field" id="field" value='moving_way'>
-                                    </div>
-
-                                <div>
-                                    <p class="h5"><u>זמינות</u></p>
-                                </div>
-
-
-                                <div>
-                                    <label for="guiding">האם להראות רק את המתנדבים שמוכנים להתנדב לחוגים?</label>
-                                    <input type="checkbox" name="guiding" id="guiding" value='True'>
-                                </div>
-
-                                <div>
-                                    <label for="availability">האם להראות רק את המתנדבים הזמינים כעת</label>
-                                    <input type="checkbox" name="availability" id="availability" value='ONLY_NOW' checked>
-                                </div>
-                                  <div>
-                                    <p class="h5"><u>שם</u></p>
-                                </div>
-                                   <div>
-                                    <label for="availability">חיפוש שם</label>
-                                    <input type="text" name="searchname" id="searchname" placeholder = "הזין שם מלא">
-                                </div>
-
-                              </div>
-                              <div class="modal-footer d-flex justify-content-center">
-                                <button type="submit" class="btn btn-default">בצע פילטר</button>
-                              </div>
-                          </form>
-                        </div>
-                      </div>
+                            </div>
+                        </form>
                     </div>
+                </div>
+            </div>
+            <div class="modal fade" id="delete_volunteer{{ volunteer.id }}" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+
+
+                        <form method="post" action="{% url 'delete_volunteer' volunteer.id %}">
+                            {% csrf_token %}
+
+
+                            <div class="modal-footer d-flex justify-content-center">
+                                <button type="submit" class="btn btn-default">מחיקה מהמאגר</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade m" id="make_tag{{ volunteer.id }}" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel"
+                 aria-hidden="true" style="top:100px;">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content text-center">
+                        {% if certificate_id != -1 %}
+                            <img src="{% url 'volunteer_certificate' pk=certificate_id %}" width="400">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div>
+
+        {% if page != 1 %}
+            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
+        {% endif %}
+        &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
+        {% if not page == num_pages %}
+            <a href="{% url 'show_all_volunteers' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
+        {% endif %}
+        {% if page == 1 %}
+            <a href="{% url 'show_all_volunteers' %}/{{ page|add:39 }}?{{ request.META.QUERY_STRING }}"
+               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אחרון</a>
+            <a href="{% url 'show_all_volunteers' %}/{{ page|add:20 }}?{{ request.META.QUERY_STRING }}"
+               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
+
+        {% endif %}
+        {% if page == 41 %}
+            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-40 }}?{{ request.META.QUERY_STRING }}"
+               style="color:black;font-size:10px;">עמוד ראשון</a>
+            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-20 }}?{{ request.META.QUERY_STRING }}"
+               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
+
+
+        {% endif %}
+
+
+    </div>
+
+    <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+
+                <form method="get" action="{% url 'show_all_volunteers' %}">
+                    <div class="modal-header text-center">
+                        <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
+                    </div>
+                    <div class="modal-body mx-3">
+
+                        {#                               increas?#}
+                        <div>
+                            <p class="h5"><u>בחר אזורים להצגה</u></p>
+
+
+                            <div>
+                                <label for="area">הכל</label>
+                                <input type="checkbox" name="area" id="area" value=>
+                            </div>
+                            <div>
+                                <label for="area">צפון</label>
+                                <input type="checkbox" name="area" id="area" value='צפון'>
+                            </div>
+
+                            <div>
+                                <label for="area">ירושלים והסביבה</label>
+                                <input type="checkbox" name="area" id="area" value='ירושלים והסביבה'>
+                            </div>
+
+                            <div>
+                                <label for="area">מרכז</label>
+                                <input type="checkbox" name="area" id="area" value='מרכז'>
+                            </div>
+
+                            <div>
+                                <label for="area">יהודה ושומרון</label>
+                                <input type="checkbox" name="area" id="area" value='יהודה ושומרון'>
+                            </div>
+                            <div>
+                                <label for="area">דרום</label>
+                                <input type="checkbox" name="area" id="area" value='דרום'>
+                            </div>
+                            <div>
+                                <label for="area">סיוע טלפוני</label>
+                                <input type="checkbox" name="area" id="area" value='סיוע טלפוני'>
+                            </div>
+
+                        </div>
+                        <div>
+
+                            <p class="h5"><u>בחר שפה</u></p>
+                            <div>
+                                <label for="area">הכל</label>
+                                <input type="checkbox" name="area" id="area" value=>
+                            </div>
+                            <div>
+                                <label for="language">עברית</label>
+                                <input type="checkbox" name="language" id="language" value='עברית'>
+                            </div>
+
+
+                            <div>
+                                <label for="language">אנגלית</label>
+                                <input type="checkbox" name="language" id="language" value='אנגלית'>
+                            </div>
+
+                            <div>
+                                <label for="language">רוסית</label>
+                                <input type="checkbox" name="language" id="language" value='רוסית'>
+                            </div>
+
+                            <div>
+                                <label for="language">צרפתית</label>
+                                <input type="checkbox" name="language" id="language" value='צרפתית'>
+                            </div>
+
+                            <div>
+                                <label for="language">ערבית</label>
+                                <input type="checkbox" name="language" id="language" value='ערבית'>
+                            </div>
+
+                            <div>
+                                <label for="language">אחר</label>
+                                <input type="checkbox" name="language" id="language" value='אחר'>
+                            </div>
+                        </div>
+
+
+                        <div>
+                            <p class="h5"><u>בחר את השדה שאתה מעוניין למיין לפיו</u></p>
+                        </div>
+                        <div>
+                            <label for="field">שם</label>
+                            <input type="radio" name="field" id="field" value='full_name'>
+                        </div>
+                        <div>
+                            <label for="field">עיר</label>
+                            <input type="radio" name="field" id="field" value='city'>
+                        </div>
+                        <div>
+                            <label for="field">גיל</label>
+                            <input type="radio" name="field" id="field" value='age'>
+                        </div>
+                        <div>
+                            <label for="field">דרכי התניידות</label>
+                            <input type="radio" name="field" id="field" value='moving_way'>
+                        </div>
+
+                        <div>
+                            <p class="h5"><u>זמינות</u></p>
+                        </div>
+
+
+                        <div>
+                            <label for="guiding">האם להראות רק את המתנדבים שמוכנים להתנדב לחוגים?</label>
+                            <input type="checkbox" name="guiding" id="guiding" value='True'>
+                        </div>
+
+                        <div>
+                            <label for="availability">האם להראות רק את המתנדבים הזמינים כעת</label>
+                            <input type="checkbox" name="availability" id="availability" value='ONLY_NOW' checked>
+                        </div>
+                        <div>
+                            <p class="h5"><u>שם</u></p>
+                        </div>
+                        <div>
+                            <label for="availability">חיפוש שם</label>
+                            <input type="text" name="searchname" id="searchname" placeholder="הזין שם מלא">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button type="submit" class="btn btn-default">בצע פילטר</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 
 
 
 
     <div class="fixed-action-btn " style="position:fixed; bottom: 10px; left: 12px;">
-      <a href="{% url 'index' %}" class="btn-floating btn-lg red btn btn-outline-dark">
-        ->
-      </a>
+        <a href="{% url 'index' %}" class="btn-floating btn-lg red btn btn-outline-dark">
+            ->
+        </a>
     </div>
+    <script type='text/javascript'>
+
+        $(".m").on('shown.bs.modal', function () {
+
+
+            var element = $("#the_tag");
+            var getCanvas;
+            var w = element.width();
+            var h = element.height();
+
+
+            element.css({
+                    'transform': 'scale(2)',
+                    '-ms-transform': 'scale(2)',
+                    '-webkit-transform': 'scale(2)'
+                }
+            );
+
+            html2canvas(element, {
+                onrendered: function (canvas) {
+                    element.css({
+                            'transform': '',
+                            '-ms-transform': '',
+                            '-webkit-transform': ''
+                        }
+                    );
+
+                    $("#previewImage").append(canvas);
+                    getCanvas = canvas;
+                },
+                scale: 2,
+                width: w * 3,
+                height: h * 3
+            });
+
+            $("#convert").on('click', function () {
+                var imageData = getCanvas.toDataURL("image/png");
+
+                var newData = imageData.replace(/^data:image\/png/, "data:application/octet-stream");
+                $("#convert").attr("download", "levEchadVolunteerTag.png").attr("href", newData);
+            });
+
+        });
+
+
+    </script>
 {% endblock %}

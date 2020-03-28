@@ -5,19 +5,14 @@
 
 
 {% block body %}
-<h1>תודה רבה מתנדב יקר!</h1>
-<h2>אנחנו מעבדים את הבקשה</h2>
+    <h1>תודה רבה מתנדב יקר!</h1>
+    <h2>אנחנו מעבדים את הבקשה</h2>
 
-<br><br>
-
-
-<!--strong><h3>תג זה הינו הכרחי עבור ביצוע ההתנדבות - שמור את התג בטלפון שלך</h3></strong>
-<div class = "tag" style = "position:absolute;left:35%;">
-<img src = {% static 'client/tag.png' %} width = 400>
-  <div class = "taginfo" style = "position:absolute;top:70px;right:50px;">
-  <p> שם מתנדב: {{name}} </p>
-  <p style="margin-top:-10px;"> תעודת זהות: {{taz}} </p>
-    </div>
-</div>-->
-
+    <br><br>
+    <h3>תג זה הינו הכרחי עבור ביצוע ההתנדבות - שמור את התג בטלפון שלך</h3>
+    <img src="{% url 'volunteer_certificate' pk=certificate_id %}" alt="volunteer tag" width="400" />
+    <br />
+    <a href="{% url 'volunteer_certificate' pk=certificate_id %}" download>הורדת תג</a>
 {% endblock %}
+
+
