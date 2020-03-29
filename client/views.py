@@ -106,7 +106,7 @@ def volunteer_view(request):
             volunter_new = Volunteer.objects.create(tz_number=answer["identity"], first_name=answer["first_name"],
                                      last_name=answer["last_name"],
                                      email=answer["email"],
-                                     age=answer["age"], organization=answer['organization'],
+                                     date_of_birth=answer["date_of_birth"], organization=answer['organization'],
                                      phone_number=answer["phone_number"],
                                      city=City.objects.get(name=answer["city"]), neighborhood=answer['neighborhood'],
                                      address=answer["address"],

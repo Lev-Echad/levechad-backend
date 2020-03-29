@@ -80,7 +80,8 @@ class Volunteer(Timestampable):
         ("HAMAL", "חמל"),
         ("PROJECT", "פרויקט"),
         ("CHILD_CARE", "משפחתון"),
-        ("MISSIONS", "משימות")
+        ("MISSIONS", "משימות"),
+        ("AGRICULTURE", "חקלאות")
     )
 
     def get_or_generate_valid_certificate(self):
@@ -98,7 +99,8 @@ class Volunteer(Timestampable):
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
-    age = models.IntegerField()
+    age = models.IntegerField(null=True, default=None)
+    date_of_birth = models.DateField(null=True, default=None)
     volunteer_type = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, choices=TYPES, default="MISSIONS")
     areas = models.ManyToManyField(Area)
     languages = models.ManyToManyField(Language)
