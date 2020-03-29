@@ -97,34 +97,39 @@ def volunteer_view(request):
         form = VolunteerForm(request.POST)
         if form.is_valid():
             answer = form.cleaned_data
-            languagesGot = Language.objects.filter(name__in=answer["languages"])
-            areasGot = Area.objects.filter(name__in=answer["area"])
-            keep_mandatory_worker_children = False
-            if answer["childrens"] == "YES":
-                keep_mandatory_worker_children = True
-                
-            volunter_new = Volunteer.objects.create(tz_number=answer["identity"], first_name=answer["first_name"],
-                                     last_name=answer["last_name"],
-                                     email=answer["email"],
-                                     age=answer["age"], organization=answer['organization'],
-                                     phone_number=answer["phone_number"],
-                                     city=City.objects.get(name=answer["city"]), neighborhood=answer['neighborhood'],
-                                     address=answer["address"],
-                                     available_saturday=answer["available_on_saturday"],
-                                     notes=answer["notes"], moving_way=answer["transportation"],
-                                     hearing_way=answer["hearing_way"],
-                                     keep_mandatory_worker_children=keep_mandatory_worker_children, guiding=False)
-            volunter_new.languages.set(languagesGot)
-            volunter_new.areas.set(areasGot)
-            volunter_new.save()
+            languages = Language.objects.filter(name__in=answer["languages"])
+            areas = Area.objects.filter(name__in=answer["area"])
+
+            volunteer_new = Volunteer.objects.create(
+                tz_number=answer["id_number"],
+                first_name=answer["first_name"],
+                last_name=answer["last_name"],
+                email=answer["email"],
+                age=answer["age"],
+                organization=answer['organization'],
+                phone_number=answer["phone_number"],
+                city=City.objects.get(name=answer["city"]),
+                neighborhood=answer['neighborhood'],
+                address=answer["address"],
+                available_saturday=answer["available_on_saturday"],
+                notes=answer["notes"],
+                moving_way=answer["transportation"],
+                hearing_way=answer["hearing_way"],
+                keep_mandatory_worker_children=(answer["childrens"] == "YES"),
+                guiding=False
+            )
+            volunteer_new.languages.set(languages)
+            volunteer_new.areas.set(areas)
+            volunteer_new.save()
 
             # creating volunteer certificate
-            volunter_new.get_or_generate_valid_certificate()
+            volunteer_new.get_or_generate_valid_certificate()
 
             # process the data in form.cleaned_data as required
             # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunter_new.pk))
+            # redirect to a new URL:
+            # TODO Don't hardcode URLs, get them by view
+            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunteer_new.pk))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = VolunteerForm()
