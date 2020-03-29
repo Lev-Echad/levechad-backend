@@ -313,7 +313,6 @@ def volunteer_edit_notes(request, pk):
 def delete_volunteer(request, pk):
     to_delete = Volunteer.objects.get(id=pk)
     to_delete.delete()
-    to_delete.save()
     return redirect('show_all_volunteers')
 
 
@@ -374,8 +373,8 @@ def find_closes_persons(request, pk):
 
     # closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
 
-    if len(closes_volunteer) > 30:
-        closes_volunteer = closes_volunteer[0:29]
+    if len(closes_volunteer) > 100:
+        closes_volunteer = closes_volunteer[0:100]
 
     # ----- check for each volunterr how much times he apper
     appers_list = []
