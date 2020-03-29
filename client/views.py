@@ -196,7 +196,13 @@ def get_certificate_view(request):
             # TODO: change to 'get' instead of 'first' after fixing #50
             volunteer = Volunteer.objects.filter(tz_number=form['tz_number'].data).first()
             if volunteer is not None:
-                active_certificate = volunteer.get_active_certificates().first()
+                '''
+                 TODO: this a hotfix that generate a valid certificate to any user that requests one. 
+                 it should be reverted to the commented part  when #52 is solved
+                '''
+                # active_certificate = volunteer.get_active_certificates().first()
+                active_certificate = volunteer.get_or_generate_valid_certificate()
+
                 if active_certificate is not None:
                     context['certificate_id'] = active_certificate.id
                 else:
