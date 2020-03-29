@@ -242,6 +242,14 @@ div {
 .page-footer p {
   margin: 0px;
 }
+@media only screen and (max-width: 400px) {
+
+    #aboutvolu{
+    font-size:8px;
+    max-height:350px;
+    }
+
+}
 @media only screen and (max-width: 600px) {
   .tag {
     left:25%;
@@ -253,7 +261,25 @@ div {
     |
     }
     #aboutvolu{
-    font-size:10px;
+    font-size:8px;
+    max-height:350px;
     }
     
 }
+@media only screen and (max-width: 800px) {
+
+    #aboutvolu{
+    font-size:8px;
+    max-height:350px;
+    }
+
+}
+@media only screen and (max-width: 1000px) {
+
+    #aboutvolu{
+    font-size:10px;
+    max-height:350px;
+    }
+
+}
+

@@ -21,7 +21,7 @@
             <th scope="col">שם פרטי</th>
             <th scope="col">שם משפחה</th>
             <th scope="col">סוג</th>
-            <th scope="col">גיל</th>
+            <th scope="col">תאריך לידה/גיל</th>
             <th scope="col">אזור</th>
             <th scope="col">שפה</th>
             <th scope="col">מספר טלפון</th>
@@ -49,7 +49,13 @@
                 <td>{{ volunteer.first_name }}</td>
                 <td>{{ volunteer.last_name }}</td>
                 <td>{{ volunteer.get_volunteer_type_display }}</td>
-                <td>{{ volunteer.age }}</td>
+                <td>
+                {% if volunteer.age %}
+                    {{ volunteer.age }}
+                {%  else %}
+                    {{ volunteer.date_of_birth|date:"d/m/Y" }}
+                {% endif %}
+                </td>
                 <td>
                     {% for area in volunteer.areas.all %}
                         {{ area }},

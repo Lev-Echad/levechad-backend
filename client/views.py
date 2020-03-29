@@ -106,7 +106,7 @@ def volunteer_view(request):
             volunter_new = Volunteer.objects.create(tz_number=answer["identity"], first_name=answer["first_name"],
                                      last_name=answer["last_name"],
                                      email=answer["email"],
-                                     age=answer["age"], organization=answer['organization'],
+                                     date_of_birth=answer["date_of_birth"], organization=answer['organization'],
                                      phone_number=answer["phone_number"],
                                      city=City.objects.get(name=answer["city"]), neighborhood=answer['neighborhood'],
                                      address=answer["address"],
@@ -196,7 +196,13 @@ def get_certificate_view(request):
             # TODO: change to 'get' instead of 'first' after fixing #50
             volunteer = Volunteer.objects.filter(tz_number=form['tz_number'].data).first()
             if volunteer is not None:
-                active_certificate = volunteer.get_active_certificates().first()
+                '''
+                 TODO: this a hotfix that generate a valid certificate to any user that requests one. 
+                 it should be reverted to the commented part  when #52 is solved
+                '''
+                # active_certificate = volunteer.get_active_certificates().first()
+                active_certificate = volunteer.get_or_generate_valid_certificate()
+
                 if active_certificate is not None:
                     context['certificate_id'] = active_certificate.id
                 else:
