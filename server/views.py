@@ -170,6 +170,7 @@ def show_all_volunteers(request, page=1):
         else:
             valid_certificates.append(-1)
 
+    print(dir(volunteer))
     # make match qs to tuple
     final_data = []
     for i in range(0, len(match_qs)):
