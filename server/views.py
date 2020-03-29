@@ -229,6 +229,7 @@ def show_all_help_request(request, page=1):
     if len(match_qs) == 0 and (not something_mark):
         match_qs = HelpRequest.objects.all()
 
+    match_qs = match_qs.order_by("-updated_date")
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
     match_qs = paginator.page(page)
 
