@@ -1,0 +1,16 @@
+name: CI
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  code-style:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: pycodestyle
+      uses: ./.github/actions/code-style
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
