@@ -89,7 +89,6 @@ class VolunteerForm(forms.Form):
         self.fields['identity'].label = "מספר ת.ז"
         self.fields['organization'].label = "ארגון"
         self.fields['languages'].label = "שפות שאתה דובר"
-        # self.fields['age'].label = "גיל"
         self.fields['date_of_birth'].label = "תאריך לידה"
         self.fields['phone_number'].label = "מספר פלאפון"
         self.fields['email'].label = "כתובת אימייל"
