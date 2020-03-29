@@ -223,7 +223,8 @@ class OtherForm(BaseHelpForm):
         self.fields['address'].label = "כתובת מגורים"
         self.fields['notes'].label = "הערות"
         self.fields[
-            'other_need'].label = "פרט לאיזו עזרה אתה זקוק" + "\n" + "(הארגון אינו תומך בסיוע כלכלי,נוכל להפנות לגורמים הרלוונטיים)"
+            'other_need'].label = "פרט לאיזו עזרה אתה זקוק" + "\n" + \
+                                  "(הארגון אינו תומך בסיוע כלכלי,נוכל להפנות לגורמים הרלוונטיים)"
 
 
 class ShoppingForm(BaseHelpForm):
