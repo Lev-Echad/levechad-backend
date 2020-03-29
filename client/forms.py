@@ -1,13 +1,17 @@
-from django import forms
 import json
+import re
+
+from django import forms
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
+
 from client.models import Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
 
 FIELD_NAME_MAPPING = {
 }
 
+ID_NUMBER_REGEX = r'^\d{8,9}$'
 
-# Create your models here.
 AREAS = (
     ("צפון", "צפון"),
     ("ירושלים והסביבה", "ירושלים והסביבה"),
@@ -26,13 +30,35 @@ json_file.close()
 #     your_name = forms.CharField(label='Your name', max_length=100)
 
 
-
-
 # SEND HELP FORM
 # -------------------------------------------------------------------------------------------------------
 
-def get_the_lang_choices():
-    return  [(str(x),str(x)) for x in Language.objects.all()]
+def get_lang_choices():
+    return [(str(x), str(x)) for x in Language.objects.all()]
+
+
+def id_number_validator(value):
+    def digits_of(n):
+        return [int(d) for d in str(n)]
+
+    if not re.match(ID_NUMBER_REGEX, value):
+        raise ValidationError('Invalid ID number.', params={'value': value})
+    if len(value) == 8:
+        value = '0' + value
+
+    # Calculate Sifrat Bikoret (Luhn Checksum)
+    checksum = 0
+    digits = digits_of(value)
+    odd_digits = digits[:-1:2]
+    even_digits = digits[1:-1:2]
+    checksum += sum(odd_digits)
+    for digit in even_digits:
+        checksum += sum(digits_of(digit * 2))
+    checksum = 10 - (checksum % 10)  # Get difference from upper round number
+
+    if str(checksum) != value[-1]:
+        raise ValidationError('Invalid ID number: Incorrect check digit')
+
 
 class VolunteerForm(forms.Form):
     MOVING_WAYS = (
@@ -53,14 +79,13 @@ class VolunteerForm(forms.Form):
         ("NO", "לא"),
     )
 
-    my_validator = RegexValidator(r"^\d+$")
     first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    identity = forms.CharField(max_length=ID_LENGTH, validators=[my_validator])
+    id_number = forms.CharField(max_length=ID_LENGTH, validators=[id_number_validator])
     organization = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     age = forms.IntegerField()
     area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
-    languages = forms.MultipleChoiceField(choices = get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
+    languages = forms.MultipleChoiceField(choices = get_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     email = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     city = forms.ChoiceField(choices=CITIES)
@@ -70,24 +95,20 @@ class VolunteerForm(forms.Form):
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
     hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
-    area = forms.MultipleChoiceField(choices = AREAS, widget=forms.CheckboxSelectMultiple())
+    area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
     childrens = forms.ChoiceField(choices=BOOL)
     chamal = forms.ChoiceField(choices=BOOL)
-
-
 
     no_corona1 = forms.BooleanField()
     no_corona2 = forms.BooleanField()
     no_corona3 = forms.BooleanField()
     no_corona4 = forms.BooleanField()
 
-
-
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
         self.fields['first_name'].label = "שם פרטי"
         self.fields['last_name'].label = "שם משפחה"
-        self.fields['identity'].label = "מספר ת.ז"
+        self.fields['id_number'].label = "מספר ת.ז"
         self.fields['organization'].label = "ארגון"
         self.fields['languages'].label = "שפות שאתה דובר"
         self.fields['age'].label = "גיל"
@@ -101,25 +122,26 @@ class VolunteerForm(forms.Form):
         self.fields['notes'].label = "הערות"
         self.fields['transportation'].label = "דרכי התניידות"
         self.fields['hearing_way'].label = "איך שמעת עלינו"
-        self.fields['no_corona1'].label = "אני מאשר\ת כי לא חזרתי מחו''ל ב-14 הימים האחרונים"
-        self.fields['no_corona2'].label = "אני מאשר\ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
+        self.fields['no_corona1'].label = "אני מאשר/ת כי לא חזרתי מחו\"ל ב-14 הימים האחרונים"
+        self.fields['no_corona2'].label = "אני מאשר/ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
         self.fields['no_corona3'].label = "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
-        self.fields['no_corona4'].label = "אני מאשר\ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
+        self.fields['no_corona4'].label = "אני מאשר/ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
 
         self.fields['childrens'].label = (
-            "האם את\ה מעוניינ\ת לסייע לעובדים חיוניים (מסגרות חיוניות לילדי צוות רפואי)? - עדיפות ל-3 ימי התנדבות.  "
+            "האם את/ה מעוניינ/ת לסייע לעובדים חיוניים (מסגרות חיוניות לילדי צוות רפואי)? - עדיפות ל-3 ימי התנדבות."
         )
         self.fields['chamal'].label = (
-            " ?האם אתה מתנדב חמ''ל"
+            "?האם אתה מתנדב חמ\"ל"
         )
 
 
 class GetCertificateForm(forms.Form):
-    tz_number = forms.CharField(max_length=9, validators=[RegexValidator(r"^\d+$")], required=True)
+    id_number = forms.CharField(max_length=9, validators=[id_number_validator], required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['tz_number'].label = 'אנא הזן תעודת זהות'
+        self.fields['id_number'].label = 'אנא הזן תעודת זהות'
+
 
 class ScheduleForm(forms.Form):
     TIMES = (
@@ -146,8 +168,6 @@ class ScheduleForm(forms.Form):
         self.fields['saturday'].label = "שבת"
 
 
-
-
 # GET HELP FORM
 # -------------------------------------------------------------------------------------------------------
 
@@ -159,9 +179,9 @@ class BaseHelpForm(forms.Form):
         ('OTHER', 'אחר')
     )"""
 
-    my_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
+    phone_number_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
     full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[my_validator])
+    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[phone_number_validator])
     area = forms.ChoiceField(choices = AREAS)
     city = forms.ChoiceField(choices = CITIES)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
