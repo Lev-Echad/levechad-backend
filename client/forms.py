@@ -58,8 +58,6 @@ class VolunteerForm(forms.Form):
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     identity = forms.CharField(max_length=ID_LENGTH, validators=[my_validator])
     organization = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
-    # TODO: Remove age, add date of birth with correct format.
-    # age = forms.IntegerField()
     date_of_birth = forms.DateField(input_formats=['%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%d.%m.%Y', '%d.%m.%y'],
                                     required=True)
     area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
