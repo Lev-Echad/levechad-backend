@@ -293,6 +293,8 @@ def help_edit_stat(request, pk):
             to_edit.helping_volunteer = volunteer_to_add
         except Volunteer.DoesNotExist:
             pass
+        except ValueError:
+            pass
 
     to_edit.save()
     return redirect('show_all_help_request')
