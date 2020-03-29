@@ -229,6 +229,7 @@ def show_all_help_request(request, page=1):
     if len(match_qs) == 0 and (not something_mark):
         match_qs = HelpRequest.objects.all()
 
+    match_qs = match_qs.order_by("-id")
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
     match_qs = paginator.page(page)
 
@@ -292,6 +293,8 @@ def help_edit_stat(request, pk):
             to_edit.helping_volunteer = volunteer_to_add
         except Volunteer.DoesNotExist:
             pass
+        except ValueError:
+            pass
 
     to_edit.save()
     return redirect('show_all_help_request')
@@ -310,7 +313,6 @@ def volunteer_edit_notes(request, pk):
 def delete_volunteer(request, pk):
     to_delete = Volunteer.objects.get(id=pk)
     to_delete.delete()
-    to_delete.save()
     return redirect('show_all_volunteers')
 
 
@@ -371,8 +373,8 @@ def find_closes_persons(request, pk):
 
     # closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
 
-    if len(closes_volunteer) > 30:
-        closes_volunteer = closes_volunteer[0:29]
+    if len(closes_volunteer) > 100:
+        closes_volunteer = closes_volunteer[0:100]
 
     # ----- check for each volunterr how much times he apper
     appers_list = []
