@@ -49,11 +49,13 @@
                 <td>{{ volunteer.first_name }}</td>
                 <td>{{ volunteer.last_name }}</td>
                 <td>{{ volunteer.get_volunteer_type_display }}</td>
-                <td>{% if volunteer.age %}
+                <td>
+                {% if volunteer.age %}
                     {{ volunteer.age }}
                 {%  else %}
                     {{ volunteer.date_of_birth|date:"d/m/Y" }}
-                {% endif %}</td>
+                {% endif %}
+                </td>
                 <td>
                     {% for area in volunteer.areas.all %}
                         {{ area }},
