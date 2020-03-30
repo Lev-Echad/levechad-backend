@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area
-from django.db.models import F, Q
+from django.db.models import F, Q, Count
 from django.core.paginator import Paginator
 import datetime
 from datetime import time, date
@@ -71,17 +71,16 @@ also filters by filter
 
 @login_required
 def show_all_volunteers(request, page=1):
-    qs = Volunteer.objects.all()
     filter_options = dict()
     q_option = Q()
-    availability_now_id = []
 
     # ------- filters -------
     areas = request.GET.getlist('area')
     lans = request.GET.getlist('language')
     availability = request.GET.getlist('availability')
     guidings = request.GET.getlist('guiding')
-    search_name = request.GET.getlist('searchname')
+    search_first_name = request.GET.getlist('search_first_name')
+    search_last_name = request.GET.getlist('search_last_name')
 
     if len(get_mandatory_areas(request)) != 0:
         filter_options['areas__name__in'] = get_mandatory_areas(request)
@@ -95,66 +94,47 @@ def show_all_volunteers(request, page=1):
     if len(guidings) != 0:
         filter_options['guiding'] = True
 
-    if len(search_name) != 0 and search_name[0] != '':
-        split_name = search_name[0].split()
-        q_option |= Q(last_name=' '.join(split_name[1:])) | Q(first_name=split_name[0])
+    if len(search_first_name) != 0 and search_first_name[0] != '':
+        q_option |= Q(first_name=search_first_name[0])
+
+    if len(search_last_name) != 0 and search_last_name[0] != '':
+        q_option |= Q(last_name=search_last_name[0])
 
     # --------- check time now --------
-    availability_qs = []
-    if len(availability) != 0:
-        now = datetime.datetime.now()
-        now_day = now.strftime("%A")
+    now = datetime.datetime.now()
+    now_day = now.strftime("%A")
+    yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
+    yesterday_day = yesterday.strftime("%A")
 
-        yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-        yesterday_day = yesterday.strftime("%A")
+    if is_time_between(time(7, 00), time(15, 00)):
+        schedule_filter = "schedule__" + now_day + "__contains"
+        schedule_id = 1
+    elif is_time_between(time(15, 00), time(23, 00)):
+        schedule_filter = "schedule__" + now_day + "__contains"
+        schedule_id = 2
+    elif is_time_between(time(23, 00), time(00, 00)):
+        schedule_filter = "schedule__" + now_day + "__contains"
+        schedule_id = 3
+    else:
+        schedule_filter = "schedule__" + yesterday_day + "__contains"
+        schedule_id = 3
 
-        # check option 1
-        if is_time_between(time(7, 00), time(15, 00)):
-            schedule_filter = "schedule__" + now_day + "__contains"
-            availability_qs = qs.filter(**{schedule_filter: 1})
+    if len(availability) != 0 and '' not in availability:
+        filter_options[schedule_filter] = schedule_id
 
-        # check option 2
-        elif is_time_between(time(15, 00), time(23, 00)):
-            schedule_filter = "schedule__" + now_day + "__contains"
-            availability_qs = qs.filter(**{schedule_filter: 2})
-
-        # check option 3 before midnight
-        elif is_time_between(time(23, 00), time(00, 00)):
-            schedule_filter = "schedule__" + now_day + "__contains"
-            availability_qs = qs.filter(**{schedule_filter: 3})
-
-        # check option 3 after midnight
-        elif is_time_between(time(00, 00), time(7, 00)):
-            schedule_filter = "schedule__" + yesterday_day + "__contains"
-            availability_qs = qs.filter(**{schedule_filter: 3})
-
-        if availability_qs:
-            for volunteer in availability_qs:
-                availability_now_id.append(volunteer.id)
-
-    match_qs = Volunteer.objects.filter(q_option, **filter_options)
+    match_qs = Volunteer.objects.filter(q_option, **filter_options).annotate(appears_count=Count('helprequest'))
+    availability_now_id = match_qs.filter(**{schedule_filter: schedule_id}).values_list('id', flat=True)
 
     # ----- orders -----
     if 'field' in request.GET:
         field = request.GET.get('field')
         match_qs = match_qs.order_by(field)
 
-    # ----- check for each volunteer how much times he apper
-    appers_list = []
-    valid_certificates = []
-    for volunteer in match_qs:
-        appers_list.append(HelpRequest.objects.filter(helping_volunteer=volunteer).count())
-        volunteer.get_active_certificates()
-        valid_certificate = volunteer.get_active_certificates().first()
-        if valid_certificate is not None:
-            valid_certificates.append(valid_certificate.id)
-        else:
-            valid_certificates.append(-1)
-
-    # make match qs to tuple
+    # ----- build final data ----
     final_data = []
-    for i in range(0, len(match_qs)):
-        final_data.append((match_qs[i], appers_list[i], valid_certificates[i]))
+    for volunteer in match_qs:
+        valid_certificate = volunteer.get_active_certificates().first()
+        final_data.append((volunteer, valid_certificate.id if valid_certificate is not None else -1))
 
     paginator = Paginator(final_data, RESULTS_IN_PAGE)
 

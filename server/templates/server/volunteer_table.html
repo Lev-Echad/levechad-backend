@@ -42,7 +42,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for volunteer, num_of_appers, certificate_id in volunteer_data %}
+        {% for volunteer, certificate_id in volunteer_data %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
@@ -80,7 +80,7 @@
                         לא פנוי
                     {% endif %}
                 </td>
-                <td>{{ num_of_appers }}</td>
+                <td>{{ volunteer.appears_count }}</td>
                 <td>{{ volunteer.guiding }}</td>
 
                 <td>
@@ -327,15 +327,24 @@
                         <div>
                             <p class="h5"><u>שם</u></p>
                         </div>
-                        <div>
-                            <label for="availability">חיפוש שם פרטי</label>
-                            <input type="text" name="searchfirstname" id="searchfirstname" placeholder="הזין שם פרטי" />
-                        </div>
-                        <div>
-                            <label for="availability">חיפוש שם משפחה</label>
-                            <input type="text" name="searchlastname" id="searchlastname" placeholder="הזין שם משפחה" />
-                        </div>
-
+                        <table>
+                            <tr>
+                                <td>
+                                    <label for="availability">חיפוש שם פרטי</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="search_first_name" id="search_first_name" placeholder="הזין שם פרטי" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="availability">חיפוש שם משפחה</label>&nbsp;
+                                </td>
+                                <td>
+                                    <input type="text" name="search_last_name" id="search_last_name" placeholder="הזין שם משפחה" />
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                     <div class="modal-footer d-flex justify-content-center">
                         <button type="submit" class="btn btn-default">בצע פילטר</button>
