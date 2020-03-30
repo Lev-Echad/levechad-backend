@@ -38,7 +38,7 @@ def export_model_to_xls(
     response['Content-Disposition'] = f'attachment; filename="{filename}.xls"'
 
     wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet(spreadsheet_name if spreadsheet_name is not None else '{}s'.format(model_type.__name__))
+    ws = wb.add_sheet(spreadsheet_name if spreadsheet_name is not None else f'{model_type.__name__}s')
     ws.cols_right_to_left = True
 
     bold_font = xlwt.easyxf('font:bold on')
