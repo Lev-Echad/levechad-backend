@@ -127,7 +127,7 @@ def volunteer_view(request):
             return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunter_new.pk))
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = VolunteerForm()
+        form = VolunteerForm(initial={'organization': request.GET.get('org', '')})
 
     return render(request, 'volunteer.html', {'form': form})
 
