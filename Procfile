@@ -1,1 +1,1 @@
-web: gunicorn levechad.wsgi --log-file -
+web: gunicorn levechad.wsgi
