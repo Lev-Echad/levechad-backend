@@ -86,6 +86,7 @@ class VolunteerForm(forms.Form):
         self.fields['last_name'].label = "שם משפחה"
         self.fields['identity'].label = "מספר ת.ז"
         self.fields['organization'].label = "ארגון"
+        self.fields['organization'].widget.attrs['readonly'] = True
         self.fields['languages'].label = "שפות שאתה דובר"
         self.fields['date_of_birth'].label = "תאריך לידה"
         self.fields['phone_number'].label = "מספר פלאפון"
