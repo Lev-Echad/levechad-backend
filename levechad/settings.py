@@ -31,8 +31,7 @@ if ENV == 'PRODUCTION':
 if ENV == 'DEVELOPMENT':
     DEBUG = True
 elif ENV == 'PRODUCTION':
-    # DEBUG = False
-    DEBUG = True
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -163,4 +162,9 @@ STATIC_URL = "/static/"
 LOGIN_REDIRECT_URL = '/server'
 
 if ENV == 'PRODUCTION':
+    # Enforcing TLS/SLL
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+
+    # Loading heroku config
     django_heroku.settings(locals())
