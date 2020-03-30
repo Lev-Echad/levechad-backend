@@ -30,13 +30,13 @@ def export_model_to_xls(
 
     :return: HttpResponse of content type application/ms-excel with the .xls file as an attachment
     """
+    if filename is None:
+        current_time = datetime.datetime.now().strftime('%Y_%m_%d-%H%M%S')
+        filename = f'{model_type.__name__.lower()}_data-{current_time}'
+
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="{}.xls"'.format(
-        filename if filename is not None else '{}_data-{}'.format(
-            model_type.__name__.lower(),
-            datetime.datetime.now().strftime('%Y_%m_%d-%H%M%S')
-        )
-    )
+    response['Content-Disposition'] = f'attachment; filename="{filename}.xls"'
+
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet(spreadsheet_name if spreadsheet_name is not None else '{}s'.format(model_type.__name__))
     ws.cols_right_to_left = True
