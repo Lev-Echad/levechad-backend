@@ -71,7 +71,6 @@ class VolunteerForm(forms.Form):
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
     hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
-    area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
     childrens = forms.ChoiceField(choices=BOOL)
     chamal = forms.ChoiceField(choices=BOOL)
 
