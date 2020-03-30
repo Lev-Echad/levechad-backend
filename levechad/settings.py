@@ -31,7 +31,8 @@ if ENV == 'PRODUCTION':
 if ENV == 'DEVELOPMENT':
     DEBUG = True
 elif ENV == 'PRODUCTION':
-    DEBUG = False
+    # DEBUG = False
+    DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
