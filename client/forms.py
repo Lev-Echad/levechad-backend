@@ -147,6 +147,11 @@ class ScheduleForm(forms.Form):
         self.fields['friday'].label = "שישי"
         self.fields['saturday'].label = "שבת"
 
+#TODO: Complete here.
+class AgreementForm(forms.Form):
+    agree = forms.BooleanField
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 # GET HELP FORM
 # -------------------------------------------------------------------------------------------------------

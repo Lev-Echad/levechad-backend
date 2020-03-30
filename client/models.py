@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from datetime import timedelta, date
+
 # -*- coding: utf-8 -*-
 
 DEFAULT_MAX_FIELD_LENGTH = 200
@@ -61,11 +62,16 @@ class VolunteerSchedule(Timestampable):
     Saturday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
 
 
+class ParentalConsent(models.Model):
+    parent_id_num = models.CharField(max_length=ID_LENGTH)
+    parent_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+
+
 class Volunteer(Timestampable):
     MOVING_WAYS = (
         ("CAR", "רכב"),
         ("PUBL", "תחבצ"),
-        ("FOOT","רגלית")
+        ("FOOT", "רגלית")
     )
     HEARING_WAYS = (
         ("FB_INST", "פייסבוק ואינסטגרם"),
@@ -116,6 +122,8 @@ class Volunteer(Timestampable):
     moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, null=True)
+    parent_consent = models.OneToOneField(ParentalConsent, on_delete=models.CASCADE, null=True)
+    is_valid = models.BooleanField(default=False)
 
 
 class VolunteerCertificate(models.Model):
