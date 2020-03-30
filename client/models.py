@@ -1,15 +1,27 @@
 # coding=utf-8
+from datetime import timedelta, date
 
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from datetime import timedelta, date
-# -*- coding: utf-8 -*-
+from django.dispatch import receiver
+from django.db.models.signals import pre_save
+
+from client.validators import id_number_validator
 
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
 ID_LENGTH = 11
 DAY_NAME_LENGTH = 3
+
+
+@receiver(pre_save)
+def pre_save_handler(sender, instance, *args, **kwargs):
+    """
+    Django doesn't validate fields before saving by calling clean functions because of compatibility issues. This does.
+    See https://docs.djangoproject.com/en/3.0/ref/models/instances/#validating-objects
+    """
+    instance.full_clean()
 
 
 class Timestampable(models.Model):
@@ -93,7 +105,7 @@ class Volunteer(Timestampable):
     def get_active_certificates(self):
         return self.certificates.filter(expiration_date__gte=date.today())
 
-    tz_number = models.CharField(max_length=ID_LENGTH, blank=True)
+    tz_number = models.CharField(max_length=ID_LENGTH, blank=True, validators=[id_number_validator])
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
