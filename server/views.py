@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 import xlwt
 
 RESULTS_IN_PAGE = 50
-PAGINATION_SHORTCUT_NUMBER = 7
+PAGINATION_SHORTCUT_NUMBER = 10
 
 
 def is_time_between(begin_time, end_time, check_time=None):

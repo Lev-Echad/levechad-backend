@@ -9,6 +9,22 @@
 <a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">שינוי תצוגה</a></p>
 <a href="{% url 'export_help_xls' %}">ייצוא מידע לאקסל</a>
 
+<div>
+    {% if 1 not in pages_before and page != 1 %}
+            <a href="{% url 'show_all_help_request' %}/{{ 1 }}?{{ request.META.QUERY_STRING }}">&lt;&lt;</a>
+        {% endif %}
+        {% for i in pages_before %}
+            <a href="{% url 'show_all_help_request' %}/{{ i }}?{{ request.META.QUERY_STRING }}">{{ i }}</a>
+        {% endfor %}
+        &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
+        {% for i in pages_after %}
+            <a href="{% url 'show_all_help_request' %}/{{ i }}?{{ request.META.QUERY_STRING }}">{{ i }}</a>
+        {% endfor %}
+        {% if num_pages not in pages_after and num_pages != page %}
+            <a href="{% url 'show_all_help_request' %}/{{ num_pages }}?{{ request.META.QUERY_STRING }}">&gt;&gt;</a>
+        {% endif %}
+</div>
+
 <table class="table table-hover table-bordered text-center">
     <thead>
         <tr>
