@@ -96,7 +96,7 @@
 
                                     <div>
                                         <label for="status">הועבר למתנדב</label>
-                                        <input type="radio" name="status" id="status" value='TO_VOLUNTER'>
+                                        <input type="radio" name="status" id="status" value='TO_VOLUNTEER'>
                                     </div>
 
                                     <div>
@@ -185,7 +185,7 @@
                     {% endfor %}
                 </td>
                 <td>{{ volunteer.phone_number }}</td>
-                <td>{{ volunteer.tz_number }}</td>
+                <td>{{ volunteer.id_number }}</td>
                 <td>{{ volunteer.city }}</td>
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
@@ -222,7 +222,7 @@
                                     <h5><u>המצב הנוכחי הוא:</u></h5>
 
                                     <div>
-                                        <input type="hidden" name="status" id="status" value='TO_VOLUNTER'>
+                                        <input type="hidden" name="status" id="status" value='TO_VOLUNTEER'>
                                     </div>
                                 </div>
 

@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='volunteer',
             name='volunteer_type',
-            field=models.CharField(choices=[('NIGHBORHOOD_COORDINATOR', 'רכז שכונה'), ('CITY_COORDINATOR', 'רכז עיר'), ('STAFF', 'מטה'), ('HAMAL', 'חמל'), ('PROJECT', 'פרויקט'), ('CHILD_CARE', 'משפחתון'), ('MISSIONS', 'משימות')], default='MISSIONS', max_length=200),
+            field=models.CharField(choices=[('NIEGHBORHOOD_COORDINATOR', 'רכז שכונה'), ('CITY_COORDINATOR', 'רכז עיר'), ('STAFF', 'מטה'), ('HAMAL', 'חמל'), ('PROJECT', 'פרויקט'), ('CHILD_CARE', 'משפחתון'), ('MISSIONS', 'משימות')], default='MISSIONS', max_length=200),
         ),
     ]

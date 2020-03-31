@@ -103,7 +103,7 @@ def volunteer_view(request):
             if answer["childrens"] == "YES":
                 keep_mandatory_worker_children = True
                 
-            volunter_new = Volunteer.objects.create(tz_number=answer["identity"], first_name=answer["first_name"],
+            volunteer_new = Volunteer.objects.create(tz_number=answer["identity"], first_name=answer["first_name"],
                                      last_name=answer["last_name"],
                                      email=answer["email"],
                                      date_of_birth=answer["date_of_birth"], organization=answer['organization'],
@@ -114,17 +114,17 @@ def volunteer_view(request):
                                      notes=answer["notes"], moving_way=answer["transportation"],
                                      hearing_way=answer["hearing_way"],
                                      keep_mandatory_worker_children=keep_mandatory_worker_children, guiding=False)
-            volunter_new.languages.set(languagesGot)
-            volunter_new.areas.set(areasGot)
-            volunter_new.save()
+            volunteer_new.languages.set(languagesGot)
+            volunteer_new.areas.set(areasGot)
+            volunteer_new.save()
 
             # creating volunteer certificate
-            volunter_new.get_or_generate_valid_certificate()
+            volunteer_new.get_or_generate_valid_certificate()
 
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:y
-            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunter_new.pk))
+            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunteer_new.pk))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = VolunteerForm()
@@ -172,7 +172,7 @@ def shopping_help(request):
 
             new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
                                       city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="BUYIN",
+                                      address=answer["address"], notes=answer["notes"], type="BUYING",
                                       type_text=answer["to_buy"], area=areasGot)
             new_request.save()
 
@@ -281,7 +281,7 @@ def home_help(request):
             areasGot = Area.objects.all().get(name=answer["area"])
             new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
                                       city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="HOME_HEL",
+                                      address=answer["address"], notes=answer["notes"], type="HOME_HELP",
                                       type_text=answer["need_text"], area=areasGot)
             new_request.save()
 

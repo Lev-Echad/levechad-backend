@@ -74,7 +74,7 @@ class Volunteer(Timestampable):
         ("OTHR", "אחר")
     )
     TYPES = (
-        ("NIGHBORHOOD_COORDINATOR", "רכז שכונה"),
+        ("NIeGHBORHOOD_COORDINATOR", "רכז שכונה"),
         ("CITY_COORDINATOR", "רכז עיר"),
         ("STAFF", "מטה"),
         ("HAMAL", "חמל"),
@@ -94,7 +94,7 @@ class Volunteer(Timestampable):
     def get_active_certificates(self):
         return self.certificates.filter(expiration_date__gte=date.today())
 
-    tz_number = models.CharField(max_length=ID_LENGTH, blank=True)
+    id_number = models.CharField(max_length=ID_LENGTH, blank=True)
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
@@ -125,10 +125,10 @@ class VolunteerCertificate(models.Model):
 
 class HelpRequest(Timestampable):
     TYPES = (
-        ('BUYIN', 'קניות'),
+        ('BUYING', 'קניות'),
         ('TRAVEL', 'איסוף'),
         ('MEDICI', 'תרופות'),
-        ('HOME_HEL', 'עזרה בבית'),
+        ('HOME_HELP', 'עזרה בבית'),
         ('PHONE_HEL', 'תמיכה טלפונית'),
         ('VITAL_WORK', 'סיוע לעובדים חיוניים'),
         ('OTHER', 'אחר')
@@ -137,7 +137,7 @@ class HelpRequest(Timestampable):
     STATUSES = (
         ('WAITING', 'התקבלה'),
         ('IN_CARE', 'בטיפול'),
-        ('TO_VOLUNTER', 'הועבר למתנדב'),
+        ('TO_VOLUNTEER', 'הועבר למתנדב'),
         ('DONE', 'טופל'),
         ('NOT_DONE', 'לא טופל')
     )

@@ -376,7 +376,7 @@ def find_closes_persons(request, pk):
     if len(closest_volunteer) > 100:
         closest_volunteer = closest_volunteer[0:100]
 
-    # ----- check for each volunterr how much times he apper
+    # ----- check for each volunteer how much times he apper
     appers_list = []
     for volu in closest_volunteer:
         appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())

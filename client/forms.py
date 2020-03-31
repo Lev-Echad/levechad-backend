@@ -115,7 +115,7 @@ class VolunteerForm(forms.Form):
 
 
 class GetCertificateForm(forms.Form):
-    tz_number = forms.CharField(max_length=9, validators=[RegexValidator(r"^\d+$")], required=True)
+    id_number = forms.CharField(max_length=9, validators=[RegexValidator(r"^\d+$")], required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -152,7 +152,7 @@ class ScheduleForm(forms.Form):
 
 class BaseHelpForm(forms.Form):
     """TYPES = (
-        ('BUYIN', 'קניות\\איסוף'),
+        ('BUYING', 'קניות\\איסוף'),
         ('MEDICI', 'תרופות'),
         ('PHONE_HEL', 'תמיכה טלפונית'),
         ('OTHER', 'אחר')
