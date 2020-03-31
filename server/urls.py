@@ -11,6 +11,7 @@ urlpatterns = [
     path('edit/<int:pk>', views.help_edit_stat, name='change_stat'),
     path('find_closes/<int:pk>', views.find_closes_persons, name='find_closes_persons'),
     path('edit_note/<int:pk>', views.volunteer_edit_notes, name='volunteer_edit_notes'),
+    path('edit_type/<int:pk>', views.volunteer_edit_type, name='volunteer_edit_type'),
     path('create_volunteer_certificate/<int:volunteer_id>', views.create_volunteer_certificate, name='create_volunteer_certificate'),
 
     path('delete_volunteer/<int:pk>', views.delete_volunteer, name='delete_volunteer'),

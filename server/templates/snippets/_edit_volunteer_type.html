@@ -1,0 +1,36 @@
+<div class="modal fade" id="edit_volu_type{{ volunteer.id }}" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+
+            <form method="post" action="{% url 'volunteer_edit_type' volunteer.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h4 class="modal-title w-100 font-weight-bold">עריכה</h4>
+                </div>
+                <div class="modal-body mx-3">
+                    <div class="right">
+                        <h5><u>שינוי סוג מתנדב</u></h5>
+
+
+                        <div>
+                            <label for="type">סוג:</label>
+                            <select name="volunteer_type" id="volunteer_type">
+                                {% for choice, choice_name in volunteer.TYPES %}
+                                <option value={{ choice }}>{{ choice_name }}</option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="submit" class="btn btn-default">שמור שינויים</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

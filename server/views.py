@@ -308,6 +308,14 @@ def volunteer_edit_notes(request, pk):
     to_edit.save()
     return redirect('show_all_volunteers')
 
+@login_required
+def volunteer_edit_type(request, pk):
+    to_edit = Volunteer.objects.get(id=pk)
+    if request.POST.get('volunteer_type') is not None:
+        to_edit.volunteer_type = request.POST.get('volunteer_type')
+    to_edit.save()
+    return redirect('show_all_volunteers')
+
 
 @login_required
 def delete_volunteer(request, pk):
