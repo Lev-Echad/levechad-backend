@@ -125,6 +125,8 @@ def show_all_volunteers(request, page=1):
     if 'field' in request.GET:
         field = request.GET.get('field')
         match_qs = match_qs.order_by(field)
+    else:
+        match_qs = match_qs.order_by('id')
 
     # ----- build final data ----
     paged_data = []
