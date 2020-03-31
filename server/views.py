@@ -8,8 +8,9 @@ from datetime import time, date
 from django.http import HttpResponse, HttpResponseBadRequest
 import xlwt
 
-RESULTS_IN_PAGE = 1
+RESULTS_IN_PAGE = 50
 PAGINATION_SHORTCUT_NUMBER = 7
+
 
 def is_time_between(begin_time, end_time, check_time=None):
     # If check time is not given, default to current UTC time
@@ -179,8 +180,8 @@ def show_all_volunteers(request, page=1):
 
     final_data = paginator.page(page)
 
-    list_pages_before = range(max(1, page-PAGINATION_SHORTCUT_NUMBER), page)
-    list_pages_after = range(page+1, min(page+PAGINATION_SHORTCUT_NUMBER+1, paginator.num_pages+1))
+    list_pages_before = range(max(1, page - PAGINATION_SHORTCUT_NUMBER), page)
+    list_pages_after = range(page + 1, min(page + PAGINATION_SHORTCUT_NUMBER + 1, paginator.num_pages + 1))
 
     context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
                'num_pages': paginator.num_pages, 'pages_before': list_pages_before, 'pages_after': list_pages_after}
@@ -236,7 +237,11 @@ def show_all_help_request(request, page=1):
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
     match_qs = paginator.page(page)
 
-    context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages}
+    list_pages_before = range(max(1, page - PAGINATION_SHORTCUT_NUMBER), page)
+    list_pages_after = range(page + 1, min(page + PAGINATION_SHORTCUT_NUMBER + 1, paginator.num_pages + 1))
+
+    context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages,
+               'pages_before': list_pages_before, 'pages_after': list_pages_after}
     return render(request, 'server/help_table.html', context)
 
 
