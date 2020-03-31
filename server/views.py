@@ -69,8 +69,8 @@ def get_close_pages(current_page, pages_count):
     """
     Generates lists of pages to link to, before and after, while considering page number and current location in mind.
     Ammount of pages to each side is defined in PAGINATION_SHORTCUT_NUMBER.
-    :param page: current page number
-    :param max_page: last page number
+    :param current_page: current page number
+    :param pages_count: total amount of pages
     :return: (list of pages to link to before current page, list of pages to link to after current page)
     """
     list_pages_before = range(max(1, page - PAGINATION_SHORTCUT_NUMBER), page)
