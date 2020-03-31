@@ -173,32 +173,19 @@
     </table>
 
     <div>
-        {% for i in list_pages_before %}
-    {% endfor %}
-        {% if page != 1 %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
+        {% if 1 not in pages_before and page != 1 %}
+            <a href="{% url 'show_all_volunteers' %}/{{ 1 }}?{{ request.META.QUERY_STRING }}">&lt;&lt;</a>
         {% endif %}
+        {% for i in pages_before %}
+            <a href="{% url 'show_all_volunteers' %}/{{ i }}?{{ request.META.QUERY_STRING }}">{{ i }}</a>
+        {% endfor %}
         &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
-        {% if not page == num_pages %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
+        {% for i in pages_after %}
+            <a href="{% url 'show_all_volunteers' %}/{{ i }}?{{ request.META.QUERY_STRING }}">{{ i }}</a>
+        {% endfor %}
+        {% if num_pages not in pages_after and num_pages != page %}
+            <a href="{% url 'show_all_volunteers' %}/{{ num_pages }}?{{ request.META.QUERY_STRING }}">&gt;&gt;</a>
         {% endif %}
-        {% if page == 1 %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:39 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אחרון</a>
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:20 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-        {% endif %}
-        {% if page == 41 %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-40 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;">עמוד ראשון</a>
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-20 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-
-        {% endif %}
-
-
     </div>
 
     <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
