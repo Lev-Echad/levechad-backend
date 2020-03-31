@@ -58,6 +58,7 @@ def homepage(request):
             "total_help_requests": HelpRequest.objects.count() + 84
         }
     }
+    #added 1786 and 84 since those are the stats for before this app
 
     return render(request, 'index.html', context)
 
