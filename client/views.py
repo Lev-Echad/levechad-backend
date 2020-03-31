@@ -1,46 +1,13 @@
+import io
+from PIL import Image, ImageDraw, ImageFont
+from bidi.algorithm import get_display
+
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.contrib.staticfiles import finders
 
 from .forms import *
 from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
-from django.contrib.staticfiles import finders
-from PIL import Image, ImageDraw, ImageFont
-import io
-from bidi.algorithm import get_display
-import datetime
-
-
-def helper_help(pk, fullName):
-    return HelpRequest.objects.get(pk=pk, full_name=fullName)
-
-
-def volunteer_certificate_image_view(request, pk):
-    volunteer_certificate = VolunteerCertificate.objects.get(id=pk)
-    volunteer = volunteer_certificate.volunteer
-    tag_filename = finders.find('client/tag.jpeg')
-    font_filename = finders.find('client/fonts/BN Amnesia.ttf')
-    photo = None
-    try:
-        photo = Image.open(tag_filename)
-        drawing = ImageDraw.Draw(photo)
-        font = ImageFont.truetype(font_filename, size=40)
-
-        black = (3, 8, 12)
-
-        lines_to_insert = [
-            f'שם מתנדב: {volunteer.first_name} {volunteer.last_name}',
-            f'תעודת זהות: {volunteer.tz_number}',
-            f'תוקף התעודה: {volunteer_certificate.expiration_date}',
-            f'מספר תעודה: {volunteer_certificate.id}',
-        ]
-
-        drawing.text((700, 200), get_display('\n'.join(lines_to_insert)), fill=black, font=font, align='right')
-        with io.BytesIO() as output:
-            photo.save(output, format='png')
-            return HttpResponse(output.getvalue(), content_type='image/png')
-    finally:
-        if photo is not None:
-            photo.close()
 
 
 def thanks(request):
@@ -48,7 +15,7 @@ def thanks(request):
         username = request.GET['username']
         pk = request.GET['pk']
 
-        hr = helper_help(pk, username)
+        hr = HelpRequest.objects.get(pk=pk, full_name=username)
 
         return render(request, 'thanks.html', {
             "id": pk,
@@ -71,7 +38,7 @@ def thanks_volunteer(request):
 
     return render(request, 'thanks_volunteer.html', {
         "name": f'{volunteer.first_name} {volunteer.last_name}',
-        "certificate_id": volunteer_certificate.id
+        "certificate": volunteer_certificate
     })
 
 
@@ -189,7 +156,7 @@ def shopping_help(request):
     return render(request, 'help_pages/shopping.html', {'form': form})
 
 
-def get_certificate_view(request):
+def find_certificate_view(request):
     context = {'form': GetCertificateForm()}
     if request.method == 'POST':
         form = GetCertificateForm(request.POST)
@@ -205,7 +172,8 @@ def get_certificate_view(request):
                 active_certificate = volunteer.get_or_generate_valid_certificate()
 
                 if active_certificate is not None:
-                    context['certificate_id'] = active_certificate.id
+                    active_certificate.update_image_if_nonexistent()
+                    context['certificate'] = active_certificate
                 else:
                     context['error'] = 'לא נמצאה תעודה בתוקף!'
             else:
@@ -213,7 +181,17 @@ def get_certificate_view(request):
         else:
             context['error'] = 'יש למלא את השדות כנדרש!'
 
-    return render(request, 'get_certificate.html', context=context)
+    return render(request, 'find_certificate.html', context=context)
+
+
+def download_certificate_view(request, pk):
+    # We could've easily used the download attribute on <a> tags w/ the media URL directly,
+    # but this doesn't work on Firefox for some reason.
+    # TODO remove this when #125 is done (S3 integration) and use the download attribute, it will probably work
+    with open(VolunteerCertificate.objects.get(id=pk).image_path, 'rb') as image_file:
+        response = HttpResponse(image_file.read(), content_type='image/png')
+        response['Content-Disposition'] = 'attachment; filename="volunteer_tag.png"'
+        return response
 
 
 def medic_help(request):
