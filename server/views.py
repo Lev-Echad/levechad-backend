@@ -65,6 +65,19 @@ def index(request):
     return render(request, 'server/server_index.html', context)
 
 
+def get_close_pages(page, max_page):
+    """
+    Generates lists of pages to link to, before and after, while considering page number and current location in mind.
+    Ammount of pages to each side is defined in PAGINATION_SHORTCUT_NUMBER.
+    :param page: current page number
+    :param max_page: last page number
+    :return: (list of pages to link to before current page, list of pages to link to after current page)
+    """
+    list_pages_before = range(max(1, page - PAGINATION_SHORTCUT_NUMBER), page)
+    list_pages_after = range(page + 1, min(page + PAGINATION_SHORTCUT_NUMBER + 1, max_page)+1)
+    return list_pages_before, list_pages_after
+
+
 """
 also filters by filter
 """
@@ -177,11 +190,8 @@ def show_all_volunteers(request, page=1):
         final_data.append((match_qs[i], appers_list[i], valid_certificates[i]))
 
     paginator = Paginator(final_data, RESULTS_IN_PAGE)
-
     final_data = paginator.page(page)
-
-    list_pages_before = range(max(1, page - PAGINATION_SHORTCUT_NUMBER), page)
-    list_pages_after = range(page + 1, min(page + PAGINATION_SHORTCUT_NUMBER + 1, paginator.num_pages + 1))
+    list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
 
     context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
                'num_pages': paginator.num_pages, 'pages_before': list_pages_before, 'pages_after': list_pages_after,
@@ -238,8 +248,7 @@ def show_all_help_request(request, page=1):
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
     match_qs = paginator.page(page)
 
-    list_pages_before = range(max(1, page - PAGINATION_SHORTCUT_NUMBER), page)
-    list_pages_after = range(page + 1, min(page + PAGINATION_SHORTCUT_NUMBER + 1, paginator.num_pages + 1))
+    list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
 
     context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages,
                'pages_before': list_pages_before, 'pages_after': list_pages_after}
