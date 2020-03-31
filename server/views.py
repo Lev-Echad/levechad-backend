@@ -8,8 +8,8 @@ from datetime import time, date
 from django.http import HttpResponse, HttpResponseBadRequest
 import xlwt
 
-RESULTS_IN_PAGE = 50
-PAGINATION_SHORTCUT_NUMBER = 10
+RESULTS_IN_PAGE = 1
+PAGINATION_SHORTCUT_NUMBER = 7
 
 
 def is_time_between(begin_time, end_time, check_time=None):
@@ -184,7 +184,8 @@ def show_all_volunteers(request, page=1):
     list_pages_after = range(page + 1, min(page + PAGINATION_SHORTCUT_NUMBER + 1, paginator.num_pages + 1))
 
     context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
-               'num_pages': paginator.num_pages, 'pages_before': list_pages_before, 'pages_after': list_pages_after}
+               'num_pages': paginator.num_pages, 'pages_before': list_pages_before, 'pages_after': list_pages_after,
+               'page_url': 'show_all_volunteers'}
     return render(request, 'server/volunteer_table.html', context)
 
 
