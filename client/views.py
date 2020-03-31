@@ -54,9 +54,8 @@ def thanks_volunteer(request):
 def homepage(request):
     context = {
         "numbers": {
-            "total_volunteers": Volunteer.objects.count(),
-            "total_help_requests": HelpRequest.objects.count(),
-            "solved_help_requests": HelpRequest.objects.filter(status="DONE").count()
+            "total_volunteers": Volunteer.objects.count() + 1786,
+            "total_help_requests": HelpRequest.objects.count() + 84
         }
     }
 
