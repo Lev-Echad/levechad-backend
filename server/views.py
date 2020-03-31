@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 import xlwt
 
 RESULTS_IN_PAGE = 50
+PAGINATION_SHORTCUT_NUMBER = 7
 
 
 def is_time_between(begin_time, end_time, check_time=None):
@@ -58,6 +59,19 @@ def index(request):
     }
 
     return render(request, 'server/server_index.html', context)
+
+
+def get_close_pages(current_page, pages_count):
+    """
+    Generates lists of pages to link to, before and after, while considering page number and current location in mind.
+    Ammount of pages to each side is defined in PAGINATION_SHORTCUT_NUMBER.
+    :param current_page: current page number
+    :param pages_count: total amount of pages
+    :return: (list of pages to link to before current page, list of pages to link to after current page)
+    """
+    list_pages_before = range(max(1, current_page - PAGINATION_SHORTCUT_NUMBER), current_page)
+    list_pages_after = range(current_page + 1, min(current_page + PAGINATION_SHORTCUT_NUMBER + 1, pages_count)+1)
+    return list_pages_before, list_pages_after
 
 
 """
@@ -140,8 +154,16 @@ def show_all_volunteers(request, page=1):
         valid_certificate = volunteer.get_active_certificates().first()
         final_data.append((volunteer, valid_certificate.id if valid_certificate is not None else -1))
 
-    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
-               'num_pages': paginator.num_pages}
+    list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
+
+    context = {
+        'volunteer_data': final_data,
+        'availability_now_id': availability_now_id,
+        'page': page,
+        'num_pages': paginator.num_pages,
+        'pages_before': list_pages_before,
+        'pages_after': list_pages_after
+    }
     return render(request, 'server/volunteer_table.html', context)
 
 
@@ -184,7 +206,15 @@ def show_all_help_request(request, page=1):
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
     match_qs = paginator.page(page)
 
-    context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages}
+    list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
+
+    context = {
+        'help_requests': match_qs,
+        'page': page,
+        'num_pages': paginator.num_pages,
+        'pages_before': list_pages_before,
+        'pages_after': list_pages_after
+    }
     return render(request, 'server/help_table.html', context)
 
 

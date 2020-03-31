@@ -13,6 +13,10 @@
 
     </p>
 
+    <div>
+        {% include "snippets/volunteer_pager.html" %}
+    </div>
+
     <table class="table table-hover table-bordered text-center">
         <thead>
         <tr>
@@ -173,31 +177,7 @@
     </table>
 
     <div>
-
-        {% if page != 1 %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
-        {% endif %}
-        &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
-        {% if not page == num_pages %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
-        {% endif %}
-        {% if page == 1 %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:39 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אחרון</a>
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:20 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-        {% endif %}
-        {% if page == 41 %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-40 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;">עמוד ראשון</a>
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-20 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-
-        {% endif %}
-
-
+        {% include "snippets/volunteer_pager.html" %}
     </div>
 
     <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
