@@ -111,7 +111,7 @@ def show_all_volunteers(request, page=1):
     if len(search_last_name) != 0 and search_last_name[0] != '':
         q_option |= Q(last_name=search_last_name[0])
 
-    if len(search_id) != 0 and search_id[0].strip():
+    if len(search_id) != 0 and search_id[0] != '':
         q_option |= Q(id=search_id[0])
 
     # --------- check time now --------
