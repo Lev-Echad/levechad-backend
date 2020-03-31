@@ -9,7 +9,6 @@ def id_number_validator(value):
     Validates ID numbers by the ID_NUMBER_REGEX and the Sifrat Bikoret.
     :type value: str
     """
-    print('validation of value'+value)
     def digits_of(n):
         return [int(d) for d in str(n)]
 
