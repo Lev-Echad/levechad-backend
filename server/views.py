@@ -8,7 +8,7 @@ from datetime import time, date
 from django.http import HttpResponse, HttpResponseBadRequest
 import xlwt
 
-RESULTS_IN_PAGE = 1
+RESULTS_IN_PAGE = 50
 PAGINATION_SHORTCUT_NUMBER = 7
 
 
@@ -193,9 +193,12 @@ def show_all_volunteers(request, page=1):
     final_data = paginator.page(page)
     list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
 
-    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
-               'num_pages': paginator.num_pages, 'pages_before': list_pages_before, 'pages_after': list_pages_after,
-               'page_url': 'show_all_volunteers'}
+    context = {'volunteer_data': final_data,
+               'availability_now_id': availability_now_id,
+               'page': page,
+               'num_pages': paginator.num_pages,
+               'pages_before': list_pages_before,
+               'pages_after': list_pages_after}
     return render(request, 'server/volunteer_table.html', context)
 
 
@@ -250,8 +253,11 @@ def show_all_help_request(request, page=1):
 
     list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
 
-    context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages,
-               'pages_before': list_pages_before, 'pages_after': list_pages_after}
+    context = {'help_requests': match_qs,
+               'page': page,
+               'num_pages': paginator.num_pages,
+               'pages_before': list_pages_before,
+               'pages_after': list_pages_after}
     return render(request, 'server/help_table.html', context)
 
 
