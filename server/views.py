@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from client.models import Volunteer, HelpRequest, Area
+from client.models import Volunteer, HelpRequest, Area, City
 from django.db.models import F, Q
 from django.core.paginator import Paginator
 import datetime
@@ -178,9 +178,9 @@ def show_all_volunteers(request, page=1):
     paginator = Paginator(final_data, RESULTS_IN_PAGE)
 
     final_data = paginator.page(page)
-
+    city_names = list(c.name for c in City.objects.all())
     context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
-               'num_pages': paginator.num_pages}
+               'num_pages': paginator.num_pages, 'city_names': city_names}
     return render(request, 'server/volunteer_table.html', context)
 
 
@@ -307,6 +307,24 @@ def volunteer_edit_notes(request, pk):
         to_edit.notes = request.POST.get('notes')
     to_edit.save()
     return redirect('show_all_volunteers')
+
+@login_required()
+def volunteer_edit_tz_num(request, pk):
+    to_edit = Volunteer.objects.get(id=pk)
+    if request.POST.get('tz_num') is not None:
+        to_edit.tz_number = request.POST.get('tz_num')
+    to_edit.save()
+    return redirect('show_all_volunteers')
+
+@login_required()
+def volunteer_edit_city(request, pk):
+    to_edit = Volunteer.objects.get(id=pk)
+    if request.POST.get('city_name') is not None:
+        city = City.objects.get(name=request.POST.get('city_name'))
+        to_edit.city = city
+    to_edit.save()
+    return redirect('show_all_volunteers')
+
 
 @login_required
 def volunteer_edit_type(request, pk):
