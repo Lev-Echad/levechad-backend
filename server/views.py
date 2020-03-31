@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 import xlwt
 
 RESULTS_IN_PAGE = 50
-PAGINATION_SHORTCUT_NUMBER = 7
+PAGINATION_SHORTCUT_NUMBER = 10
 
 
 def is_time_between(begin_time, end_time, check_time=None):
@@ -70,7 +70,7 @@ def get_close_pages(current_page, pages_count):
     :return: (list of pages to link to before current page, list of pages to link to after current page)
     """
     list_pages_before = range(max(1, current_page - PAGINATION_SHORTCUT_NUMBER), current_page)
-    list_pages_after = range(current_page + 1, min(current_page + PAGINATION_SHORTCUT_NUMBER + 1, pages_count)+1)
+    list_pages_after = range(current_page + 1, min(current_page + PAGINATION_SHORTCUT_NUMBER, pages_count)+1)
     return list_pages_before, list_pages_after
 
 
