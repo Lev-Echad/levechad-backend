@@ -55,10 +55,10 @@ def homepage(request):
     context = {
         "numbers": {
             "total_volunteers": Volunteer.objects.count() + 1786,
-            "total_help_requests": HelpRequest.objects.count() + 84
+            "total_help_requests": HelpRequest.objects.count() + 84     #added 1786 and 84 since those are the stats for before this app
+
         }
     }
-    #added 1786 and 84 since those are the stats for before this app
 
     return render(request, 'index.html', context)
 
