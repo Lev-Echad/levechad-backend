@@ -65,7 +65,7 @@ def index(request):
     return render(request, 'server/server_index.html', context)
 
 
-def get_close_pages(page, max_page):
+def get_close_pages(current_page, pages_count):
     """
     Generates lists of pages to link to, before and after, while considering page number and current location in mind.
     Ammount of pages to each side is defined in PAGINATION_SHORTCUT_NUMBER.
