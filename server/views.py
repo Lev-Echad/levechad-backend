@@ -193,12 +193,14 @@ def show_all_volunteers(request, page=1):
     final_data = paginator.page(page)
     list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
 
-    context = {'volunteer_data': final_data,
-               'availability_now_id': availability_now_id,
-               'page': page,
-               'num_pages': paginator.num_pages,
-               'pages_before': list_pages_before,
-               'pages_after': list_pages_after}
+    context = {
+        'volunteer_data': final_data,
+        'availability_now_id': availability_now_id,
+        'page': page,
+        'num_pages': paginator.num_pages,
+        'pages_before': list_pages_before,
+        'pages_after': list_pages_after
+    }
     return render(request, 'server/volunteer_table.html', context)
 
 
