@@ -173,7 +173,8 @@
     </table>
 
     <div>
-
+        {% for i in list_pages_before %}
+    {% endfor %}
         {% if page != 1 %}
             <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
         {% endif %}

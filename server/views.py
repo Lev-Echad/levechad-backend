@@ -179,8 +179,11 @@ def show_all_volunteers(request, page=1):
 
     final_data = paginator.page(page)
 
+    list_pages_before = range(max(1, page-7), page)
+    list_pages_after = range(page+1, min(page+8, paginator.num_pages+1))
+
     context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
-               'num_pages': paginator.num_pages}
+               'num_pages': paginator.num_pages, 'pages_before': list_pages_before, 'pages_after': list_pages_after}
     return render(request, 'server/volunteer_table.html', context)
 
 
