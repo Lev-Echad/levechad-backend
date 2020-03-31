@@ -131,14 +131,16 @@ def show_all_volunteers(request, page=1):
         match_qs = match_qs.order_by(field)
 
     # ----- build final data ----
+    paged_data = []
+
+    paginator = Paginator(match_qs, RESULTS_IN_PAGE)
+
+    paged_data = paginator.page(page)
+
     final_data = []
-    for volunteer in match_qs:
+    for volunteer in paged_data:
         valid_certificate = volunteer.get_active_certificates().first()
         final_data.append((volunteer, valid_certificate.id if valid_certificate is not None else -1))
-
-    paginator = Paginator(final_data, RESULTS_IN_PAGE)
-
-    final_data = paginator.page(page)
 
     context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
                'num_pages': paginator.num_pages}
