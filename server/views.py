@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area
-from django.db.models import F, Q
+from django.db.models import F, Q, Count
 from django.core.paginator import Paginator
 import datetime
 from datetime import time, date
@@ -71,113 +71,76 @@ also filters by filter
 
 @login_required
 def show_all_volunteers(request, page=1):
-    qs = Volunteer.objects.all()
+    filter_options = dict()
+    q_option = Q()
 
     # ------- filters -------
     areas = request.GET.getlist('area')
     lans = request.GET.getlist('language')
     availability = request.GET.getlist('availability')
     guidings = request.GET.getlist('guiding')
-    search_name = request.GET.getlist('searchname')
-    something_mark = False
+    search_first_name = request.GET.getlist('search_first_name')
+    search_last_name = request.GET.getlist('search_last_name')
 
-    area_qs = Volunteer.objects.all().none()
-    language_qs = Volunteer.objects.all().none()
-    availability_qs = Volunteer.objects.all().all()
-
-    area_qs = qs
     if len(get_mandatory_areas(request)) != 0:
-        area_qs = qs.filter(areas__name__in=get_mandatory_areas(request))
+        filter_options['areas__name__in'] = get_mandatory_areas(request)
 
     if len(areas) != 0 and '' not in areas:
-        something_mark = True
-        area_qs = area_qs.filter(areas__name__in=areas)
+        filter_options['areas__name__in'] = filter_options.get('areas__name__in', list()) + areas
 
     if len(lans) != 0 and '' not in lans:
-        something_mark = True
-        language_qs = qs.filter(languages__name__in=lans)
+        filter_options['languages__name__in'] = lans
 
     if len(guidings) != 0:
-        something_mark = True
-        qs = qs.filter(guiding=True)
+        filter_options['guiding'] = True
 
-    if len(search_name) != 0:
-        something_mark = True
-        split_name = search_name[0].split()
-        qs = qs.filter(Q(last_name=' '.join(split_name[1:])) | Q(first_name=split_name[0]))
+    if len(search_first_name) != 0 and search_first_name[0] != '':
+        q_option |= Q(first_name=search_first_name[0])
+
+    if len(search_last_name) != 0 and search_last_name[0] != '':
+        q_option |= Q(last_name=search_last_name[0])
 
     # --------- check time now --------
     now = datetime.datetime.now()
     now_day = now.strftime("%A")
-
     yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
     yesterday_day = yesterday.strftime("%A")
 
-    # check option 1
     if is_time_between(time(7, 00), time(15, 00)):
         schedule_filter = "schedule__" + now_day + "__contains"
-        availability_qs = qs.filter(**{schedule_filter: 1})
-
-    # check option 2
+        schedule_id = 1
     elif is_time_between(time(15, 00), time(23, 00)):
         schedule_filter = "schedule__" + now_day + "__contains"
-        availability_qs = qs.filter(**{schedule_filter: 2})
-
-
-    # check option 3 before midnight
+        schedule_id = 2
     elif is_time_between(time(23, 00), time(00, 00)):
         schedule_filter = "schedule__" + now_day + "__contains"
-        availability_qs = qs.filter(**{schedule_filter: 3})
-
-    # check option 3 after midnight
-    elif is_time_between(time(00, 00), time(7, 00)):
+        schedule_id = 3
+    else:
         schedule_filter = "schedule__" + yesterday_day + "__contains"
-        availability_qs = qs.filter(**{schedule_filter: 3})
+        schedule_id = 3
 
-    availability_now_id = []
-    if availability_qs != []:
-        for volunteer in availability_qs:
-            availability_now_id.append(volunteer.id)
+    if len(availability) != 0 and '' not in availability:
+        filter_options[schedule_filter] = schedule_id
 
-    if len(availability) == 0:
-        availability_qs = Volunteer.objects.all().all()
-
-    # union matchings from both categoties
-    match_qs = area_qs.union(language_qs)
-
-    # if there were no matches display all and there are people available
-    if len(match_qs) == 0 and (not something_mark):
-        match_qs = Volunteer.objects.all()
-
-    availability_qs = (availability_qs)
-    match_qs = match_qs.intersection(availability_qs)
+    match_qs = Volunteer.objects.filter(q_option, **filter_options).annotate(appears_count=Count('helprequest'))
+    availability_now_id = match_qs.filter(**{schedule_filter: schedule_id}).values_list('id', flat=True)
 
     # ----- orders -----
     if 'field' in request.GET:
         field = request.GET.get('field')
-        field = "-" + field
         match_qs = match_qs.order_by(field)
 
-    # ----- check for each volunteer how much times he apper
-    appers_list = []
-    valid_certificates = []
-    for volunteer in match_qs:
-        appers_list.append(HelpRequest.objects.filter(helping_volunteer=volunteer).count())
-        volunteer.get_active_certificates()
-        valid_certificate = volunteer.get_active_certificates().first()
-        if valid_certificate is not None:
-            valid_certificates.append(valid_certificate.id)
-        else:
-            valid_certificates.append(-1)
+    # ----- build final data ----
+    paged_data = []
 
-    # make match qs to tuple
+    paginator = Paginator(match_qs, RESULTS_IN_PAGE)
+
+    paged_data = paginator.page(page)
+
     final_data = []
-    for i in range(0, len(match_qs)):
-        final_data.append((match_qs[i], appers_list[i], valid_certificates[i]))
-
-    paginator = Paginator(final_data, RESULTS_IN_PAGE)
-
-    final_data = paginator.page(page)
+    for volunteer in paged_data:
+        valid_certificate = volunteer.get_active_certificates().first()
+        final_data.append((volunteer, valid_certificate.id if valid_certificate is not None else -1))
 
     context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
                'num_pages': paginator.num_pages}
