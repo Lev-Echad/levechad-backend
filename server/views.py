@@ -91,6 +91,7 @@ def show_all_volunteers(request, page=1):
     guidings = request.GET.getlist('guiding')
     search_first_name = request.GET.getlist('search_first_name')
     search_last_name = request.GET.getlist('search_last_name')
+    search_id = request.GET.getlist('search_id')
 
     if len(get_mandatory_areas(request)) != 0:
         filter_options['areas__name__in'] = get_mandatory_areas(request)
@@ -109,6 +110,9 @@ def show_all_volunteers(request, page=1):
 
     if len(search_last_name) != 0 and search_last_name[0] != '':
         q_option |= Q(last_name=search_last_name[0])
+
+    if len(search_id) != 0 and search_id[0] != '':
+        q_option |= Q(id=search_id[0])
 
     # --------- check time now --------
     now = datetime.datetime.now()
@@ -175,11 +179,13 @@ also filters by filter
 @login_required
 def show_all_help_request(request, page=1):
     filter_options = dict()
+    q_option = Q()
 
     statuses = request.GET.getlist('status')
     areas = request.GET.getlist('area')
     types = request.GET.getlist('type')
     search_name = request.GET.getlist('search_name')
+    search_id = request.GET.getlist('search_id')
 
     if len(statuses) != 0 and '' not in statuses:
         filter_options['status__in'] = statuses
@@ -196,7 +202,10 @@ def show_all_help_request(request, page=1):
     if len(search_name) != 0 and '' not in search_name:
         filter_options['full_name__icontains'] = search_name[0]
 
-    match_qs = HelpRequest.objects.filter(**filter_options)
+    if len(search_id) != 0 and search_id[0].strip():
+        q_option |= Q(id=search_id[0])
+
+    match_qs = HelpRequest.objects.filter(q_option, **filter_options)
 
     if 'field' in request.GET:
         match_qs = match_qs.order_by(request.GET.get('field'))
