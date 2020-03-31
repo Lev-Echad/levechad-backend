@@ -69,8 +69,8 @@ def get_close_pages(current_page, pages_count):
     :param pages_count: total amount of pages
     :return: (list of pages to link to before current page, list of pages to link to after current page)
     """
-    list_pages_before = range(max(1, page - PAGINATION_SHORTCUT_NUMBER), page)
-    list_pages_after = range(page + 1, min(page + PAGINATION_SHORTCUT_NUMBER + 1, max_page)+1)
+    list_pages_before = range(max(1, current_page - PAGINATION_SHORTCUT_NUMBER), current_page)
+    list_pages_after = range(current_page + 1, min(current_page + PAGINATION_SHORTCUT_NUMBER + 1, pages_count)+1)
     return list_pages_before, list_pages_after
 
 
