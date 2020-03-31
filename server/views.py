@@ -324,7 +324,7 @@ def find_closes_persons(request, pk):
     req_x = req_city.x
     req_y = req_city.y
 
-    closes_volunteer = Volunteer.objects.all()
+    closest_volunteer = Volunteer.objects.all()
 
     # adding here a function that tell if the volunteer is aviavble
     # --------- check time now --------
@@ -339,23 +339,23 @@ def find_closes_persons(request, pk):
     # check option 1
     if is_time_between(time(7, 00), time(15, 00)):
         filter = "schedule__" + now_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 1})
+        availability_qs = closest_volunteer.filter(**{filter: 1})
 
     # check option 2
     elif is_time_between(time(15, 00), time(23, 00)):
         filter = "schedule__" + now_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 2})
+        availability_qs = closest_volunteer.filter(**{filter: 2})
 
 
     # check option 3 before midnight
     elif is_time_between(time(23, 00), time(00, 00)):
         filter = "schedule__" + now_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 3})
+        availability_qs = closest_volunteer.filter(**{filter: 3})
 
     # check option 3 after midnight
     elif is_time_between(time(00, 00), time(7, 00)):
         filter = "schedule__" + yesterday_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 3})
+        availability_qs = closest_volunteer.filter(**{filter: 3})
 
     # check for the persons that good timing if the day is good
 
@@ -364,33 +364,33 @@ def find_closes_persons(request, pk):
         for volu in availability_qs:
             availability_now_id.append(volu.id)
 
-    closes_volunteer = availability_qs
+    closest_volunteer = availability_qs
 
-    closes_volunteer = sorted(closes_volunteer,
+    closest_volunteer = sorted(closest_volunteer,
                               key=lambda volu: -HelpRequest.objects.filter(helping_volunteer=volu).count())
-    closes_volunteer = sorted(closes_volunteer,
+    closest_volunteer = sorted(closest_volunteer,
                               key=lambda volu: (volu.city.x - req_x) ** 2 + (volu.city.y - req_y) ** 2)
 
-    # closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
+    # closest_volunteer = closest_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
 
-    if len(closes_volunteer) > 100:
-        closes_volunteer = closes_volunteer[0:100]
+    if len(closest_volunteer) > 100:
+        closest_volunteer = closest_volunteer[0:100]
 
     # ----- check for each volunterr how much times he apper
     appers_list = []
-    for volu in closes_volunteer:
+    for volu in closest_volunteer:
         appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
 
     final_data = []
-    for i in range(0, len(closes_volunteer)):
-        tot_x = (closes_volunteer[i].city.x - request_person.city.x) ** 2
-        tot_y = (closes_volunteer[i].city.y - request_person.city.y) ** 2
+    for i in range(0, len(closest_volunteer)):
+        tot_x = (closest_volunteer[i].city.x - request_person.city.x) ** 2
+        tot_y = (closest_volunteer[i].city.y - request_person.city.y) ** 2
         tot_value = int(((tot_x + tot_y) ** 0.5) / 100)
-        final_data.append((closes_volunteer[i], tot_value, appers_list[i]))
+        final_data.append((closest_volunteer[i], tot_value, appers_list[i]))
 
-    context = {'help_request': request_person, 'closes_volunteer': final_data,
+    context = {'help_request': request_person, 'closest_volunteer': final_data,
                'availability_now_id': availability_now_id}
-    return render(request, 'server/closes_volunteer.html', context)
+    return render(request, 'server/closest_volunteer.html', context)
 
 
 def export_users_xls(request):
