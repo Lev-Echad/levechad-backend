@@ -179,6 +179,7 @@ also filters by filter
 @login_required
 def show_all_help_request(request, page=1):
     filter_options = dict()
+    q_option = Q()
 
     statuses = request.GET.getlist('status')
     areas = request.GET.getlist('area')
@@ -201,7 +202,10 @@ def show_all_help_request(request, page=1):
     if len(search_name) != 0 and '' not in search_name:
         filter_options['full_name__icontains'] = search_name[0]
 
-    match_qs = HelpRequest.objects.filter(**filter_options)
+    if len(search_id) != 0 and search_id[0].strip():
+        q_option |= Q(id=search_id[0])
+
+    match_qs = HelpRequest.objects.filter(q_option, **filter_options)
 
     if 'field' in request.GET:
         match_qs = match_qs.order_by(request.GET.get('field'))
