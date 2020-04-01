@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name="index"),
-    path('volunteer_table', views.show_all_volunteers, name='show_all_volunteers'),
+    path('volunteer_table/', views.show_all_volunteers, name='show_all_volunteers'),
     path('volunteer_table/<int:page>', views.show_all_volunteers, name='show_all_volunteers_page'),
     path('help_table', views.show_all_help_request, name='show_all_help_request'),
     path('help_table/<int:page>', views.show_all_help_request, name='show_all_help_request_page'),
@@ -14,7 +14,7 @@ urlpatterns = [
     path('create_volunteer_certificate/<int:volunteer_id>', views.create_volunteer_certificate, name='create_volunteer_certificate'),
 
     path('delete_volunteer/<int:pk>', views.delete_volunteer, name='delete_volunteer'),
-    path(r'export/xls/', views.export_users_xls, name='export_users_xls'),
-    path(r'export/xls1/', views.export_help_xls, name='export_help_xls'),
+    path('export/xls/', views.export_users_xls, name='export_users_xls'),
+    path('export/xls1/', views.export_help_xls, name='export_help_xls'),
 
 ]
