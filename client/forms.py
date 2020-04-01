@@ -24,7 +24,7 @@ onlyNames.sort()
 CITIES = [(str(x), str(x)) for x in onlyNames]
 
 # Add a blank option to CITIES in order to enable setting the initial value of the ChoiceField to ''.
-CITIES.append(('', ''))
+CITIES = [('', '')] + CITIES
 json_file.close()
 
 
