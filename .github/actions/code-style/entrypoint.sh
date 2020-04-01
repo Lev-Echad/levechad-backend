@@ -23,7 +23,7 @@ comment="${COMMENT_MESSAGE}${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CO
 if [ $pycode_retval -ne 0 ]; then
   payload=$(echo '{}' | jq --arg body "$comment" '.body = $body')
   comments_url=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
-  curl -s -S -H "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/json" --data-binary --data "$payload" "$comments_url"
+  curl -s -S -H "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/json" --data-binary "$payload" "$comments_url"
 else
   echo "There were no pycodestyle issues"
 fi
