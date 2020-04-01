@@ -15,11 +15,15 @@ AREAS = (
     ("דרום", "דרום")
 )
 
+NOT_BLANK_VALIDATOR = RegexValidator(r"^.+$")
+
 json_file = open('./client/city.json', encoding="utf-8")
 data = json.load(json_file)
 onlyNames = [a["name"] for a in data]
 onlyNames.sort()
 CITIES = [(str(x), str(x)) for x in onlyNames]
+
+# Add a blank option to CITIES in order to enable setting the initial value of the ChoiceField to ''.
 CITIES.append(('', ''))
 json_file.close()
 
@@ -55,7 +59,6 @@ class VolunteerForm(forms.Form):
     )
 
     my_validator = RegexValidator(r"^\d+$")
-    not_blank_validator = RegexValidator(r"^.+$")
 
     first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
@@ -67,7 +70,7 @@ class VolunteerForm(forms.Form):
     languages = forms.MultipleChoiceField(choices=get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     email = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    city = forms.ChoiceField(choices=CITIES, initial='', validators=[not_blank_validator])
+    city = forms.ChoiceField(choices=CITIES, initial='', validators=[NOT_BLANK_VALIDATOR])
     neighborhood = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     available_on_saturday = forms.BooleanField(required=False)
@@ -163,12 +166,11 @@ class BaseHelpForm(forms.Form):
     )"""
 
     phone_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
-    not_blank_validator = RegexValidator(r"^(?!\s*$).+")
 
     full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[phone_validator])
     area = forms.ChoiceField(choices=AREAS)
-    city = forms.ChoiceField(choices=CITIES, validators=[not_blank_validator])
+    city = forms.ChoiceField(choices=CITIES, validators=[NOT_BLANK_VALIDATOR])
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
 
