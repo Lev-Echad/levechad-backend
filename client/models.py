@@ -142,7 +142,9 @@ class HelpRequest(Timestampable):
         ('NOT_DONE', 'לא טופל')
     )
 
-    full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
+    first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
+    last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     phone_number = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)

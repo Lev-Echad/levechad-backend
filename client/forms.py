@@ -160,7 +160,9 @@ class BaseHelpForm(forms.Form):
     )"""
 
     my_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
-    full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False, widget=forms.HiddenInput())
+    first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[my_validator])
     area = forms.ChoiceField(choices=AREAS)
     city = forms.ChoiceField(choices=CITIES)
@@ -172,7 +174,8 @@ class BaseHelpForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
+        self.fields['first_name'].label = "שם פרטי"
+        self.fields['last_name'].label = "שם משפחה"
         self.fields['phone_number'].label = "מספר פלאפון"
         self.fields['area'].label = "אזור"
         self.fields['city'].label = "עיר מגורים"
@@ -200,7 +203,8 @@ class MedicForm(BaseHelpForm):
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
+        self.fields['first_name'].label = "שם פרטי"
+        self.fields['last_name'].label = "שם משפחה"
         self.fields['phone_number'].label = "מספר פלאפון"
         self.fields['area'].label = "אזור"
         self.fields['city'].label = "עיר מגורים"
@@ -215,7 +219,8 @@ class OtherForm(BaseHelpForm):
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
+        self.fields['first_name'].label = "שם פרטי"
+        self.fields['last_name'].label = "שם משפחה"
         self.fields['phone_number'].label = "מספר פלאפון"
         self.fields['area'].label = "אזור"
         self.fields['city'].label = "עיר מגורים"
@@ -231,7 +236,8 @@ class ShoppingForm(BaseHelpForm):
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
+        self.fields['first_name'].label = "שם פרטי"
+        self.fields['last_name'].label = "שם משפחה"
         self.fields['phone_number'].label = "מספר פלאפון"
         self.fields['area'].label = "אזור"
         self.fields['city'].label = "עיר מגורים"
@@ -245,13 +251,14 @@ class TravelForm(BaseHelpForm):
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
+        self.fields['first_name'].label = "שם פרטי"
+        self.fields['last_name'].label = "שם משפחה"
         self.fields['phone_number'].label = "מספר פלאפון"
         self.fields['area'].label = "אזור"
         self.fields['city'].label = "עיר מגורים"
         self.fields['address'].label = "כתובת מגורים"
         self.fields['notes'].label = "הערות"
-        self.fields['travel_need'].label = "'פרט את מסלול הנסיעה הנדרש"
+        self.fields['travel_need'].label = "פרט את מסלול הנסיעה הנדרש"
 
 
 class WorkersForm(BaseHelpForm):
@@ -260,7 +267,8 @@ class WorkersForm(BaseHelpForm):
 
     def __init__(self, *args, **kwargs):
         super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
+        self.fields['first_name'].label = "שם פרטי"
+        self.fields['last_name'].label = "שם משפחה"
         self.fields['phone_number'].label = "מספר פלאפון"
         self.fields['area'].label = "אזור"
         self.fields['city'].label = "עיר מגורים"
