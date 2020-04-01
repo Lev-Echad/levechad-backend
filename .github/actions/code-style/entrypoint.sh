@@ -17,8 +17,7 @@ pycode_output=$(pycodestyle ${LINTER_ARGS} .)
 pycode_retval=$?
 echo $pycode_output
 
-safe_newline = $'\n'
-comment="${COMMENT_MESSAGE}${safe_newline}${MARKDOWN_CODE_WRAPPER}${safe_newline}${pycode_output}${safe_newline}${MARKDOWN_CODE_WRAPPER}"
+comment="${COMMENT_MESSAGE}${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}"
 
 # If there were errors as part of linting, post a comment. Else, do nothing.
 if [ $pycode_retval -ne 0 ]; then
