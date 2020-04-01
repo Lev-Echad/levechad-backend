@@ -396,6 +396,7 @@ def find_closes_persons(request, pk):
 
 def export_users_xls(request):
     fields_descriptions = {
+        'id': 'מזהה מתנדב',
         'first_name': 'שם פרטי',
         'last_name': 'שם משפחה',
         'tz_number': 'תעודת זהות',
