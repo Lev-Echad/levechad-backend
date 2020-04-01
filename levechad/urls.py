@@ -12,6 +12,5 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 
-# if settings.DEBUG:
-# TODO Only serve media files on debug mode after #125 is done (S3)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

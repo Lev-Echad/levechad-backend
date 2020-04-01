@@ -36,6 +36,8 @@ def thanks_volunteer(request):
     volunteer = Volunteer.objects.get(id=volunteer_id)
     volunteer_certificate = volunteer.get_active_certificates().first()
 
+    volunteer_certificate.update_image_if_nonexistent()
+
     return render(request, 'thanks_volunteer.html', {
         "name": f'{volunteer.first_name} {volunteer.last_name}',
         "certificate": volunteer_certificate
@@ -182,16 +184,6 @@ def find_certificate_view(request):
             context['error'] = 'יש למלא את השדות כנדרש!'
 
     return render(request, 'find_certificate.html', context=context)
-
-
-def download_certificate_view(request, pk):
-    # We could've easily used the download attribute on <a> tags w/ the media URL directly,
-    # but this doesn't work on Firefox for some reason.
-    # TODO remove this when #125 is done (S3 integration) and use the download attribute, it will probably work
-    with open(VolunteerCertificate.objects.get(id=pk).image_path, 'rb') as image_file:
-        response = HttpResponse(image_file.read(), content_type='image/png')
-        response['Content-Disposition'] = 'attachment; filename="volunteer_tag.png"'
-        return response
 
 
 def medic_help(request):

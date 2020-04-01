@@ -1,14 +1,16 @@
 # coding=utf-8
-import os
-from datetime import timedelta, date
+import io
+from datetime import date
 
+import boto3
+from PIL import Image, ImageDraw, ImageFont
+from bidi.algorithm import get_display
+
+from django.contrib.staticfiles import finders
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.conf import settings
-from django.dispatch import receiver
-
-import client.certificate_manager
+from django.core.files.base import ContentFile
 
 
 DEFAULT_MAX_FIELD_LENGTH = 200
@@ -113,7 +115,7 @@ class Volunteer(Timestampable):
                 if getattr(self, key) != value:
                     # A change occurred in one of the fields listed in the dict - update valid certificates images
                     for certificate in self.get_active_certificates():
-                        client.certificate_manager.create_certificate_image(certificate)
+                        certificate.create_image()
 
                     break
 
@@ -159,28 +161,66 @@ class Volunteer(Timestampable):
 
 
 class VolunteerCertificate(models.Model):
-    IMAGE_GENERAL_PATH_FORMAT = ['certificates', '{}.png']
-    IMAGE_PATH_FORMAT = os.path.join(settings.MEDIA_ROOT, *IMAGE_GENERAL_PATH_FORMAT)
-    IMAGE_URL_FORMAT = f'{settings.MEDIA_URL}{"/".join(IMAGE_GENERAL_PATH_FORMAT)}'
+    CERTIFICATE_TEXT_COLOR = (3, 8, 12)  # (R, G, B)
+    CERTIFICATE_TEXT_SIZE = 40
+    CERTIFICATE_TEXT_POSITION = (700, 200)
+    IMAGE_PATH = 'certificates/{id}.png'
+    DOWNLOAD_LINK_EXPIRATION_SECONDS = 600
+
+    def _certificate_image_path(self, filename):
+        return type(self).IMAGE_PATH.format(id=self.id)
 
     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='certificates', null=False)
     expiration_date = models.DateField(default=date.today)
+    image = models.FileField(blank=True, upload_to=_certificate_image_path)
+
+    def create_image(self):
+        volunteer = self.volunteer
+        tag_filename = finders.find('client/tag.jpeg')
+        font_filename = finders.find('client/fonts/BN Amnesia.ttf')
+        photo = None
+        try:
+            photo = Image.open(tag_filename)
+            drawing = ImageDraw.Draw(photo)
+            font = ImageFont.truetype(font_filename, size=type(self).CERTIFICATE_TEXT_SIZE)
+
+            lines_to_insert = [
+                f'שם מתנדב: {volunteer.first_name} {volunteer.last_name}',
+                f'תעודת זהות: {volunteer.tz_number}',
+                f'תוקף התעודה: {self.expiration_date}',
+                f'מספר תעודה: {self.id}',
+            ]
+
+            drawing.text(
+                type(self).CERTIFICATE_TEXT_POSITION,
+                get_display('\n'.join(lines_to_insert)),
+                fill=type(self).CERTIFICATE_TEXT_COLOR,
+                font=font,
+                align='right'
+            )
+            with io.BytesIO() as output:
+                photo.save(output, format='png')
+                self.image.save(type(self).IMAGE_PATH.format(id=self.id), ContentFile(output.getvalue()))
+        finally:
+            if photo is not None:
+                photo.close()
 
     def update_image_if_nonexistent(self):
-        if not os.path.exists(self.image_path):
-            client.certificate_manager.create_certificate_image(self)
+        if not self.image.name:
+            self.create_image()
 
     @property
-    def image_url(self):
-        if not self.id:
-            return None
-        return type(self).IMAGE_URL_FORMAT.format(self.id)
-
-    @property
-    def image_path(self):
-        if not self.id:
-            return None
-        return type(self).IMAGE_PATH_FORMAT.format(self.id)
+    def image_download_url(self):
+        s3 = boto3.client('s3')
+        return s3.generate_presigned_url(
+            'get_object',
+            Params={
+                'Bucket': 'levechad-media-bucket',
+                'Key': 'media/{}'.format(type(self).IMAGE_PATH.format(id=self.id)),
+                'ResponseContentDisposition': 'attachment;filename={}'.format(f'{self.id}.png'),
+            },
+            ExpiresIn=type(self).DOWNLOAD_LINK_EXPIRATION_SECONDS
+        )
 
 
 class HelpRequest(Timestampable):
@@ -221,9 +261,3 @@ class HamalUser(models.Model):
 
     def __str__(self):
         return str(self.area)
-
-
-@receiver(models.signals.post_save, sender=VolunteerCertificate)
-def volunteer_certificate_saved(sender, instance, *args, **kwargs):
-    instance.update_image_if_nonexistent()
-    client.certificate_manager.lazy_purge_certificates(sender)
