@@ -17,14 +17,13 @@ pycode_output=$(pycodestyle ${LINTER_ARGS} .)
 pycode_retval=$?
 echo $pycode_output
 
-# Backslash in (some) markdown is newline
-comment="${COMMENT_MESSAGE}\\${MARKDOWN_CODE_WRAPPER}\\${pycode_output}\\${MARKDOWN_CODE_WRAPPER}"
+comment="${COMMENT_MESSAGE}\n${MARKDOWN_CODE_WRAPPER}\n${pycode_output}\n${MARKDOWN_CODE_WRAPPER}"
 
 # If there were errors as part of linting, post a comment. Else, do nothing.
 if [ $pycode_retval -ne 0 ]; then
   payload=$(echo '{}' | jq --arg body "$comment" '.body = $body')
   comments_url=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
-  curl -s -S -H "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/json" --data "$payload" "$comments_url"
+  curl -s -S -H "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/json" --binary-data --data "$payload" "$comments_url"
 else
   echo "There were no pycodestyle issues"
 fi
