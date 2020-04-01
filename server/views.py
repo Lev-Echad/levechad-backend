@@ -421,7 +421,6 @@ def export_users_xls(request):
     return server.xls_exporter.export_model_to_xls(Volunteer, fields_descriptions)
 
 
-
 @login_required
 def create_volunteer_certificate(request, volunteer_id):
     try:

@@ -17,7 +17,6 @@
         <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">שם מלא</th>
             <th scope="col">שם פרטי</th>
             <th scope="col">שם משפחה</th>
             <th scope="col">סוג</th>
@@ -45,7 +44,6 @@
         {% for volunteer, num_of_appers, certificate_id in volunteer_data %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
-                <td>{{ volunteer.full_name }}</td>
                 <td>{{ volunteer.first_name }}</td>
                 <td>{{ volunteer.last_name }}</td>
                 <td>{{ volunteer.get_volunteer_type_display }}</td>
@@ -294,8 +292,12 @@
                             <p class="h5"><u>בחר את השדה שאתה מעוניין למיין לפיו</u></p>
                         </div>
                         <div>
-                            <label for="field">שם</label>
-                            <input type="radio" name="field" id="field" value='full_name'>
+                            <label for="field">שם פרטי</label>
+                            <input type="radio" name="field" id="field" value='first_name'>
+                        </div>
+                        <div>
+                            <label for="field">שם משפחה</label>
+                            <input type="radio" name="field" id="field" value='last_name'>
                         </div>
                         <div>
                             <label for="field">עיר</label>
