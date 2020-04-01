@@ -2,7 +2,12 @@
 {% load bootstrap %}
 
 {% block title %}לב אחד - התנדב{% endblock %}
-
+{% block extra_scripts %}
+    <!-- send page view notification to facebook !-->
+    <script>
+        fbq('track', 'ViewContent');
+    </script>
+{% endblock %}
 
 {% block body %}
 
