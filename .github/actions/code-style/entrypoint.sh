@@ -17,7 +17,8 @@ pycode_output=$(pycodestyle ${LINTER_ARGS} .)
 pycode_retval=$?
 echo $pycode_output
 
-comment="${COMMENT_MESSAGE}\n${MARKDOWN_CODE_WRAPPER}\n${pycode_output}\n${MARKDOWN_CODE_WRAPPER}"
+# Backslash in (some) markdown is newline
+comment="${COMMENT_MESSAGE}\\${MARKDOWN_CODE_WRAPPER}\\${pycode_output}\\${MARKDOWN_CODE_WRAPPER}"
 
 # If there were errors as part of linting, post a comment. Else, do nothing.
 if [ $pycode_retval -ne 0 ]; then
