@@ -55,7 +55,7 @@ class VolunteerForm(forms.Form):
     )
 
     my_validator = RegexValidator(r"^\d+$")
-    not_blank_validator = RegexValidator(r"^(?!\s*$).+")
+    not_blank_validator = RegexValidator(r"^.+$")
 
     first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
