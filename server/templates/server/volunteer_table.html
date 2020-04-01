@@ -13,6 +13,10 @@
 
     </p>
 
+    <div>
+        {% include "snippets/volunteer_pager.html" %}
+    </div>
+
     <table class="table table-hover table-bordered text-center">
         <thead>
         <tr>
@@ -42,7 +46,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for volunteer, num_of_appers, certificate_id in volunteer_data %}
+        {% for volunteer, certificate_id in volunteer_data %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
@@ -80,7 +84,7 @@
                         לא פנוי
                     {% endif %}
                 </td>
-                <td>{{ num_of_appers }}</td>
+                <td>{{ volunteer.appears_count }}</td>
                 <td>{{ volunteer.guiding }}</td>
 
                 <td>
@@ -173,31 +177,7 @@
     </table>
 
     <div>
-
-        {% if page != 1 %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
-        {% endif %}
-        &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
-        {% if not page == num_pages %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
-        {% endif %}
-        {% if page == 1 %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:39 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אחרון</a>
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:20 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-        {% endif %}
-        {% if page == 41 %}
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-40 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;">עמוד ראשון</a>
-            <a href="{% url 'show_all_volunteers' %}/{{ page|add:-20 }}?{{ request.META.QUERY_STRING }}"
-               style="color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-
-        {% endif %}
-
-
+        {% include "snippets/volunteer_pager.html" %}
     </div>
 
     <div class="modal fade" id="modalLoginForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -294,8 +274,8 @@
                             <p class="h5"><u>בחר את השדה שאתה מעוניין למיין לפיו</u></p>
                         </div>
                         <div>
-                            <label for="field">שם</label>
-                            <input type="radio" name="field" id="field" value='full_name'>
+                            <label for="field"> שם</label>
+                            <input type="radio" name="field" id="field" value='first_name'>
                         </div>
                         <div>
                             <label for="field">עיר</label>
@@ -327,11 +307,32 @@
                         <div>
                             <p class="h5"><u>שם</u></p>
                         </div>
-                        <div>
-                            <label for="availability">חיפוש שם</label>
-                            <input type="text" name="searchname" id="searchname" placeholder="הזין שם מלא">
-                        </div>
-
+                        <table>
+                            <tr>
+                                <td>
+                                    <label for="availability">חיפוש שם פרטי</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="search_first_name" id="search_first_name" placeholder="הזן שם פרטי" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="availability">חיפוש שם משפחה</label>&nbsp;
+                                </td>
+                                <td>
+                                    <input type="text" name="search_last_name" id="search_last_name" placeholder="הזן שם משפחה" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="availability">חיפוש מזהה מתנדב</label>&nbsp;
+                                </td>
+                                <td>
+                                    <input type="text" name="search_id" id="search_id" placeholder="הזן מזהה מתנדב" />
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                     <div class="modal-footer d-flex justify-content-center">
                         <button type="submit" class="btn btn-default">בצע פילטר</button>
