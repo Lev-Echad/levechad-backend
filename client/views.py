@@ -120,7 +120,6 @@ def volunteer_view(request):
             )
             volunteer_new.languages.set(languages)
             volunteer_new.areas.set(areas)
-            volunteer_new.save()
 
             # creating volunteer certificate
             volunteer_new.get_or_generate_valid_certificate()
