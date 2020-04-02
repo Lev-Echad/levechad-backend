@@ -33,7 +33,6 @@ elif ENV == 'PRODUCTION':
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [

@@ -199,7 +199,7 @@ def get_certificate_view(request):
         form = GetCertificateForm(request.POST)
         if form.is_valid():
             # TODO: change to 'get' instead of 'first' after fixing #50
-            volunteer = Volunteer.objects.filter(tz_number=form['tz_number'].data).first()
+            volunteer = Volunteer.objects.filter(tz_number=form['id_number'].data).first()
             if volunteer is not None:
                 '''
                  TODO: this a hotfix that generate a valid certificate to any user that requests one. 
