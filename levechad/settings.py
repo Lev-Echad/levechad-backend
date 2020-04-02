@@ -160,7 +160,7 @@ LOGIN_REDIRECT_URL = '/server'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-if not DEBUG:
+if ENV != 'PRODUCTION':
     # In development, let django serve static files (and media files in urls.py)
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
