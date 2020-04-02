@@ -172,9 +172,9 @@ class VolunteerCertificate(models.Model):
 
     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='certificates', null=False)
     expiration_date = models.DateField(default=date.today)
-    image = models.FileField(blank=True, upload_to=_certificate_image_path)
+    _image = models.FileField(blank=True, upload_to=_certificate_image_path)
 
-    def create_image(self):
+    def create_image(self, save=True):
         volunteer = self.volunteer
         tag_filename = finders.find('client/tag.jpeg')
         font_filename = finders.find('client/fonts/BN Amnesia.ttf')
@@ -200,14 +200,20 @@ class VolunteerCertificate(models.Model):
             )
             with io.BytesIO() as output:
                 photo.save(output, format='png')
-                self.image.save(type(self).IMAGE_PATH.format(id=self.id), ContentFile(output.getvalue()))
+                self._image.save(type(self).IMAGE_PATH.format(id=self.id), ContentFile(output.getvalue()), save=save)
         finally:
             if photo is not None:
                 photo.close()
 
-    def update_image_if_nonexistent(self):
-        if not self.image.name:
-            self.create_image()
+    def update_image_if_nonexistent(self, save=True):
+        if not self._image.name:
+            self.create_image(save=save)
+
+    @property
+    def image(self):
+        if self.id is not None:
+            self.update_image_if_nonexistent()
+        return self._image
 
     @property
     def image_download_url(self):

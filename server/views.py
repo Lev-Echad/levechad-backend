@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area
 from django.db.models import F, Q
 from django.core.paginator import Paginator
+from django.urls import reverse
 import datetime
 from datetime import time, date
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -163,12 +164,7 @@ def show_all_volunteers(request, page=1):
     valid_certificates = []
     for volunteer in match_qs:
         appers_list.append(HelpRequest.objects.filter(helping_volunteer=volunteer).count())
-        volunteer.get_active_certificates()
-        valid_certificate = volunteer.get_active_certificates().first()
-        if valid_certificate is not None:
-            valid_certificates.append(valid_certificate.id)
-        else:
-            valid_certificates.append(-1)
+        valid_certificates.append(volunteer.get_active_certificates().first())
 
     # make match qs to tuple
     final_data = []
@@ -433,11 +429,12 @@ def export_users_xls(request):
 def create_volunteer_certificate(request, volunteer_id):
     try:
         volunteer = Volunteer.objects.get(id=volunteer_id)
-        certificate = volunteer.get_or_generate_valid_certificate()
+        volunteer.get_or_generate_valid_certificate()
     except Volunteer.DoesNotExist:
         return HttpResponseBadRequest()
 
-    return redirect('volunteer_certificate', pk=certificate.id)
+    next_page_name = request.GET.get('next', 'index')
+    return redirect(next_page_name)
 
 
 def export_help_xls(request):

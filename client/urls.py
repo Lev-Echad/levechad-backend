@@ -21,5 +21,4 @@ urlpatterns = [
     path('help/shopping', views.shopping_help),
     path('help/travel', views.travel_help),
     path('help/workers', views.workers_help),
-    # path('download_certificate/<int:pk>', views.download_certificate_view, name='download_certificate'),
 ]

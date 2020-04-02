@@ -36,8 +36,6 @@ def thanks_volunteer(request):
     volunteer = Volunteer.objects.get(id=volunteer_id)
     volunteer_certificate = volunteer.get_active_certificates().first()
 
-    volunteer_certificate.update_image_if_nonexistent()
-
     return render(request, 'thanks_volunteer.html', {
         "name": f'{volunteer.first_name} {volunteer.last_name}',
         "certificate": volunteer_certificate
@@ -174,7 +172,6 @@ def find_certificate_view(request):
                 active_certificate = volunteer.get_or_generate_valid_certificate()
 
                 if active_certificate is not None:
-                    active_certificate.update_image_if_nonexistent()
                     context['certificate'] = active_certificate
                 else:
                     context['error'] = 'לא נמצאה תעודה בתוקף!'

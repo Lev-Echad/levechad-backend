@@ -42,7 +42,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for volunteer, num_of_appers, certificate_id in volunteer_data %}
+        {% for volunteer, num_of_appers, certificate in volunteer_data %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.full_name }}</td>
@@ -89,13 +89,15 @@
                        data-target="#edit_volu{{ volunteer.id }}"> ערוך</a>
                 </td>
                 <td>
-                    {% if certificate_id != -1 %}
+                    {% if certificate is not None %}
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal"
                        data-target="#make_tag{{ volunteer.id }}">תג מתדנב</a>
                     {% else %}
                         לא נמצא תג מתנדב!
                         <br />
-                        <a href="{% url 'create_volunteer_certificate' volunteer_id=volunteer.id %}">צור</a>
+                        <a href="{% url 'create_volunteer_certificate' volunteer_id=volunteer.id %}?next={{ request.resolver_match.url_name|urlencode }}">
+                            צור
+                        </a>
                     {% endif %}
                 </td>
 
@@ -161,8 +163,8 @@
                  aria-hidden="true" style="top:100px;">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content text-center">
-                        {% if certificate_id != -1 %}
-                            <img src="{% url 'volunteer_certificate' pk=certificate_id %}" width="400">
+                        {% if certificate is not None %}
+                            <img src="{{ certificate.image.url }}" width="400">
                         {% endif %}
                     </div>
                 </div>
