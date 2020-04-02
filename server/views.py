@@ -1,12 +1,13 @@
+import datetime
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area, City
 from django.db.models import F, Q, Count
 from django.core.paginator import Paginator
-import datetime
-from datetime import time, date
 from django.http import HttpResponse, HttpResponseBadRequest
-import xlwt
+
+import server.xls_exporter
 
 RESULTS_IN_PAGE = 50
 PAGINATION_SHORTCUT_NUMBER = 7
@@ -115,13 +116,13 @@ def show_all_volunteers(request, page=1):
     yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
     yesterday_day = yesterday.strftime("%A")
 
-    if is_time_between(time(7, 00), time(15, 00)):
+    if is_time_between(datetime.time(7, 00), datetime.time(15, 00)):
         schedule_filter = "schedule__" + now_day + "__contains"
         schedule_id = 1
-    elif is_time_between(time(15, 00), time(23, 00)):
+    elif is_time_between(datetime.time(15, 00), datetime.time(23, 00)):
         schedule_filter = "schedule__" + now_day + "__contains"
         schedule_id = 2
-    elif is_time_between(time(23, 00), time(00, 00)):
+    elif is_time_between(datetime.time(23, 00), datetime.time(00, 00)):
         schedule_filter = "schedule__" + now_day + "__contains"
         schedule_id = 3
     else:
@@ -319,23 +320,23 @@ def find_closes_persons(request, pk):
     availability_qs = []
 
     # check option 1
-    if is_time_between(time(7, 00), time(15, 00)):
+    if is_time_between(datetime.time(7, 00), datetime.time(15, 00)):
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 1})
 
     # check option 2
-    elif is_time_between(time(15, 00), time(23, 00)):
+    elif is_time_between(datetime.time(15, 00), datetime.time(23, 00)):
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 2})
 
 
     # check option 3 before midnight
-    elif is_time_between(time(23, 00), time(00, 00)):
+    elif is_time_between(datetime.time(23, 00), datetime.time(00, 00)):
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 3})
 
     # check option 3 after midnight
-    elif is_time_between(time(00, 00), time(7, 00)):
+    elif is_time_between(datetime.time(00, 00), datetime.time(7, 00)):
         filter = "schedule__" + yesterday_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 3})
 
@@ -376,39 +377,31 @@ def find_closes_persons(request, pk):
 
 
 def export_users_xls(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="volunteer_data.xls"'
+    fields_descriptions = {
+        'id': 'מזהה מתנדב',
+        'first_name': 'שם פרטי',
+        'last_name': 'שם משפחה',
+        'tz_number': 'תעודת זהות',
+        'volunteer_type': 'סוג מתנדב',
+        'date_of_birth': 'תאריך לידה',
+        'organization': 'ארגון',
+        'phone_number': 'מספר טלפון',
+        'areas': 'איזור מגורים',
+        'languages': 'שפות',
+        'email': 'אימייל',
+        'city': 'עיר',
+        'neighborhood': 'שכונת מגורים',
+        'address': 'כתובת',
+        'available_saturday': 'זמין בשבת?',
+        'keep_mandatory_worker_children': 'מעוניין לסייע לילדי עובדים חיוניים?',
+        'guiding': 'מדריך',
+        'notes': 'הערות',
+        'moving_way': 'דרך תחבורה',
+        'hearing_way': 'דרך הוותדעות על לב אחד',
+        'created_date': 'מועד הרשמות',
+    }
 
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('Volunteers')
-
-    # Sheet header, first row
-    row_num = 0
-
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-
-    columns = ['שם', 'שם פרטי', 'שם משפחה', 'תעודת זהות', 'סוג', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר',
-               'אימייל', 'פנוי בשבת',
-               'משפחותונים', 'Notes', ]
-
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
-
-    # Sheet body, remaining rows
-    font_style = xlwt.XFStyle()
-
-    rows = Volunteer.objects.all().values_list('full_name', 'first_name', 'last_name', 'tz_number', 'volunteer_type',
-                                               'age',
-                                               'phone_number', 'areas', 'city', 'email', 'available_saturday',
-                                               'guiding', 'notes')
-    for row in rows:
-        row_num += 1
-        for col_num in range(len(row)):
-            ws.write(row_num, col_num, row[col_num], font_style)
-
-    wb.save(response)
-    return response
+    return server.xls_exporter.export_model_to_xls(Volunteer, fields_descriptions)
 
 
 @login_required
@@ -423,32 +416,18 @@ def create_volunteer_certificate(request, volunteer_id):
 
 
 def export_help_xls(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="help_request_data.xls"'
+    fields_descriptions = {
+        'id': 'מזהה בקשה',
+        'created_date': 'תאריך הבקשה',
+        'full_name': 'שם פונה',
+        'phone_number': 'טלפון',
+        'area': 'איזור',
+        'address': 'כתובת',
+        'city': 'עיר',
+        'type': 'סוג פנייה',
+        'notes': 'הערות',
+        'status': 'סטטוס',
+        'helping_volunteer': 'מתנדב שמטפל',
+    }
 
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('HelpRequests')
-
-    # Sheet header, first row
-    row_num = 0
-
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-
-    columns = ['שם פונה', 'טלפון', 'איזור', 'כתובת' 'עיר', 'סוג פנייה', 'הערות', 'סטטוס', 'מתנדב שמפטל']
-
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
-
-    # Sheet body, remaining rows
-    font_style = xlwt.XFStyle()
-
-    rows = HelpRequest.objects.all().values_list('full_name', 'phone_number', 'area', 'address', 'city', 'type',
-                                                 'notes', 'status', 'helping_volunteer')
-    for row in rows:
-        row_num += 1
-        for col_num in range(len(row)):
-            ws.write(row_num, col_num, row[col_num], font_style)
-
-    wb.save(response)
-    return response
+    return server.xls_exporter.export_model_to_xls(HelpRequest, fields_descriptions, spreadsheet_name='Help Requests')

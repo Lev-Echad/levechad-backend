@@ -230,7 +230,7 @@ def medic_help(request):
             answer = form.cleaned_data
             type_text = ""
             if (answer["need_prescription"]):
-                type_text = "\nתרופת מרשם"
+                type_text = "תרופת מרשם\n"
 
             areasGot = Area.objects.all().get(name=answer["area"])
             new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],

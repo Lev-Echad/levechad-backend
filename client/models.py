@@ -102,7 +102,6 @@ class Volunteer(Timestampable):
     tz_number = models.CharField(max_length=ID_LENGTH, blank=True, validators=[id_number_validator])
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
-    full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     age = models.IntegerField(null=True, blank=True, default=None)
     date_of_birth = models.DateField(null=True, default=None)
@@ -121,6 +120,13 @@ class Volunteer(Timestampable):
     moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
+
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
+    def __str__(self):
+        return self.full_name
 
 
 class VolunteerCertificate(models.Model):
