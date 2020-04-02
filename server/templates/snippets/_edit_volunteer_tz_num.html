@@ -1,0 +1,31 @@
+            <div class="modal fade" id="edit_volu_tz_num{{ volunteer.id }}" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+
+
+                        <form method="post" action="{% url 'volunteer_edit_tz_num' volunteer.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h4 class="modal-title w-100 font-weight-bold">עריכה</h4>
+                            </div>
+                            <div class="modal-body mx-3">
+                                <div class="right">
+                                    <h5><u>שינוי ת"ז מתנדב</u></h5>
+
+
+                                    <div>
+                                        <label for="notes">ת"ז:</label>
+                                        <input type="text" name="tz_num" id="tz_num" value='{{ volunteer.tz_number }}'>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer d-flex justify-content-center">
+                                <button type="submit" class="btn btn-default">שמור שינויים</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>

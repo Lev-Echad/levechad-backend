@@ -76,6 +76,7 @@ class Volunteer(Timestampable):
         ("RAD_TV", "רדיו וטלוויזיה"),
         ("OTHR", "אחר")
     )
+    DEFAULT_TYPE = "MISSIONS"
     TYPES = (
         ("NIGHBORHOOD_COORDINATOR", "רכז שכונה"),
         ("CITY_COORDINATOR", "רכז עיר"),
@@ -83,9 +84,10 @@ class Volunteer(Timestampable):
         ("HAMAL", "חמל"),
         ("PROJECT", "פרויקט"),
         ("CHILD_CARE", "משפחתון"),
-        ("MISSIONS", "משימות"),
-        ("AGRICULTURE", "חקלאות")
+        ("AGRICULTURE", "חקלאות"),
+        (DEFAULT_TYPE, "משימות")
     )
+
 
     def get_or_generate_valid_certificate(self):
         certificate = self.get_active_certificates().first()
@@ -104,7 +106,7 @@ class Volunteer(Timestampable):
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     age = models.IntegerField(null=True, blank=True, default=None)
     date_of_birth = models.DateField(null=True, default=None)
-    volunteer_type = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, choices=TYPES, default="MISSIONS")
+    volunteer_type = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, choices=TYPES, default=DEFAULT_TYPE)
     areas = models.ManyToManyField(Area)
     languages = models.ManyToManyField(Language)
     phone_number = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
