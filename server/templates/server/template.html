@@ -57,9 +57,11 @@
                 </li>
             </ul>
             <ul class="navbar-nav mr-auto left">
+                {% if user and user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">{{ user.username }}: התנתק</a>
                 </li>
+                {% endif %}
             </ul>
         </div>
     </nav>

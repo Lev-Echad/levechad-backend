@@ -33,7 +33,6 @@ elif ENV == 'PRODUCTION':
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrapform',
-    'mathfilters'
+    'mathfilters',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
