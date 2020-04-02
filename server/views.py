@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from client.models import Volunteer, HelpRequest, Area, City
+from client.models import Volunteer, HelpRequest, Area
 from django.db.models import F, Q, Count
 from django.core.paginator import Paginator
 import datetime
@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 import xlwt
 
 RESULTS_IN_PAGE = 50
+PAGINATION_SHORTCUT_NUMBER = 7
 
 
 def is_time_between(begin_time, end_time, check_time=None):
@@ -21,16 +22,12 @@ def is_time_between(begin_time, end_time, check_time=None):
 
 
 def get_mandatory_areas(request):
-    mandatory_areas = []
-
     if hasattr(request.user, 'hamaluser') and request.user.hamaluser is not None:
         area = request.user.hamaluser.area
         if area.name == "מרכז":
-            mandatory_areas = Area.objects.all().filter(name__in=["ירושלים והסביבה", "מרכז", "יהודה ושומרון"])
-        else:
-            mandatory_areas = [area]
-
-    return mandatory_areas
+            return ["ירושלים והסביבה", "מרכז", "יהודה ושומרון"]
+        return [area]
+    return list()
 
 
 @login_required
@@ -64,9 +61,17 @@ def index(request):
     return render(request, 'server/server_index.html', context)
 
 
-"""
-also filters by filter
-"""
+def get_close_pages(current_page, pages_count):
+    """
+    Generates lists of pages to link to, before and after, while considering page number and current location in mind.
+    Ammount of pages to each side is defined in PAGINATION_SHORTCUT_NUMBER.
+    :param current_page: current page number
+    :param pages_count: total amount of pages
+    :return: (list of pages to link to before current page, list of pages to link to after current page)
+    """
+    list_pages_before = range(max(1, current_page - PAGINATION_SHORTCUT_NUMBER), current_page)
+    list_pages_after = range(current_page + 1, min(current_page + PAGINATION_SHORTCUT_NUMBER + 1, pages_count)+1)
+    return list_pages_before, list_pages_after
 
 
 @login_required
@@ -81,6 +86,7 @@ def show_all_volunteers(request, page=1):
     guidings = request.GET.getlist('guiding')
     search_first_name = request.GET.getlist('search_first_name')
     search_last_name = request.GET.getlist('search_last_name')
+    search_id = request.GET.getlist('search_id')
 
     if len(get_mandatory_areas(request)) != 0:
         filter_options['areas__name__in'] = get_mandatory_areas(request)
@@ -99,6 +105,9 @@ def show_all_volunteers(request, page=1):
 
     if len(search_last_name) != 0 and search_last_name[0] != '':
         q_option |= Q(last_name=search_last_name[0])
+
+    if len(search_id) != 0 and search_id[0] != '':
+        q_option |= Q(id=search_id[0])
 
     # --------- check time now --------
     now = datetime.datetime.now()
@@ -129,104 +138,89 @@ def show_all_volunteers(request, page=1):
     if 'field' in request.GET:
         field = request.GET.get('field')
         match_qs = match_qs.order_by(field)
+    else:
+        match_qs = match_qs.order_by('id')
 
     # ----- build final data ----
+    paged_data = []
+
+    paginator = Paginator(match_qs, RESULTS_IN_PAGE)
+
+    paged_data = paginator.page(page)
+
     final_data = []
-    for volunteer in match_qs:
+    for volunteer in paged_data:
         valid_certificate = volunteer.get_active_certificates().first()
         final_data.append((volunteer, valid_certificate.id if valid_certificate is not None else -1))
 
-    paginator = Paginator(final_data, RESULTS_IN_PAGE)
-
-    final_data = paginator.page(page)
+    list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
     city_names = list(c.name for c in City.objects.all())
-    context = {'volunteer_data': final_data, 'availability_now_id': availability_now_id, 'page': page,
-               'num_pages': paginator.num_pages, 'city_names': city_names}
+    context = {
+        'volunteer_data': final_data,
+        'availability_now_id': availability_now_id,
+        'city_names': city_names,
+        'page': page,
+        'num_pages': paginator.num_pages,
+        'pages_before': list_pages_before,
+        'pages_after': list_pages_after
+    }
     return render(request, 'server/volunteer_table.html', context)
-
-
-"""
-also filters by filter
-"""
 
 
 @login_required
 def show_all_help_request(request, page=1):
-    qs = HelpRequest.objects.all()
+    filter_options = dict()
+    q_option = Q()
 
     statuses = request.GET.getlist('status')
-    type = request.GET.getlist('type')
     areas = request.GET.getlist('area')
+    types = request.GET.getlist('type')
     search_name = request.GET.getlist('search_name')
+    search_id = request.GET.getlist('search_id')
 
-    something_mark = False
+    if len(statuses) != 0 and '' not in statuses:
+        filter_options['status__in'] = statuses
 
-    status_qs = HelpRequest.objects.none()
-    type_qs = HelpRequest.objects.none()
-    area_qs = HelpRequest.objects.all().none()
-
-    if len(statuses) != 0 and not '' in statuses:
-        something_mark = True
-        status_qs = qs.filter(status=statuses)
-
-    if len(type) != 0 and not '' in type:
-        something_mark = True
-        type_qs = qs.filter(type__in=type)
     if len(get_mandatory_areas(request)) != 0:
-        area_qs = area_qs.filter(area__name__in=get_mandatory_areas(request))
+        filter_options['area__name__in'] = get_mandatory_areas(request)
 
-    if len(areas) != 0 and not '' in areas:
-        something_mark = True
-        area_qs = area_qs.filter(area__name__in=areas)
+    if len(areas) != 0 and '' not in areas:
+        filter_options['area__name__in'] = filter_options.get('area__name__in', list()) + areas
 
-    if len(search_name) != 0:
-        something_mark = True
-        qs = qs.filter(full_name=search_name[0])
+    if len(types) != 0 and '' not in types:
+        filter_options['type__in'] = types
 
-    # union matchings from both categoties
-    match_qs = status_qs.union(type_qs, area_qs)
+    if len(search_name) != 0 and '' not in search_name:
+        filter_options['full_name__icontains'] = search_name[0]
 
-    # if there were no matches display all
-    if len(match_qs) == 0 and (not something_mark):
-        match_qs = HelpRequest.objects.all()
+    if len(search_id) != 0 and search_id[0].strip():
+        q_option |= Q(id=search_id[0])
 
-    match_qs = match_qs.order_by("-id")
+    match_qs = HelpRequest.objects.filter(q_option, **filter_options)
+
+    if 'field' in request.GET:
+        match_qs = match_qs.order_by(request.GET.get('field'))
+    else:
+        match_qs = match_qs.order_by("id")
+
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
     match_qs = paginator.page(page)
 
-    context = {'help_requests': match_qs, 'page': page, 'num_pages': paginator.num_pages}
+    list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
+
+    context = {
+        'help_requests': match_qs,
+        'page': page,
+        'num_pages': paginator.num_pages,
+        'pages_before': list_pages_before,
+        'pages_after': list_pages_after
+    }
     return render(request, 'server/help_table.html', context)
 
 
 """
 also filters by filter
 """
-
-
-@login_required
-def order_help_request(request):
-    qs = HelpRequest.objects.all()
-    statuses = request.POST.getlist('status')
-    type = request.POST.getlist('type')
-
-    status_qs = HelpRequest.objects.none()
-    type_qs = HelpRequest.objects.none()
-
-    if len(statuses) != 0:
-        status_qs = qs.filter(status__in=statuses)
-
-    if len(type) != 0:
-        type_qs = qs.filter(type__in=type)
-
-    # union matchings from both categoties
-    match_qs = status_qs.union(type_qs)
-
-    # if there were no matches display all
-    if len(match_qs) == 0:
-        match_qs = qs
-
-    context = {'help_requests': match_qs}
-    return render(request, 'server/help_table.html', context)
 
 
 @login_required

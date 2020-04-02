@@ -7,20 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:image" content="{% static 'client/logo.png' %}"/>
     <script
-  src="https://code.jquery.com/jquery-3.4.1.min.js"
-  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-  crossorigin="anonymous"></script>
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
-<script
-  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
-  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
-  crossorigin="anonymous"></script>
-<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+    <script
+            src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+            integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
     <link
             rel="stylesheet"
             href="https://cdn.rtlcss.com/bootstrap/v4.2.1/css/bootstrap.min.css"
@@ -30,66 +30,95 @@
 
     <title>{% block title %}{% endblock %}</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'client/icon.png' %}"/>
-<script>
-$(document).ready(function() {
-    $("#id_date_of_birth").datepicker({
-        changeYear: true,
-        dateFormat: 'dd/mm/yy',
-        yearRange: '-100:+0'
-    });
-});
-</script>
+
+    <!-- Facebook Pixel Code -->
+    <script>
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function () {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = !0;
+            n.version = '2.0';
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '929295820770466');
+        fbq('track', 'PageView');
+    </script>
+    <noscript>
+        <img height="1" width="1" src="https://www.facebook.com/tr?id=929295820770466&ev=PageView&noscript=1"/>
+    </noscript>
+    <!-- End Facebook Pixel Code -->
+    <script>
+        $(document).ready(function () {
+            $("#id_date_of_birth").datepicker({
+                changeYear: true,
+                dateFormat: 'dd/mm/yy',
+                yearRange: '-100:+0'
+            });
+        });
+    </script>
+    {% block extra_scripts %}
+    {% endblock %}
 </head>
 <body dir="rtl">
-    <div class="page-wrapper">
-        <div class="back">
-            <nav class="navbar navbar-expand-lg navbar-light">
+<div class="page-wrapper">
+    <div class="back">
+        <nav class="navbar navbar-expand-lg navbar-light">
 
-                <a class="navbar-brand" href="{% url 'client_home' %}">
-                    <img class="logo" src="{% static 'client/logo.png' %}" alt="My image">
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+            <a class="navbar-brand" href="{% url 'client_home' %}">
+                <img class="logo" src="{% static 'client/logo.png' %}" alt="My image">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mr-auto right">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'client_home' %}">דף הבית</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'client_get_help' %}">בקשת עזרה</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'client_volunteer' %}">התנדבות</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'client_get_certificate' %}">מתנדב רשום לקבלת תעודה</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               href="https://www.levechad.org/donates">לתרומות</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               href="https://www.levechad.org/about-us">אודותנו</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </div>
-        <div class="container">
-            {% include "translate.html" %}
-            {% block body %}
-            {% endblock %}
-        </div>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto right">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'client_home' %}">דף הבית</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'client_get_help' %}">בקשת עזרה</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'client_volunteer' %}">התנדבות</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'client_get_certificate' %}">מתנדב רשום לקבלת תעודה</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="https://www.levechad.org/donates">לתרומות</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="https://www.levechad.org/about-us">אודותנו</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     </div>
-    <footer class="page-footer" style="width: 100%; background-color: rgba(0, 0, 0, 0.1);
+    <div class="container">
+        {% include "translate.html" %}
+        {% block body %}
+        {% endblock %}
+    </div>
+</div>
+<footer class="page-footer" style="width: 100%; background-color: rgba(0, 0, 0, 0.1);
     font-size: 12px; justify-content:center; align-items:center;border-top: 4px solid white;">
-        <label class="center"><i> אתר זה נבנה בתרומה ע"י תוכנית תלפיות  </i></label>
-    </footer>
-
+    <label class="center"><i> אתר זה נבנה בתרומה ע"י תוכנית תלפיות </i></label>
+</footer>
 
 
 </body>

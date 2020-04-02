@@ -15,11 +15,16 @@ AREAS = (
     ("דרום", "דרום")
 )
 
+NOT_BLANK_VALIDATOR = RegexValidator(r"^.+$")
+
 json_file = open('./client/city.json', encoding="utf-8")
 data = json.load(json_file)
 onlyNames = [a["name"] for a in data]
 onlyNames.sort()
 CITIES = [(str(x), str(x)) for x in onlyNames]
+
+# Add a blank option to CITIES in order to enable setting the initial value of the ChoiceField to ''.
+CITIES = [('', '')] + CITIES
 json_file.close()
 
 
@@ -54,6 +59,7 @@ class VolunteerForm(forms.Form):
     )
 
     my_validator = RegexValidator(r"^\d+$")
+
     first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     identity = forms.CharField(max_length=ID_LENGTH, validators=[my_validator])
@@ -63,8 +69,8 @@ class VolunteerForm(forms.Form):
     area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
     languages = forms.MultipleChoiceField(choices=get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    email = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    city = forms.ChoiceField(choices=CITIES)
+    email = forms.EmailField()
+    city = forms.ChoiceField(choices=CITIES, initial='', validators=[NOT_BLANK_VALIDATOR])
     neighborhood = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     available_on_saturday = forms.BooleanField(required=False)
@@ -159,11 +165,12 @@ class BaseHelpForm(forms.Form):
         ('OTHER', 'אחר')
     )"""
 
-    my_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
+    phone_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
+
     full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[my_validator])
+    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[phone_validator])
     area = forms.ChoiceField(choices=AREAS)
-    city = forms.ChoiceField(choices=CITIES)
+    city = forms.ChoiceField(choices=CITIES, validators=[NOT_BLANK_VALIDATOR])
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
 
