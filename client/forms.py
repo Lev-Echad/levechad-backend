@@ -1,29 +1,28 @@
-from django import forms
 import json
+
+from django import forms
 from django.core.validators import RegexValidator
 from client.models import Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH, AREAS
+from client.validators import id_number_validator
+
 
 FIELD_NAME_MAPPING = {
 }
 
-# Create your models here.
+NOT_BLANK_VALIDATOR = RegexValidator(r"^.+$")
 
 json_file = open('./client/city.json', encoding="utf-8")
 data = json.load(json_file)
 onlyNames = [a["name"] for a in data]
 onlyNames.sort()
 CITIES = [(str(x), str(x)) for x in onlyNames]
+
+# Add a blank option to CITIES in order to enable setting the initial value of the ChoiceField to ''.
+CITIES = [('', '')] + CITIES
 json_file.close()
 
 
-# class NameForm(forms.Form):
-#     your_name = forms.CharField(label='Your name', max_length=100)
-
-
-# SEND HELP FORM
-# -------------------------------------------------------------------------------------------------------
-
-def get_the_lang_choices():
+def get_lang_choices():
     return [(str(x), str(x)) for x in Language.objects.all()]
 
 
@@ -46,25 +45,23 @@ class VolunteerForm(forms.Form):
         ("NO", "לא"),
     )
 
-    my_validator = RegexValidator(r"^\d+$")
     first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    identity = forms.CharField(max_length=ID_LENGTH, validators=[my_validator])
+    id_number = forms.CharField(max_length=ID_LENGTH, validators=[id_number_validator])
     organization = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     date_of_birth = forms.DateField(input_formats=['%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%d.%m.%Y', '%d.%m.%y'],
                                     required=True)
     area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
-    languages = forms.MultipleChoiceField(choices=get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
+    languages = forms.MultipleChoiceField(choices=get_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    email = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    city = forms.ChoiceField(choices=CITIES)
+    email = forms.EmailField()
+    city = forms.ChoiceField(choices=CITIES, initial='', validators=[NOT_BLANK_VALIDATOR])
     neighborhood = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     available_on_saturday = forms.BooleanField(required=False)
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     transportation = forms.ChoiceField(choices=MOVING_WAYS)
     hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
-    area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
     childrens = forms.ChoiceField(choices=BOOL)
     chamal = forms.ChoiceField(choices=BOOL)
 
@@ -77,7 +74,7 @@ class VolunteerForm(forms.Form):
         super(forms.Form, self).__init__(*args, **kwargs)
         self.fields['first_name'].label = "שם פרטי"
         self.fields['last_name'].label = "שם משפחה"
-        self.fields['identity'].label = "מספר ת.ז"
+        self.fields['id_number'].label = "מספר ת.ז"
         self.fields['organization'].label = "ארגון"
         self.fields['languages'].label = "שפות שאתה דובר"
         self.fields['date_of_birth'].label = "תאריך לידה"
@@ -91,28 +88,26 @@ class VolunteerForm(forms.Form):
         self.fields['notes'].label = "הערות"
         self.fields['transportation'].label = "דרכי התניידות"
         self.fields['hearing_way'].label = "איך שמעת עלינו"
-        self.fields['no_corona1'].label = "אני מאשר\ת כי לא חזרתי מחו''ל ב-14 הימים האחרונים"
-        self.fields[
-            'no_corona2'].label = "אני מאשר\ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
-        self.fields[
-            'no_corona3'].label = "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
-        self.fields[
-            'no_corona4'].label = "אני מאשר\ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
+        self.fields['no_corona1'].label = "אני מאשר/ת כי לא חזרתי מחו\"ל ב-14 הימים האחרונים"
+        self.fields['no_corona2'].label = "אני מאשר/ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
+        self.fields['no_corona3'].label = "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
+        self.fields['no_corona4'].label = "אני מאשר/ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
 
         self.fields['childrens'].label = (
-            "האם את\ה מעוניינ\ת לסייע לעובדים חיוניים (מסגרות חיוניות לילדי צוות רפואי)? - עדיפות ל-3 ימי התנדבות.  "
+            "האם את/ה מעוניינ/ת לסייע לעובדים חיוניים (מסגרות חיוניות לילדי צוות רפואי)? - עדיפות ל-3 ימי התנדבות."
         )
         self.fields['chamal'].label = (
-            " ?האם אתה מתנדב חמ''ל"
+            "?האם אתה מתנדב חמ\"ל"
         )
 
 
 class GetCertificateForm(forms.Form):
-    tz_number = forms.CharField(max_length=9, validators=[RegexValidator(r"^\d+$")], required=True)
+    id_number = forms.CharField(max_length=9, validators=[id_number_validator], required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['tz_number'].label = 'אנא הזן תעודת זהות'
+        self.fields['id_number'].label = 'אנא הזן תעודת זהות'
+
 
 
 class ScheduleForm(forms.Form):
@@ -151,9 +146,10 @@ class BaseHelpForm(forms.Form):
         ('OTHER', 'אחר')
     )"""
 
-    my_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
+    phone_number_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
+
     full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[my_validator])
+    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[phone_number_validator])
     area = forms.ChoiceField(choices=AREAS)
     city = forms.ChoiceField(choices=CITIES)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)

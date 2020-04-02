@@ -78,9 +78,9 @@ def thanks_volunteer(request):
 def homepage(request):
     context = {
         "numbers": {
-            "total_volunteers": Volunteer.objects.count(),
-            "total_help_requests": HelpRequest.objects.count(),
-            "solved_help_requests": HelpRequest.objects.filter(status="DONE").count()
+            "total_volunteers": Volunteer.objects.count() + 1786,
+            "total_help_requests": HelpRequest.objects.count() + 84     #added 1786 and 84 since those are the stats for before this app
+
         }
     }
 
@@ -97,34 +97,38 @@ def volunteer_view(request):
         form = VolunteerForm(request.POST)
         if form.is_valid():
             answer = form.cleaned_data
-            languagesGot = Language.objects.filter(name__in=answer["languages"])
-            areasGot = Area.objects.filter(name__in=answer["area"])
-            keep_mandatory_worker_children = False
-            if answer["childrens"] == "YES":
-                keep_mandatory_worker_children = True
-                
-            volunter_new = Volunteer.objects.create(tz_number=answer["identity"], first_name=answer["first_name"],
-                                     last_name=answer["last_name"],
-                                     email=answer["email"],
-                                     date_of_birth=answer["date_of_birth"], organization=answer['organization'],
-                                     phone_number=answer["phone_number"],
-                                     city=City.objects.get(name=answer["city"]), neighborhood=answer['neighborhood'],
-                                     address=answer["address"],
-                                     available_saturday=answer["available_on_saturday"],
-                                     notes=answer["notes"], moving_way=answer["transportation"],
-                                     hearing_way=answer["hearing_way"],
-                                     keep_mandatory_worker_children=keep_mandatory_worker_children, guiding=False)
-            volunter_new.languages.set(languagesGot)
-            volunter_new.areas.set(areasGot)
-            volunter_new.save()
+            languages = Language.objects.filter(name__in=answer["languages"])
+            areas = Area.objects.filter(name__in=answer["area"])
+
+            volunteer_new = Volunteer.objects.create(
+                tz_number=answer["id_number"],
+                first_name=answer["first_name"],
+                last_name=answer["last_name"],
+                email=answer["email"],
+                date_of_birth=answer["date_of_birth"],
+                organization=answer['organization'],
+                phone_number=answer["phone_number"],
+                city=City.objects.get(name=answer["city"]),
+                neighborhood=answer['neighborhood'],
+                address=answer["address"],
+                available_saturday=answer["available_on_saturday"],
+                notes=answer["notes"],
+                moving_way=answer["transportation"],
+                hearing_way=answer["hearing_way"],
+                keep_mandatory_worker_children=(answer["childrens"] == "YES"),
+                guiding=False
+            )
+            volunteer_new.languages.set(languages)
+            volunteer_new.areas.set(areas)
 
             # creating volunteer certificate
-            volunter_new.get_or_generate_valid_certificate()
+            volunteer_new.get_or_generate_valid_certificate()
 
             # process the data in form.cleaned_data as required
             # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunter_new.pk))
+            # redirect to a new URL:
+            # TODO Don't hardcode URLs, get them by view
+            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunteer_new.pk))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = VolunteerForm()
@@ -194,7 +198,7 @@ def get_certificate_view(request):
         form = GetCertificateForm(request.POST)
         if form.is_valid():
             # TODO: change to 'get' instead of 'first' after fixing #50
-            volunteer = Volunteer.objects.filter(tz_number=form['tz_number'].data).first()
+            volunteer = Volunteer.objects.filter(tz_number=form['id_number'].data).first()
             if volunteer is not None:
                 '''
                  TODO: this a hotfix that generate a valid certificate to any user that requests one. 
@@ -225,7 +229,7 @@ def medic_help(request):
             answer = form.cleaned_data
             type_text = ""
             if (answer["need_prescription"]):
-                type_text = "\nתרופת מרשם"
+                type_text = "תרופת מרשם\n"
 
             areasGot = Area.objects.all().get(name=answer["area"])
             new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
@@ -268,33 +272,6 @@ def other_help(request):
         form = OtherForm()
 
     return render(request, 'help_pages/other.html', {'form': form})
-
-
-def home_help(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = HomeForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            answer = form.cleaned_data
-            areasGot = Area.objects.all().get(name=answer["area"])
-            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
-                                      city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="HOME_HEL",
-                                      type_text=answer["need_text"], area=areasGot)
-            new_request.save()
-
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = HomeForm()
-
-    return render(request, 'help_pages/home.html', {'form': form})
 
 
 def travel_help(request):

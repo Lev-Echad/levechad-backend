@@ -9,6 +9,10 @@
 <a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">שינוי תצוגה</a></p>
 <a href="{% url 'export_help_xls' %}">ייצוא מידע לאקסל</a>
 
+<div>
+    {% include 'snippets/requests_pager.html' %}
+</div>
+
 <table class="table table-hover table-bordered text-center">
     <thead>
         <tr>
@@ -165,24 +169,7 @@
 </table>
 
 <div>
-    {% if page != 1 %}
-    <a href="{% url 'show_all_help_request' %}/{{ page|add:-1 }}?{{ request.META.QUERY_STRING }}">הקודם</a>
-    {% endif %}
-    &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
-    {% if not page == num_pages %}
-    <a href="{% url 'show_all_help_request' %}/{{ page|add:1 }}?{{ request.META.QUERY_STRING }}">הבא</a>
-    {% endif %}
-    {% if page == 1 %}
-    <a href="{% url 'show_all_help_request' %}/{{ page|add:8 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אחרון</a>
-        <a href="{% url 'show_all_help_request' %}/{{ page|add:4 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-    {% endif %}
-     {% if page == 9 %}
-    <a href="{% url 'show_all_help_request' %}/{{ page|add:-8 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;">עמוד ראשון</a>
-        <a href="{% url 'show_all_help_request' %}/{{ page|add:-4 }}?{{ request.META.QUERY_STRING }}" style = "color:black;font-size:10px;border:1px solid black;margin:5px;">עמוד אמצעי</a>
-
-    
-    {% endif %}
+    {% include 'snippets/requests_pager.html' %}
 </div>
 
 
@@ -199,8 +186,12 @@
                                 <h4 class="modal-title w-100 font-weight-bold">בחר את הפילטרים הרצויים</h4>
                               </div>
                               <div class="modal-body mx-3">
-
-                                <div>
+                                  <div>
+                                      <p class="h5"><u>חיפוש לפי מספר פניה</u></p>
+                                      <label for="type">חיפוש לפי מספר פניה</label>
+                                      <input type="text" name="search_id" id="search_id" placeholder="מספר פניה">
+                                  </div>
+                                  <div>
                                     <p class="h5"><u>בחר סטטוסים להצגה</u></p>
 
                                     <div>
