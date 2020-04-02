@@ -271,33 +271,6 @@ def other_help(request):
     return render(request, 'help_pages/other.html', {'form': form})
 
 
-def home_help(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = HomeForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            answer = form.cleaned_data
-            areasGot = Area.objects.all().get(name=answer["area"])
-            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
-                                      city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="HOME_HEL",
-                                      type_text=answer["need_text"], area=areasGot)
-            new_request.save()
-
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = HomeForm()
-
-    return render(request, 'help_pages/home.html', {'form': form})
-
-
 def travel_help(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':

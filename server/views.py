@@ -74,11 +74,6 @@ def get_close_pages(current_page, pages_count):
     return list_pages_before, list_pages_after
 
 
-"""
-also filters by filter
-"""
-
-
 @login_required
 def show_all_volunteers(request, page=1):
     filter_options = dict()
@@ -171,11 +166,6 @@ def show_all_volunteers(request, page=1):
     return render(request, 'server/volunteer_table.html', context)
 
 
-"""
-also filters by filter
-"""
-
-
 @login_required
 def show_all_help_request(request, page=1):
     filter_options = dict()
@@ -230,34 +220,6 @@ def show_all_help_request(request, page=1):
 """
 also filters by filter
 """
-
-
-@login_required
-def order_help_request(request):
-    # TODO: Do we need this function? It's not is use
-
-    qs = HelpRequest.objects.all()
-    statuses = request.POST.getlist('status')
-    type = request.POST.getlist('type')
-
-    status_qs = HelpRequest.objects.none()
-    type_qs = HelpRequest.objects.none()
-
-    if len(statuses) != 0:
-        status_qs = qs.filter(status__in=statuses)
-
-    if len(type) != 0:
-        type_qs = qs.filter(type__in=type)
-
-    # union matchings from both categoties
-    match_qs = status_qs.union(type_qs)
-
-    # if there were no matches display all
-    if len(match_qs) == 0:
-        match_qs = qs
-
-    context = {'help_requests': match_qs}
-    return render(request, 'server/help_table.html', context)
 
 
 @login_required
