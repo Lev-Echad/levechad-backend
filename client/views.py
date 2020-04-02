@@ -78,9 +78,9 @@ def thanks_volunteer(request):
 def homepage(request):
     context = {
         "numbers": {
-            "total_volunteers": Volunteer.objects.count(),
-            "total_help_requests": HelpRequest.objects.count(),
-            "solved_help_requests": HelpRequest.objects.filter(status="DONE").count()
+            "total_volunteers": Volunteer.objects.count() + 1786,
+            "total_help_requests": HelpRequest.objects.count() + 84     #added 1786 and 84 since those are the stats for before this app
+
         }
     }
 
@@ -93,6 +93,7 @@ def get_help(request):
 
 def volunteer_view(request):
     # if this is a POST request we need to process the form data
+    organization = request.GET.get('org', '')
     if request.method == 'POST':
         form = VolunteerForm(request.POST)
         if form.is_valid():
@@ -105,7 +106,7 @@ def volunteer_view(request):
                 first_name=answer["first_name"],
                 last_name=answer["last_name"],
                 email=answer["email"],
-                age=answer["age"],
+                date_of_birth=answer["date_of_birth"],
                 organization=answer['organization'],
                 phone_number=answer["phone_number"],
                 city=City.objects.get(name=answer["city"]),
@@ -131,9 +132,9 @@ def volunteer_view(request):
             return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunteer_new.pk))
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = VolunteerForm()
+        form = VolunteerForm(initial={'organization': organization})
 
-    return render(request, 'volunteer.html', {'form': form})
+    return render(request, 'volunteer.html', {'form': form, 'organization': organization})
 
 
 def schedule(request):

@@ -2,13 +2,24 @@
 {% load bootstrap %}
 
 {% block title %}לב אחד - התנדב{% endblock %}
-
+{% block extra_scripts %}
+    <!-- send page view notification to facebook !-->
+    <script>
+        fbq('track', 'ViewContent');
+    </script>
+{% endblock %}
 
 {% block body %}
 
 <div id="aboutvolu">
     <p>
-        <span style ="font-size=30px;">שלום לכל המתנדבים!</span>
+        <span style ="font-size=30px;">
+            {% if organization %}
+                מתנדב '{{ organization }}' היקר!
+            {% else %}
+                שלום לכל המתנדבים!
+            {% endif %}
+        </span>
         <br>
         <strong>מגוון הפעולות הנדרשות משתנה בהתאם לצרכים אולם רוב הבקשות לסיוע הן מהתחומים הבאים:</strong>
         <ul>
