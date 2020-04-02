@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from client.models import Volunteer, HelpRequest, Area
+from client.models import Volunteer, HelpRequest, Area, City
 from django.db.models import F, Q, Count
 from django.core.paginator import Paginator
 import datetime
@@ -159,6 +159,7 @@ def show_all_volunteers(request, page=1):
         'volunteer_data': final_data,
         'availability_now_id': availability_now_id,
         'city_names': city_names,
+        'default_volunteer_type': Volunteer.DEFAULT_TYPE,
         'page': page,
         'num_pages': paginator.num_pages,
         'pages_before': list_pages_before,

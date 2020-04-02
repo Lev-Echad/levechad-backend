@@ -19,7 +19,9 @@
                             <label for="type">סוג:</label>
                             <select name="volunteer_type" id="volunteer_type">
                                 {% for choice, choice_name in volunteer.TYPES %}
-                                <option value={{ choice }}>{{ choice_name }}</option>
+                                <option value={{ choice }} {% if choice == default_volunteer_type %}selected{% endif %}>
+                                    {{ choice_name }}
+                                </option>
                                 {% endfor %}
 
                             </select>
