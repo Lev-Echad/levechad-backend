@@ -279,8 +279,14 @@ def help_edit_stat(request, pk):
     if request.POST.get('user_name') is not None:
         to_edit.status_updater = request.POST.get('user_name')
 
+    if request.POST.get('area') is not None:
+        new_area = request.POST.get('area')
+        area_to_change = Area.objects.all().get(name=new_area)
+        to_edit.area = area_to_change
+
     if request.POST.get('notes') is not None:
         to_edit.notes = request.POST.get('notes')
+
 
     if request.POST.get('volunteer_id') is not None:
         volunteer_id = request.POST.get('volunteer_id')

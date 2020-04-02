@@ -93,7 +93,6 @@ def get_help(request):
 
 def volunteer_view(request):
     # if this is a POST request we need to process the form data
-    organization = request.GET.get('org', '')
     if request.method == 'POST':
         form = VolunteerForm(request.POST)
         if form.is_valid():
@@ -128,9 +127,9 @@ def volunteer_view(request):
             return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunter_new.pk))
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = VolunteerForm(initial={'organization': organization})
+        form = VolunteerForm()
 
-    return render(request, 'volunteer.html', {'form': form, 'organization': organization})
+    return render(request, 'volunteer.html', {'form': form})
 
 
 def schedule(request):

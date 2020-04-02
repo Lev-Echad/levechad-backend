@@ -1,19 +1,12 @@
 from django import forms
 import json
 from django.core.validators import RegexValidator
-from client.models import Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
+from client.models import Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH, AREAS
 
 FIELD_NAME_MAPPING = {
 }
 
 # Create your models here.
-AREAS = (
-    ("צפון", "צפון"),
-    ("ירושלים והסביבה", "ירושלים והסביבה"),
-    ("מרכז", "מרכז"),
-    ("יהודה ושומרון", "יהודה ושומרון"),
-    ("דרום", "דרום")
-)
 
 json_file = open('./client/city.json', encoding="utf-8")
 data = json.load(json_file)
@@ -86,7 +79,6 @@ class VolunteerForm(forms.Form):
         self.fields['last_name'].label = "שם משפחה"
         self.fields['identity'].label = "מספר ת.ז"
         self.fields['organization'].label = "ארגון"
-        self.fields['organization'].widget.attrs['readonly'] = True
         self.fields['languages'].label = "שפות שאתה דובר"
         self.fields['date_of_birth'].label = "תאריך לידה"
         self.fields['phone_number'].label = "מספר פלאפון"
