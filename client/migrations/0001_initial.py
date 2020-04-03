@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                 ('updated_date', models.DateTimeField(editable=False, null=True)),
                 ('tz_number', models.CharField(blank=True, max_length=11)),
                 ('full_name', models.CharField(max_length=200)),
-                ('age', models.IntegerField()),
+                ('age', models.IntegerField(null=True)),
                 ('phone_number', models.CharField(max_length=200)),
                 ('email', models.CharField(blank=True, max_length=200)),
                 ('address', models.CharField(max_length=200)),

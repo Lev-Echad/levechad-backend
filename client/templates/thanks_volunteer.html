@@ -1,7 +1,12 @@
 {% extends "template.html" %}
 
 {% block title %}לב אחד - דף הבית{% endblock %}
-
+{% block extra_scripts %}
+    <!-- send lead notification to facebook !-->
+    <script>
+        fbq('track', 'Lead');
+    </script>
+{% endblock %}
 
 {% block body %}
     <h1>תודה רבה מתנדב יקר!</h1>

@@ -1,6 +1,6 @@
 # coding=utf-8
 import io
-from datetime import date
+from datetime import timedelta, date
 
 import boto3
 from PIL import Image, ImageDraw, ImageFont
@@ -12,6 +12,10 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 
+from django.dispatch import receiver
+from django.db.models.signals import pre_save
+
+from client.validators import id_number_validator
 
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
@@ -58,7 +62,7 @@ class City(models.Model):
 
 
 class VolunteerSchedule(Timestampable):
-    end_date = models.DateField(null=True)
+    end_date = models.DateField(null=True, blank=True)
     Sunday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
     Monday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
     Tuesday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
@@ -80,6 +84,7 @@ class Volunteer(Timestampable):
         ("RAD_TV", "רדיו וטלוויזיה"),
         ("OTHR", "אחר")
     )
+    DEFAULT_TYPE = "MISSIONS"
     TYPES = (
         ("NIGHBORHOOD_COORDINATOR", "רכז שכונה"),
         ("CITY_COORDINATOR", "רכז עיר"),
@@ -87,8 +92,8 @@ class Volunteer(Timestampable):
         ("HAMAL", "חמל"),
         ("PROJECT", "פרויקט"),
         ("CHILD_CARE", "משפחתון"),
-        ("MISSIONS", "משימות"),
-        ("AGRICULTURE", "חקלאות")
+        ("AGRICULTURE", "חקלאות"),
+        (DEFAULT_TYPE, "משימות")
     )
 
     _original_values = {
@@ -136,18 +141,17 @@ class Volunteer(Timestampable):
         """
         return self.certificates.filter(expiration_date__gte=date.today()).order_by('-expiration_date')
 
-    tz_number = models.CharField(max_length=ID_LENGTH, blank=True)
+    tz_number = models.CharField(max_length=ID_LENGTH, blank=True, validators=[id_number_validator])
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
-    full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
-    age = models.IntegerField(null=True, default=None)
+    age = models.IntegerField(null=True, blank=True, default=None)
     date_of_birth = models.DateField(null=True, default=None)
-    volunteer_type = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, choices=TYPES, default="MISSIONS")
+    volunteer_type = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, choices=TYPES, default=DEFAULT_TYPE)
     areas = models.ManyToManyField(Area)
     languages = models.ManyToManyField(Language)
     phone_number = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    email = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
+    email = models.EmailField(blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     neighborhood = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
@@ -157,7 +161,14 @@ class Volunteer(Timestampable):
     notes = models.CharField(max_length=5000, blank=True)
     moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS)
-    schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, null=True)
+    schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
+
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
+    def __str__(self):
+        return self.full_name
 
 
 class VolunteerCertificate(models.Model):
@@ -253,12 +264,12 @@ class HelpRequest(Timestampable):
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    notes = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    notes = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True, null=True)
     type = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=TYPES)
     type_text = models.CharField(max_length=5000)
     status = models.CharField(max_length=25, choices=STATUSES, blank=True, default="WAITING")
     status_updater = models.CharField(max_length=100, blank=True)
-    helping_volunteer = models.ForeignKey(Volunteer, on_delete=models.SET_NULL, null=True)
+    helping_volunteer = models.ForeignKey(Volunteer, on_delete=models.SET_NULL, null=True, blank=True)
 
 
 class HamalUser(models.Model):
@@ -267,3 +278,14 @@ class HamalUser(models.Model):
 
     def __str__(self):
         return str(self.area)
+
+
+@receiver(pre_save, sender=Volunteer)
+@receiver(pre_save, sender=VolunteerCertificate)
+@receiver(pre_save, sender=VolunteerSchedule)
+def pre_save_handler(sender, instance, *args, **kwargs):
+    """
+    Django doesn't validate fields before saving by calling clean functions because of compatibility issues. This does.
+    See https://docs.djangoproject.com/en/3.0/ref/models/instances/#validating-objects
+    """
+    instance.full_clean()

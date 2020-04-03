@@ -14,7 +14,6 @@ urlpatterns = [
     path('schedule', views.schedule),
 
     path('get_help', views.get_help, name='client_get_help'),
-    path('help/home', views.home_help),
     path('help/medic', views.medic_help),
     path('help/other', views.other_help),
     path('help/phone', views.phone_help),
