@@ -1,9 +1,17 @@
 # coding=utf-8
+import io
 from datetime import timedelta, date
 
+import boto3
+from PIL import Image, ImageDraw, ImageFont
+from bidi.algorithm import get_display
+
+from django.contrib.staticfiles import finders
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
 
@@ -68,7 +76,7 @@ class Volunteer(Timestampable):
     MOVING_WAYS = (
         ("CAR", "רכב"),
         ("PUBL", "תחבצ"),
-        ("FOOT","רגלית")
+        ("FOOT", "רגלית")
     )
     HEARING_WAYS = (
         ("FB_INST", "פייסבוק ואינסטגרם"),
@@ -88,6 +96,36 @@ class Volunteer(Timestampable):
         (DEFAULT_TYPE, "משימות")
     )
 
+    _original_values = {
+        'first_name': None,
+        'last_name': None,
+        'tz_number': None
+    }
+
+    def _update_original_values(self):
+        """
+        Updates the dict used to keep track of changes in certain fields between changes
+        """
+        self._original_values['tz_number'] = self.tz_number
+        self._original_values['first_name'] = self.first_name
+        self._original_values['last_name'] = self.last_name
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._update_original_values()
+
+    def save(self, *args, **kwargs):
+        if self.id is not None:
+            for key, value in self._original_values.items():
+                if getattr(self, key) != value:
+                    # A change occurred in one of the fields listed in the dict - update valid certificates images
+                    for certificate in self.get_active_certificates():
+                        certificate.create_image()
+
+                    break
+
+        super().save(*args, **kwargs)
+        self._update_original_values()
 
     def get_or_generate_valid_certificate(self):
         certificate = self.get_active_certificates().first()
@@ -97,7 +135,11 @@ class Volunteer(Timestampable):
         return certificate
 
     def get_active_certificates(self):
-        return self.certificates.filter(expiration_date__gte=date.today())
+        """
+        Returns the active certificates a volunteer has, ordered by expiration date (first certificate has
+        most time to live)
+        """
+        return self.certificates.filter(expiration_date__gte=date.today()).order_by('-expiration_date')
 
     tz_number = models.CharField(max_length=ID_LENGTH, blank=True, validators=[id_number_validator])
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
@@ -130,8 +172,72 @@ class Volunteer(Timestampable):
 
 
 class VolunteerCertificate(models.Model):
+    CERTIFICATE_TEXT_COLOR = (3, 8, 12)  # (R, G, B)
+    CERTIFICATE_TEXT_SIZE = 40
+    CERTIFICATE_TEXT_POSITION = (700, 200)
+    IMAGE_PATH = 'certificates/{id}.png'
+    DOWNLOAD_LINK_EXPIRATION_SECONDS = 600
+
+    def _certificate_image_path(self, filename):
+        return type(self).IMAGE_PATH.format(id=self.id)
+
     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='certificates', null=False)
     expiration_date = models.DateField(default=date.today)
+    _image = models.FileField(blank=True, upload_to=_certificate_image_path)
+
+    def create_image(self, save=True):
+        volunteer = self.volunteer
+        tag_filename = finders.find('client/tag.jpeg')
+        font_filename = finders.find('client/fonts/BN Amnesia.ttf')
+        photo = None
+        try:
+            photo = Image.open(tag_filename)
+            drawing = ImageDraw.Draw(photo)
+            font = ImageFont.truetype(font_filename, size=type(self).CERTIFICATE_TEXT_SIZE)
+
+            lines_to_insert = [
+                f'שם מתנדב: {volunteer.first_name} {volunteer.last_name}',
+                f'תעודת זהות: {volunteer.tz_number}',
+                f'תוקף התעודה: {self.expiration_date}',
+                f'מספר תעודה: {self.id}',
+            ]
+
+            drawing.text(
+                type(self).CERTIFICATE_TEXT_POSITION,
+                get_display('\n'.join(lines_to_insert)),
+                fill=type(self).CERTIFICATE_TEXT_COLOR,
+                font=font,
+                align='right'
+            )
+            with io.BytesIO() as output:
+                photo.save(output, format='png')
+                self._image.save(type(self).IMAGE_PATH.format(id=self.id), ContentFile(output.getvalue()), save=save)
+        finally:
+            if photo is not None:
+                photo.close()
+
+    def update_image_if_nonexistent(self, save=True):
+        if not self._image.name:
+            self.create_image(save=save)
+
+    @property
+    def image(self):
+        if self.id is not None:
+            self.update_image_if_nonexistent()
+        return self._image
+
+    @property
+    def image_download_url(self):
+        s3 = boto3.client('s3')
+        return s3.generate_presigned_url(
+            'get_object',
+            Params={
+                'Bucket': 'levechad-media-bucket',
+                'Key': 'media/{}'.format(type(self).IMAGE_PATH.format(id=self.id)),
+                'ResponseContentDisposition': 'attachment;filename={}'.format(f'{self.id}.png'),
+            },
+            ExpiresIn=type(self).DOWNLOAD_LINK_EXPIRATION_SECONDS
+        )
 
 
 class HelpRequest(Timestampable):

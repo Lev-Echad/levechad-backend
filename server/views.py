@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area, City
 from django.db.models import F, Q, Count
 from django.core.paginator import Paginator
+
 from django.http import HttpResponse, HttpResponseBadRequest
 
 import server.xls_exporter
@@ -143,7 +144,6 @@ def show_all_volunteers(request, page=1):
         match_qs = match_qs.order_by('id')
 
     # ----- build final data ----
-    paged_data = []
 
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
 
@@ -152,7 +152,7 @@ def show_all_volunteers(request, page=1):
     final_data = []
     for volunteer in paged_data:
         valid_certificate = volunteer.get_active_certificates().first()
-        final_data.append((volunteer, valid_certificate.id if valid_certificate is not None else -1))
+        final_data.append((volunteer, valid_certificate))
 
     list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
     city_names = list(c.name for c in City.objects.all())
@@ -408,11 +408,12 @@ def export_users_xls(request):
 def create_volunteer_certificate(request, volunteer_id):
     try:
         volunteer = Volunteer.objects.get(id=volunteer_id)
-        certificate = volunteer.get_or_generate_valid_certificate()
+        volunteer.get_or_generate_valid_certificate()
     except Volunteer.DoesNotExist:
         return HttpResponseBadRequest()
 
-    return redirect('volunteer_certificate', pk=certificate.id)
+    next_page_name = request.GET.get('next', 'index')
+    return redirect(next_page_name)
 
 
 def export_help_xls(request):

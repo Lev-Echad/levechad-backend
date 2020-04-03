@@ -1,0 +1,18 @@
+{% extends "template.html" %}
+{% load bootstrap %}
+
+{% block title %}לב אחד - התנדב{% endblock %}
+
+
+{% block body %}
+    {% if certificate is not None %}
+        {% include "components/get_certificate.html" %}
+    {% else %}
+        <a style="color: red">{{ error }}</a>
+        <form action="{% url 'client_find_certificate' %}" method="post">
+            {% csrf_token %}
+            {{ form|bootstrap }}
+            <input type="submit" class="btn btn-danger" value="חפש תעודה">
+        </form>
+    {% endif %}
+{% endblock %}

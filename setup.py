@@ -36,3 +36,5 @@ with open('cities.json', encoding="utf-8") as json_file:
         cities.append(City(name=p['name'], x=p['x'], y=p['y']))
 
     City.objects.bulk_create(cities)
+
+os.makedirs('mediafiles/certificates', exist_ok=True)
