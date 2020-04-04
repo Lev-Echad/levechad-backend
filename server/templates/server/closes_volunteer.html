@@ -153,6 +153,8 @@
             <th scope="col">#</th>
             <th scope="col">שם פרטי</th>
             <th scope="col">שם משפחה</th>
+            <th scope="col">תאריך הצטרפות</th>
+            <th scope="col">ארגון</th>
             <th scope="col">גיל</th>
             <th scope="col">אזור</th>
             <th scope="col">שפה</th>
@@ -173,6 +175,8 @@
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.first_name }}</td>
                 <td>{{ volunteer.last_name }}</td>
+                <td>{{ volunteer.created_date|date:"d/m/Y" }}</td>
+                <td>{{ volunteer.organization }}</td>
                 <td>
                     {% if volunteer.age %}
                         {{ volunteer.age }}
