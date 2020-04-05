@@ -10,6 +10,12 @@
     {% else %}
         <a style="color: red">{{ error }}</a>
         <form action="{% url 'client_find_certificate' %}" method="post">
+            <p>
+                רק מתנדבים רשומים במערכת רשאים להנפיק תעודה.
+                <br />
+                עוד לא נרשמתם כמתנדבים?
+                <a href="{% url 'client_volunteer' %}">לחצו כאן</a>
+            </p>
             {% csrf_token %}
             {{ form|bootstrap }}
             <input type="submit" class="btn btn-danger" value="חפש תעודה">
