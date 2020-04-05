@@ -3,7 +3,7 @@ import json
 from django import forms
 from django.core.validators import RegexValidator
 
-from client.models import Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
+from client.models import HelpRequest, Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
 from client.validators import id_number_validator
 
 FIELD_NAME_MAPPING = {
@@ -17,21 +17,27 @@ AREAS = (
     ("דרום", "דרום")
 )
 
-NOT_BLANK_VALIDATOR = RegexValidator(r"^.+$")
-
 json_file = open('./client/city.json', encoding="utf-8")
 data = json.load(json_file)
 onlyNames = [a["name"] for a in data]
 onlyNames.sort()
 CITIES = [(str(x), str(x)) for x in onlyNames]
 
-# Add a blank option to CITIES in order to enable setting the initial value of the ChoiceField to ''.
-CITIES = [('', '')] + CITIES
 json_file.close()
 
 
 def get_lang_choices():
     return [(str(x), str(x)) for x in Language.objects.all()]
+
+
+class NoDefaultChoiceField(forms.ChoiceField):
+    """
+    A choice field with a blank option at the beginning.
+    """
+    def __init__(self, *args, choices=None, **kwargs):
+        if choices is not None:
+            choices = [('', '')] + list(choices)
+        super().__init__(*args, choices=choices, initial='', **kwargs)
 
 
 class VolunteerForm(forms.Form):
@@ -63,15 +69,15 @@ class VolunteerForm(forms.Form):
     languages = forms.MultipleChoiceField(choices=get_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     email = forms.EmailField()
-    city = forms.ChoiceField(choices=CITIES, initial='', validators=[NOT_BLANK_VALIDATOR])
+    city = NoDefaultChoiceField(choices=CITIES)
     neighborhood = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     available_on_saturday = forms.BooleanField(required=False)
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
-    transportation = forms.ChoiceField(choices=MOVING_WAYS)
-    hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
-    childrens = forms.ChoiceField(choices=BOOL)
-    chamal = forms.ChoiceField(choices=BOOL)
+    transportation = NoDefaultChoiceField(choices=MOVING_WAYS)
+    hearing_way = NoDefaultChoiceField(choices=HEARING_WAYS)
+    childrens = NoDefaultChoiceField(choices=BOOL)
+    chamal = NoDefaultChoiceField(choices=BOOL)
 
     no_corona1 = forms.BooleanField()
     no_corona2 = forms.BooleanField()
@@ -118,7 +124,6 @@ class GetCertificateForm(forms.Form):
         self.fields['id_number'].label = 'אנא הזן תעודת זהות'
 
 
-
 class ScheduleForm(forms.Form):
     TIMES = (
         ("1", "בוקר"),
@@ -148,24 +153,15 @@ class ScheduleForm(forms.Form):
 # -------------------------------------------------------------------------------------------------------
 
 class BaseHelpForm(forms.Form):
-    """TYPES = (
-        ('BUYIN', 'קניות\\איסוף'),
-        ('MEDICI', 'תרופות'),
-        ('PHONE_HEL', 'תמיכה טלפונית'),
-        ('OTHER', 'אחר')
-    )"""
-
     phone_number_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
 
     full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[phone_number_validator])
-    area = forms.ChoiceField(choices=AREAS)
-    city = forms.ChoiceField(choices=CITIES)
+    area = NoDefaultChoiceField(choices=AREAS)
+    city = NoDefaultChoiceField(choices=CITIES)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    request_reason = NoDefaultChoiceField(choices=HelpRequest.REQUEST_REASONS)
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
-
-    # type = forms.ChoiceField(choices=TYPES)
-    # type_text = forms.CharField(max_length=5000)
 
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
@@ -175,20 +171,11 @@ class BaseHelpForm(forms.Form):
         self.fields['city'].label = "עיר מגורים"
         self.fields['address'].label = "כתובת מגורים"
         self.fields['notes'].label = "הערות"
+        self.fields['request_reason'].label = 'סיבת הבקשה'
 
 
-# class HomeForm(BaseHelpForm):
-#     need_text = forms.CharField(widget=forms.Textarea, max_length=5000)
-
-#     def __init__(self, *args, **kwargs):
-#         super(BaseHelpForm, self).__init__(*args, **kwargs)
-#         self.fields['full_name'].label = "שם מלא"
-#         self.fields['phone_number'].label = "מספר פלאפון"
-#         self.fields['area'].label = "אזור"
-#         self.fields['city'].label = "עיר מגורים"
-#         self.fields['address'].label = "כתובת מגורים"
-#         self.fields['notes'].label = "הערות"
-#         self.fields['need_text'].label = "מהי העזרה שאתה צריך"
+class PhoneHelpForm(BaseHelpForm):
+    pass
 
 
 class MedicForm(BaseHelpForm):
@@ -196,13 +183,7 @@ class MedicForm(BaseHelpForm):
     medic_name = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
-        self.fields['notes'].label = "הערות"
+        super().__init__(*args, **kwargs)
         self.fields['need_prescription'].label = "האם מדובר בתרופת מרשם"
         self.fields['medic_name'].label = "שם תרופה"
 
@@ -211,29 +192,18 @@ class OtherForm(BaseHelpForm):
     other_need = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
-        self.fields['notes'].label = "הערות"
-        self.fields[
-            'other_need'].label = "פרט לאיזו עזרה אתה זקוק" + "\n" + \
-                                  "(הארגון אינו תומך בסיוע כלכלי,נוכל להפנות לגורמים הרלוונטיים)"
+        super().__init__(*args, **kwargs)
+        self.fields['other_need'].label = '\n'.join([
+            'פרט לאיזו עזרה אתה זקוק',
+            '(הארגון אינו תומך בסיוע כלכלי,נוכל להפנות לגורמים הרלוונטיים)',
+        ])
 
 
 class ShoppingForm(BaseHelpForm):
     to_buy = forms.CharField(max_length=5000, widget=forms.Textarea)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
-        self.fields['notes'].label = "הערות"
+        super().__init__(*args, **kwargs)
         self.fields['to_buy'].label = "הכנס את רשימת הקניות שלך"
 
 
@@ -241,14 +211,8 @@ class TravelForm(BaseHelpForm):
     travel_need = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
-        self.fields['notes'].label = "הערות"
-        self.fields['travel_need'].label = "'פרט את מסלול הנסיעה הנדרש"
+        super().__init__(*args, **kwargs)
+        self.fields['travel_need'].label = "פרט את מסלול הנסיעה הנדרש"
 
 
 class WorkersForm(BaseHelpForm):
@@ -256,12 +220,7 @@ class WorkersForm(BaseHelpForm):
     workplace_need = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
+        super().__init__(*args, **kwargs)
         self.fields['notes'].label = "הערות"
 
         self.fields['workplace_name'].label = "שם המוסד בו את/ה עובד"

@@ -132,34 +132,6 @@ def schedule(request):
     return render(request, 'schedule.html', {'form': form, 'id': request.GET.get('vol_id', '')})
 
 
-def shopping_help(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = ShoppingForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            answer = form.cleaned_data
-            areasGot = Area.objects.all().get(name=answer["area"])
-
-            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
-                                      city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="BUYIN",
-                                      type_text=answer["to_buy"], area=areasGot)
-            new_request.save()
-
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = ShoppingForm()
-
-    return render(request, 'help_pages/shopping.html', {'form': form})
-
-
 def find_certificate_view(request):
     context = {'form': GetCertificateForm()}
     if request.method == 'POST':
@@ -187,140 +159,108 @@ def find_certificate_view(request):
     return render(request, 'find_certificate.html', context=context)
 
 
-def medic_help(request):
-    # if this is a POST request we need to process the form data
+# === HELP VIEWS ===
+def help_view(request, template_path, form_class, request_type_name, type_text_gen):
+    """
+    A generic help view that can be extended by the specific help views.
+    :param request: The request as received from django
+    :param template_path: The path to the template of this help request view
+    :param form_class: The class of the form used (in forms.py)
+    :param request_type_name: The string type of the request (keys of HelpRequest.TYPES)
+    :param type_text_gen: A function that takes the answer (list, form.cleaned_data) and returns the type_text field
+    """
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = MedicForm(request.POST)
-        # check whether it's valid:
+        form = form_class(request.POST)
         if form.is_valid():
             answer = form.cleaned_data
-            type_text = ""
-            if (answer["need_prescription"]):
-                type_text = "תרופת מרשם\n"
+            areas = Area.objects.all().get(name=answer['area'])
 
-            areasGot = Area.objects.all().get(name=answer["area"])
-            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
-                                      city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="MEDICI",
-                                      type_text=type_text + answer["medic_name"], area=areasGot)
+            new_request = HelpRequest(
+                full_name=answer['full_name'],
+                phone_number=answer['phone_number'],
+                city=City.objects.get(name=answer['city']),
+                address=answer['address'],
+                notes=answer['notes'],
+                type=request_type_name,
+                request_reason=answer['request_reason'],
+                type_text=type_text_gen(answer),
+                area=areas
+            )
             new_request.save()
 
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:y
             return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = MedicForm()
+        form = form_class()
 
-    return render(request, 'help_pages/medic.html', {'form': form})
+    return render(request, template_path, {'form': form})
+
+
+def shopping_help(request):
+    return help_view(
+        request,
+        'help_pages/shopping.html',
+        ShoppingForm,
+        'BUYIN',
+        lambda answer: answer['to_buy']
+    )
+
+
+def medic_help(request):
+    def generate_type_text(answer):
+        type_text = ''
+        if answer['need_prescription']:
+            type_text = 'תרופת מרשם\n'
+        return type_text + answer['medic_name']
+
+    return help_view(
+        request,
+        'help_pages/medic.html',
+        MedicForm,
+        'MEDICI',
+        generate_type_text
+    )
 
 
 def other_help(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = OtherForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            answer = form.cleaned_data
-            areasGot = Area.objects.all().get(name=answer["area"])
-            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
-                                      city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="OTHER",
-                                      type_text=answer["other_need"], area=areasGot)
-            new_request.save()
-
-            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = OtherForm()
-
-    return render(request, 'help_pages/other.html', {'form': form})
+    return help_view(
+        request,
+        'help_pages/other.html',
+        OtherForm,
+        'OTHER',
+        lambda answer: answer['other_need']
+    )
 
 
 def travel_help(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = TravelForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            answer = form.cleaned_data
-            areasGot = Area.objects.all().get(name=answer["area"])
-
-            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
-                                      city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="TRAVEL",
-                                      type_text=answer["travel_need"], area=areasGot)
-            new_request.save()
-
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = TravelForm()
-
-    return render(request, 'help_pages/travel.html', {'form': form})
+    return help_view(
+        request,
+        'help_pages/travel.html',
+        TravelForm,
+        'TRAVEL',
+        lambda answer: answer['travel_need']
+    )
 
 
 def phone_help(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = BaseHelpForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            answer = form.cleaned_data
-            areasGot = Area.objects.all().get(name=answer["area"])
-
-            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
-                                      city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="PHONE_HEL",
-                                      type_text="", area=areasGot)
-            new_request.save()
-
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = BaseHelpForm()
-
-    return render(request, 'help_pages/phone.html', {'form': form})
+    return help_view(
+        request,
+        'help_pages/phone.html',
+        PhoneHelpForm,
+        'PHONE_HEL',
+        lambda answer: ''
+    )
 
 
 def workers_help(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = WorkersForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            answer = form.cleaned_data
-            areasGot = Area.objects.all().get(name=answer["area"])
+    def generate_type_text(answer):
+        return f'שם מוסד העבודה: {answer["workplace_name"]}\n{answer["workplace_need"]}'
 
-            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
-                                      city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="WORKERS_HELP",
-                                      type_text="", area=areasGot)
-            new_request.save()
-
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = WorkersForm()
-
-    return render(request, 'help_pages/workers.html', {'form': form})
+    return help_view(
+        request,
+        'help_pages/workers.html',
+        WorkersForm,
+        'VITAL_WORK',
+        generate_type_text
+    )

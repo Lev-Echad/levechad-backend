@@ -430,6 +430,7 @@ def export_help_xls(request):
         'phone_number': 'טלפון',
         'area': 'איזור',
         'address': 'כתובת',
+        'request_reason': 'סיבת הבקשה',
         'city': 'עיר',
         'type': 'סוג פנייה',
         'notes': 'הערות',
