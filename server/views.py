@@ -3,7 +3,7 @@ import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area, City
-from django.db.models import F, Q, Count
+from django.db.models import F, Q, Count, DateTimeField
 from django.core.paginator import Paginator
 
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -179,6 +179,7 @@ def show_all_help_request(request, page=1):
     types = request.GET.getlist('type')
     search_name = request.GET.getlist('search_name')
     search_id = request.GET.getlist('search_id')
+    create_date = request.GET.getlist('create_date')
 
     if len(statuses) != 0 and '' not in statuses:
         filter_options['status__in'] = statuses
@@ -197,6 +198,11 @@ def show_all_help_request(request, page=1):
 
     if len(search_id) != 0 and search_id[0].strip():
         q_option |= Q(id=search_id[0])
+
+    if len(create_date) != 0 and '' not in create_date:
+        start_date = DateTimeField().to_python(create_date[0])
+        end_date = start_date + datetime.timedelta(days=1)
+        filter_options['created_date__range'] = (start_date, end_date)
 
     match_qs = HelpRequest.objects.filter(q_option, **filter_options)
 
