@@ -112,9 +112,10 @@ class Volunteer(Timestampable):
         ("OTHER", "אחר"),
     )
 
-    SEXES = (
+    GENDERS = (
         ('MALE', 'זכר'),
-        ('FEMALE', 'נקבה')
+        ('FEMALE', 'נקבה'),
+        ('OTHER', 'מגדר אחר'),
     )
 
     _original_values = {
@@ -167,7 +168,7 @@ class Volunteer(Timestampable):
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True, default=None)
-    sex = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=SEXES, null=True, default=None)
+    gender = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=GENDERS, null=True, default=None)
     date_of_birth = models.DateField(null=True, default=None)
     # What is volunteer_type? wanted_assignments is kind of the same...
     volunteer_type = models.CharField(
