@@ -5,6 +5,7 @@ from rest_framework import viewsets, generics, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from client.models import Volunteer, VolunteerSchedule
 from api.serializers import VolunteerSerializer, RegistrationSerializer
@@ -67,3 +68,4 @@ class RegistrationAPIViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 class ListVolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Volunteer.objects.all().order_by('-created_date')
     serializer_class = VolunteerSerializer
+    permission_classes = [IsAuthenticated]
