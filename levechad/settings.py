@@ -172,11 +172,11 @@ LOGIN_REDIRECT_URL = '/server'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-if ENV != 'PRODUCTION':
-    # In development, let django serve static files (and media files in urls.py)
-    STATIC_URL = '/static/'
-    MEDIA_URL = '/media/'
-else:
+if ENV == 'PRODUCTION':
+    # Enforcing TLS/SLL
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+
     # In production, use S3 to serve static & media files
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
@@ -195,6 +195,10 @@ else:
     PUBLIC_MEDIA_LOCATION = 'media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
     DEFAULT_FILE_STORAGE = 'levechad.storage_backends.PublicMediaStorage'
+else:
+    # In development, let django serve static files (and media files in urls.py)
+    STATIC_URL = '/static/'
+    MEDIA_URL = '/media/'
 
 
 # Django Rest Framework configuration

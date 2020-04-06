@@ -7,6 +7,7 @@ django-bootstrap-form==3.4
 django-extensions==2.2.9
 django-mathfilters==1.0.0
 django-storages==1.9.1
+django-multiselectfield==0.1.12
 docutils==0.15.2
 gunicorn==20.0.4
 jmespath==0.9.5
