@@ -38,6 +38,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'client.apps.ClientConfig',
     'server.apps.ServerConfig',
+    'api.apps.ApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'mathfilters',
     'storages',
     'django_extensions',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -193,3 +195,13 @@ else:
     PUBLIC_MEDIA_LOCATION = 'media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
     DEFAULT_FILE_STORAGE = 'levechad.storage_backends.PublicMediaStorage'
+
+
+# Django Rest Framework configuration
+_renderer_classes = ['rest_framework.renderers.JSONRenderer']
+if ENV != 'PRODUCTION':
+    _renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': _renderer_classes
+}

@@ -163,6 +163,12 @@ class Volunteer(Timestampable):
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
 
+    def get_area_names(self):
+        return ', '.join([area.name for area in self.areas.all()])
+
+    def get_language_names(self):
+        return ', '.join([language.name for language in self.languages.all()])
+
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
