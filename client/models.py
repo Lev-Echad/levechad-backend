@@ -11,6 +11,8 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
+from django.conf import settings
+from django.urls import reverse
 
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
@@ -228,16 +230,19 @@ class VolunteerCertificate(models.Model):
 
     @property
     def image_download_url(self):
-        s3 = boto3.client('s3')
-        return s3.generate_presigned_url(
-            'get_object',
-            Params={
-                'Bucket': 'levechad-media-bucket',
-                'Key': 'media/{}'.format(type(self).IMAGE_PATH.format(id=self.id)),
-                'ResponseContentDisposition': 'attachment;filename={}'.format(f'{self.id}.png'),
-            },
-            ExpiresIn=type(self).DOWNLOAD_LINK_EXPIRATION_SECONDS
-        )
+        if settings.ENV == 'PRODUCTION':
+            s3 = boto3.client('s3')
+            return s3.generate_presigned_url(
+                'get_object',
+                Params={
+                    'Bucket': 'levechad-media-bucket',
+                    'Key': 'media/{}'.format(type(self).IMAGE_PATH.format(id=self.id)),
+                    'ResponseContentDisposition': 'attachment;filename={}'.format(f'{self.id}.png'),
+                },
+                ExpiresIn=type(self).DOWNLOAD_LINK_EXPIRATION_SECONDS
+            )
+        else:
+            return reverse('download_certificate', kwargs={'pk': self.id})
 
 
 class HelpRequest(Timestampable):
