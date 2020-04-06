@@ -174,7 +174,7 @@ class Volunteer(Timestampable):
     wanted_assignments = MultiSelectField(choices=WANTED_ASSIGNMENTS, default=1)
     week_assignments_capacity = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(10)])
     areas = models.ManyToManyField(Area, blank=True)
-    languages = models.ManyToManyField(Language, blank=True)
+    languages = models.ManyToManyField(Language)
     phone_number = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     email = models.EmailField(blank=True)
     email_verified = models.BooleanField(default=False)
