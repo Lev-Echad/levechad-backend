@@ -376,7 +376,7 @@ def find_closes_persons(request, pk):
     # ----- check for each volunterr how much times he apper
     appers_list = []
     for volu in closes_volunteer:
-        appers_list.append(HelpRequest.objects.filter(helping_volunteer=volu).count())
+        appers_list.append(volu.times_volunteered)
 
     final_data = []
     for i in range(0, len(closes_volunteer)):

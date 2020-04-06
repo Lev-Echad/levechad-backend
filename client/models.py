@@ -105,8 +105,8 @@ class Volunteer(Timestampable):
     WANTED_ASSIGNMENTS = (
         ("FOOD", "חלוקת מזון"),
         ("MEDICINES", "משלוח תרופות"),
-        ("STAFF", "הסעות"),
-        ("TRANSPORTATION", "סיוע לעובדים חיוניים"),
+        ("STAFF", "סיוע לעובדים חיוניים"),
+        ("TRANSPORTATION", "הסעות"),
         ("TELEPHONE SUPPORT", "תמיכה טלפונית"),
         ("CHILD_CARE", "עזרה במשפחתונים"),
         ("OTHER", "אחר"),
@@ -203,6 +203,10 @@ class Volunteer(Timestampable):
 
     def get_language_names(self):
         return ', '.join([language.name for language in self.languages.all()])
+
+    @property
+    def times_volunteered(self):
+        return HelpRequest.objects.filter(helping_volunteer=self).count()
 
     @property
     def full_name(self):
