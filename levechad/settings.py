@@ -172,8 +172,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
 if ENV == 'PRODUCTION':
     # Enforcing TLS/SLL
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
+    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # SECURE_SSL_REDIRECT = True
 
     # In production, use S3 to serve static & media files
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
