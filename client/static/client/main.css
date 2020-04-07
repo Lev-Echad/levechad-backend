@@ -10,7 +10,7 @@ a.nav-link {
 }
 
 .form-group {
-    margin: 30px 0px;
+    margin: 30px 0;
     text-align: center;
 }
 
@@ -227,7 +227,7 @@ div {
 }
 
 .page-footer p {
-    margin: 0px;
+    margin: 0;
 }
 
 #aboutvolu {
@@ -236,6 +236,7 @@ div {
     color: #9B000B;
     padding: 7px;
     margin: 10px;
+    overflow-y: auto;
 }
 
 @media only screen and (max-width: 400px) {
