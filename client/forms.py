@@ -36,9 +36,11 @@ def get_lang_choices():
 
 class VolunteerForm(forms.Form):
     MOVING_WAYS = (
-        ("CAR", "רכב"),
-        ("PUBL", 'תחב"צ'),
-        ("FOOT", 'רגלית')
+        ("BIKE", "אופניים"),
+        ("SCOOTER", "קטנוע"),
+        ("CAR", "מכונית"),
+        ("PUBL", "תחבורה ציבורית"),
+        ("FOOT", "רגלית")
     )
 
     HEARING_WAYS = (

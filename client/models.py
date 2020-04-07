@@ -19,8 +19,6 @@ from django.dispatch import receiver
 from django.db.models.signals import pre_save
 from multiselectfield import MultiSelectField
 
-from client.validators import id_number_validator
-
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
 ID_LENGTH = 11
@@ -80,7 +78,7 @@ class Volunteer(Timestampable):
     MOVING_WAYS = (
         ("BIKE", "אופניים"),
         ("SCOOTER", "קטנוע"),
-        ("AUTOMOBILE", "מכונית"),
+        ("CAR", "מכונית"),
         ("PUBL", "תחבורה ציבורית"),
         ("FOOT", "רגלית")
     )
@@ -163,21 +161,22 @@ class Volunteer(Timestampable):
         """
         return self.certificates.filter(expiration_date__gte=date.today()).order_by('-expiration_date')
 
-    tz_number = models.CharField(max_length=ID_LENGTH, blank=True, validators=[id_number_validator])
+    tz_number = models.CharField(max_length=ID_LENGTH, blank=True)
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True, default=None)
-    gender = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=GENDERS, null=True, default=None)
-    date_of_birth = models.DateField(null=True, default=None)
+    gender = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=GENDERS, null=True, default=None, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True, default=None)
     # What is volunteer_type? wanted_assignments is kind of the same...
     volunteer_type = models.CharField(
         max_length=DEFAULT_MAX_FIELD_LENGTH,
         choices=TYPES,
         null=True,
+        blank=True,
         default=DEFAULT_TYPE
     )
-    wanted_assignments = MultiSelectField(choices=WANTED_ASSIGNMENTS, default=1)
+    wanted_assignments = MultiSelectField(choices=WANTED_ASSIGNMENTS, default=[item[0] for item in WANTED_ASSIGNMENTS])
     week_assignments_capacity = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(10)])
     areas = models.ManyToManyField(Area, blank=True)
     languages = models.ManyToManyField(Language)
@@ -191,7 +190,7 @@ class Volunteer(Timestampable):
     location_address_y = models.FloatField(default=0)
     available_saturday = models.BooleanField(default=False)
     keep_mandatory_worker_children = models.BooleanField(default=False, blank=True, null=True)
-    guiding = models.BooleanField(default=False, null=True)
+    guiding = models.BooleanField(default=False, null=True, blank=True)
     notes = models.CharField(max_length=5000, null=True, blank=True)
     moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS, blank=True, null=True)
@@ -309,7 +308,7 @@ class HelpRequest(Timestampable):
 
     full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     phone_number = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     notes = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True, null=True)
@@ -330,16 +329,19 @@ class HamalUser(models.Model):
 
 class ParentalConsent(models.Model):
     parent_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    parent_id = models.CharField(max_length=9, validators=[id_number_validator])
+    parent_id = models.CharField(max_length=9)
     volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE)
 
 
-@receiver(pre_save, sender=Volunteer)
-@receiver(pre_save, sender=VolunteerCertificate)
-@receiver(pre_save, sender=VolunteerSchedule)
-def pre_save_handler(sender, instance, *args, **kwargs):
-    """
-    Django doesn't validate fields before saving by calling clean functions because of compatibility issues. This does.
-    See https://docs.djangoproject.com/en/3.0/ref/models/instances/#validating-objects
-    """
-    instance.full_clean()
+# TODO: models validation is a good practice and should be added in the future - due to some inconsistency about our DB
+# TODO: constraints over the time, the model validation blocks lots of functionality the used to work. in the future,
+# TODO: when our data will be more normalized and standing with our constraints, this should be re-added.
+# @receiver(pre_save, sender=Volunteer)
+# @receiver(pre_save, sender=VolunteerCertificate)
+# @receiver(pre_save, sender=VolunteerSchedule)
+# def pre_save_handler(sender, instance, *args, **kwargs):
+#     """
+#     Django doesn't validate fields before saving by calling clean functions because of compatibility issues. This does.
+#     See https://docs.djangoproject.com/en/3.0/ref/models/instances/#validating-objects
+#     """
+#     instance.full_clean()
