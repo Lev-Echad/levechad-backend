@@ -19,8 +19,6 @@ from django.dispatch import receiver
 from django.db.models.signals import pre_save
 from multiselectfield import MultiSelectField
 
-from client.validators import id_number_validator
-
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
 ID_LENGTH = 11
@@ -163,7 +161,7 @@ class Volunteer(Timestampable):
         """
         return self.certificates.filter(expiration_date__gte=date.today()).order_by('-expiration_date')
 
-    tz_number = models.CharField(max_length=ID_LENGTH, blank=True, validators=[id_number_validator])
+    tz_number = models.CharField(max_length=ID_LENGTH, blank=True)
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
@@ -320,7 +318,7 @@ class HamalUser(models.Model):
 
 class ParentalConsent(models.Model):
     parent_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    parent_id = models.CharField(max_length=9, validators=[id_number_validator])
+    parent_id = models.CharField(max_length=9)
     volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE)
 
 
