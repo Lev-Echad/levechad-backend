@@ -169,12 +169,13 @@ class Volunteer(Timestampable):
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True, default=None)
     gender = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=GENDERS, null=True, default=None, blank=True)
-    date_of_birth = models.DateField(null=True, default=None)
+    date_of_birth = models.DateField(null=True, blank=True, default=None)
     # What is volunteer_type? wanted_assignments is kind of the same...
     volunteer_type = models.CharField(
         max_length=DEFAULT_MAX_FIELD_LENGTH,
         choices=TYPES,
         null=True,
+        blank=True,
         default=DEFAULT_TYPE
     )
     wanted_assignments = MultiSelectField(choices=WANTED_ASSIGNMENTS, default=WANTED_ASSIGNMENTS)
@@ -191,7 +192,7 @@ class Volunteer(Timestampable):
     location_address_y = models.FloatField(default=0)
     available_saturday = models.BooleanField(default=False)
     keep_mandatory_worker_children = models.BooleanField(default=False, blank=True, null=True)
-    guiding = models.BooleanField(default=False, null=True)
+    guiding = models.BooleanField(default=False, null=True, blank=True)
     notes = models.CharField(max_length=5000, null=True, blank=True)
     moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS)
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS, blank=True, null=True)
@@ -299,7 +300,7 @@ class HelpRequest(Timestampable):
 
     full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     phone_number = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     notes = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True, null=True)
