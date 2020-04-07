@@ -2,8 +2,11 @@ import xlwt
 import datetime
 
 import django.db.models.manager
+from django.core.paginator import Paginator
 from django.db import models
 from django.http import HttpResponse
+
+BUFFER_SIZE = 500
 
 
 def export_model_to_xls(
@@ -46,23 +49,30 @@ def export_model_to_xls(
     for col_num, header in enumerate(fields_descriptions.values()):
         ws.write(0, col_num, header, bold_font)
 
-    for row_num, volunteer in enumerate(model_type.objects.all(), start=1):
-        for col_num, key in enumerate(fields_descriptions.keys()):
-            value = getattr(volunteer, key)
-            field_choices = volunteer._meta.get_field(key).choices
-            if field_choices is not None:
-                value = dict(field_choices)[value]
+    row_num = 0
+    queryset = model_type.objects.all()
+    queryset = queryset.order_by("pk")
+    paginator = Paginator(queryset, BUFFER_SIZE)
+    for i in range(1, paginator.num_pages + 1):
+        page_qs = paginator.page(i)
+        for model_object in page_qs:
+            row_num += 1
+            for col_num, key in enumerate(fields_descriptions.keys()):
+                value = getattr(model_object, key)
+                field_choices = model_object._meta.get_field(key).choices
+                if field_choices is not None:
+                    value = dict(field_choices)[value]
 
-            if isinstance(value, bool):
-                value = 'כן' if value else 'לא'
-            elif isinstance(value, datetime.datetime):
-                value = value.strftime('%Y/%m/%d %H:%M')
-            elif isinstance(value, django.db.models.manager.Manager):
-                value = ', '.join([str(item) for item in value.all()])
-            elif isinstance(value, models.Model):
-                value = str(value)
+                if isinstance(value, bool):
+                    value = 'כן' if value else 'לא'
+                elif isinstance(value, datetime.datetime):
+                    value = value.strftime('%Y/%m/%d %H:%M')
+                elif isinstance(value, django.db.models.manager.Manager):
+                    value = ', '.join([str(item) for item in value.all()])
+                elif isinstance(value, models.Model):
+                    value = str(value)
 
-            ws.write(row_num, col_num, value)
+                ws.write(row_num, col_num, value)
 
     wb.save(response)
     return response
