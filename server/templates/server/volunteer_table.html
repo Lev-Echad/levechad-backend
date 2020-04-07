@@ -110,7 +110,7 @@
                     {% else %}
                         לא נמצא תג מתנדב!
                         <br />
-                        <a href="{% url 'create_volunteer_certificate' volunteer_id=volunteer.id %}?next={{ request.resolver_match.url_name|urlencode }}">
+                        <a href="{% url 'create_volunteer_certificate' %}?volunteer_id={{ volunteer.id }}&next={{ request.resolver_match.url_name|urlencode }}">
                             צור
                         </a>
                     {% endif %}
@@ -136,7 +136,7 @@
                     <div class="modal-content">
 
 
-                        <form method="post" action="{% url 'delete_volunteer' volunteer.id %}">
+                        <form method="post" action="{% url 'delete_volunteer' %}?pk={{ volunteer.id }}">
                             {% csrf_token %}
 
 

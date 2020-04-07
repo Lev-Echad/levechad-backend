@@ -71,7 +71,7 @@
                 {% endif %}
                 <td width="40%">
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#change_status{{ help_request.id }}">ערוך</a>
-                    <a href="{% url 'find_closes_persons' help_request.id %}" class="btn btn-outline-dark waves-effect m-2">  מצא התאמה</a>
+                    <a href="{% url 'find_closes_persons' %}?pk={{ help_request.id }}" class="btn btn-outline-dark waves-effect m-2">  מצא התאמה</a>
                 </td>
 
 {#                    change status#}
@@ -81,7 +81,7 @@
                         <div class="modal-content">
 
 
-                         <form method="post" action="{% url 'change_stat' help_request.id%}">
+                         <form method="post" action="{% url 'change_stat' %}?pk={{ help_request.id }}">
                              {% csrf_token %}
                               <div class="modal-header">
                                 <h4 class="modal-title w-100 font-weight-bold">עריכת בקשה</h4>
