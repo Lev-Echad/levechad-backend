@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from bidi.algorithm import get_display
 
 from django.contrib.staticfiles import finders
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -16,6 +17,7 @@ from django.urls import reverse
 
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
+from multiselectfield import MultiSelectField
 
 from client.validators import id_number_validator
 
@@ -76,8 +78,10 @@ class VolunteerSchedule(Timestampable):
 
 class Volunteer(Timestampable):
     MOVING_WAYS = (
-        ("CAR", "רכב"),
-        ("PUBL", "תחבצ"),
+        ("BIKE", "אופניים"),
+        ("SCOOTER", "קטנוע"),
+        ("CAR", "מכונית"),
+        ("PUBL", "תחבורה ציבורית"),
         ("FOOT", "רגלית")
     )
     HEARING_WAYS = (
@@ -96,6 +100,22 @@ class Volunteer(Timestampable):
         ("CHILD_CARE", "משפחתון"),
         ("AGRICULTURE", "חקלאות"),
         (DEFAULT_TYPE, "משימות")
+    )
+
+    WANTED_ASSIGNMENTS = (
+        ("FOOD", "חלוקת מזון"),
+        ("MEDICINES", "משלוח תרופות"),
+        ("STAFF", "הסעות"),
+        ("TRANSPORTATION", "סיוע לעובדים חיוניים"),
+        ("TELEPHONE SUPPORT", "תמיכה טלפונית"),
+        ("CHILD_CARE", "עזרה במשפחתונים"),
+        ("OTHER", "אחר"),
+    )
+
+    GENDERS = (
+        ('MALE', 'זכר'),
+        ('FEMALE', 'נקבה'),
+        ('OTHER', 'מגדר אחר'),
     )
 
     _original_values = {
@@ -146,24 +166,37 @@ class Volunteer(Timestampable):
     tz_number = models.CharField(max_length=ID_LENGTH, blank=True, validators=[id_number_validator])
     first_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
-    organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
+    organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True, default=None)
+    gender = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=GENDERS, null=True, default=None, blank=True)
     date_of_birth = models.DateField(null=True, default=None)
-    volunteer_type = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, choices=TYPES, default=DEFAULT_TYPE)
-    areas = models.ManyToManyField(Area)
+    # What is volunteer_type? wanted_assignments is kind of the same...
+    volunteer_type = models.CharField(
+        max_length=DEFAULT_MAX_FIELD_LENGTH,
+        choices=TYPES,
+        null=True,
+        default=DEFAULT_TYPE
+    )
+    wanted_assignments = MultiSelectField(choices=WANTED_ASSIGNMENTS, default=WANTED_ASSIGNMENTS)
+    week_assignments_capacity = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(10)])
+    areas = models.ManyToManyField(Area, blank=True)
     languages = models.ManyToManyField(Language)
     phone_number = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    email = models.EmailField(blank=True)
+    email = models.EmailField(blank=True, null=True)
+    email_verified = models.BooleanField(default=False)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
-    neighborhood = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True)
+    neighborhood = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    available_saturday = models.BooleanField()
-    keep_mandatory_worker_children = models.BooleanField(default=False)
-    guiding = models.BooleanField()
-    notes = models.CharField(max_length=5000, blank=True)
+    location_address_x = models.FloatField(default=0)
+    location_address_y = models.FloatField(default=0)
+    available_saturday = models.BooleanField(default=False)
+    keep_mandatory_worker_children = models.BooleanField(default=False, blank=True, null=True)
+    guiding = models.BooleanField(default=False, null=True)
+    notes = models.CharField(max_length=5000, null=True, blank=True)
     moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS)
-    hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS)
+    hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS, blank=True, null=True)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
+    score = models.IntegerField(default=0)
 
     @property
     def full_name(self):
@@ -283,6 +316,12 @@ class HamalUser(models.Model):
 
     def __str__(self):
         return str(self.area)
+
+
+class ParentalConsent(models.Model):
+    parent_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    parent_id = models.CharField(max_length=9, validators=[id_number_validator])
+    volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE)
 
 
 @receiver(pre_save, sender=Volunteer)
