@@ -410,9 +410,9 @@ def export_users_xls(request):
         'keep_mandatory_worker_children': 'מעוניין לסייע לילדי עובדים חיוניים?',
         'guiding': 'מדריך',
         'notes': 'הערות',
-        'moving_way': 'דרך תחבורה',
-        'hearing_way': 'דרך הוותדעות על לב אחד',
-        'created_date': 'מועד הרשמות',
+        'moving_way': 'אמצעי תחבורה',
+        'hearing_way': 'איך שמע על לב אחד',
+        'created_date': 'מועד הרשמה',
     }
 
     return server.xls_exporter.export_model_to_xls(Volunteer, fields_descriptions)

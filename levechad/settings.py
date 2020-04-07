@@ -160,7 +160,7 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
+TIME_ZONE = "Asia/Jerusalem"
 
 LOGIN_REDIRECT_URL = '/server'
 
@@ -171,7 +171,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
 if ENV == 'PRODUCTION':
-    # Enforcing TLS/SLL
+    # Redirect http request to https
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
 
