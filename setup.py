@@ -19,6 +19,7 @@ if Area.objects.filter(name="צפון").first() == None:
     Area(name="יהודה ושומרון").save()
     Area(name="דרום").save()
     Area(name="סיוע טלפוני").save()
+    Area(name="מטה מרכזי").save()
 
 # From now onwards start your script..
 if Language.objects.filter(name="עברית").first() == None:

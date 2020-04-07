@@ -1,8 +1,6 @@
 LevEchad
 ===========
 
-*Join us on Gitter:* [![Gitter](https://badges.gitter.im/LevEchadTech/community.svg)](https://gitter.im/LevEchadTech/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
 This is a python 3 web application in the Django framework. 
 
 The application manages the  LevEchad volunteers and provides an interface for submitting help requests to the organization. 
@@ -16,16 +14,7 @@ First time setup
 
 If this is the firsts time you're running this app, several set up steps are required to get your environment ready.
 
-It is recommended that you perform these steps within a python virtual environment, otherwise the makeup of your python 3 installation might change:
-
-    # On Windows:
-    pip install virtualenv virtualenvwrapper-win
-    mkvirtualenv levechad
-    # The prompt should now be prefixed with (levechad) - this way you know you're on the Virtual Environment.
-    # To deactivate:
-    deactivate
-    # To work on the virtual environment again:
-    workon levechad
+It is recommended that you perform these steps within a python virtual environment, otherwise the makeup of your python 3 installation might change.
 
 Before performing the listed steps make sure that the version of python you get when you type the python command into your terminal is the correct one!
 
