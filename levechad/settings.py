@@ -20,19 +20,18 @@ ENV = os.environ.get('ENV', 'DEVELOPMENT')
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-if ENV == 'DEVELOPMENT':
-    SECRET_KEY = 'MYSECRET'
 if ENV == 'PRODUCTION':
     SECRET_KEY = os.environ.get('SECRET_KEY')
+else:
+    SECRET_KEY = 'MYSECRET'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENV == 'DEVELOPMENT':
-    DEBUG = True
-elif ENV == 'PRODUCTION':
+if ENV == 'PRODUCTION':
     DEBUG = False
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -46,7 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrapform',
-    'mathfilters'
+    'mathfilters',
+    'storages',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -161,10 +162,38 @@ USE_L10N = True
 USE_TZ = True
 
 
+LOGIN_REDIRECT_URL = '/server'
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = "/static/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-LOGIN_REDIRECT_URL = '/server'
+if ENV == 'PRODUCTION':
+    # Enforcing TLS/SLL
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+
+    # In production, use S3 to serve static & media files
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+
+    AWS_DEFAULT_ACL = None
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+
+    # s3 static settings
+    STATIC_LOCATION = 'static'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
+    STATICFILES_STORAGE = 'levechad.storage_backends.StaticStorage'
+
+    # s3 public media settings
+    PUBLIC_MEDIA_LOCATION = 'media'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+    DEFAULT_FILE_STORAGE = 'levechad.storage_backends.PublicMediaStorage'
+else:
+    # In development, let django serve static files (and media files in urls.py)
+    STATIC_URL = '/static/'
+    MEDIA_URL = '/media/'

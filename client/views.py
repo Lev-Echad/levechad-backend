@@ -1,46 +1,13 @@
+import io
+from PIL import Image, ImageDraw, ImageFont
+from bidi.algorithm import get_display
+
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.contrib.staticfiles import finders
 
 from .forms import *
 from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
-from django.contrib.staticfiles import finders
-from PIL import Image, ImageDraw, ImageFont
-import io
-from bidi.algorithm import get_display
-import datetime
-
-
-def helper_help(pk, fullName):
-    return HelpRequest.objects.get(pk=pk, full_name=fullName)
-
-
-def volunteer_certificate_image_view(request, pk):
-    volunteer_certificate = VolunteerCertificate.objects.get(id=pk)
-    volunteer = volunteer_certificate.volunteer
-    tag_filename = finders.find('client/tag.jpeg')
-    font_filename = finders.find('client/fonts/BN Amnesia.ttf')
-    photo = None
-    try:
-        photo = Image.open(tag_filename)
-        drawing = ImageDraw.Draw(photo)
-        font = ImageFont.truetype(font_filename, size=40)
-
-        black = (3, 8, 12)
-
-        lines_to_insert = [
-            f'שם מתנדב: {volunteer.first_name} {volunteer.last_name}',
-            f'תעודת זהות: {volunteer.tz_number}',
-            f'תוקף התעודה: {volunteer_certificate.expiration_date}',
-            f'מספר תעודה: {volunteer_certificate.id}',
-        ]
-
-        drawing.text((700, 200), get_display('\n'.join(lines_to_insert)), fill=black, font=font, align='right')
-        with io.BytesIO() as output:
-            photo.save(output, format='png')
-            return HttpResponse(output.getvalue(), content_type='image/png')
-    finally:
-        if photo is not None:
-            photo.close()
 
 
 def thanks(request):
@@ -48,7 +15,7 @@ def thanks(request):
         username = request.GET['username']
         pk = request.GET['pk']
 
-        hr = helper_help(pk, username)
+        hr = HelpRequest.objects.get(pk=pk, full_name=username)
 
         return render(request, 'thanks.html', {
             "id": pk,
@@ -71,7 +38,7 @@ def thanks_volunteer(request):
 
     return render(request, 'thanks_volunteer.html', {
         "name": f'{volunteer.first_name} {volunteer.last_name}',
-        "certificate_id": volunteer_certificate.id
+        "certificate": volunteer_certificate
     })
 
 
@@ -98,34 +65,38 @@ def volunteer_view(request):
         form = VolunteerForm(request.POST)
         if form.is_valid():
             answer = form.cleaned_data
-            languagesGot = Language.objects.filter(name__in=answer["languages"])
-            areasGot = Area.objects.filter(name__in=answer["area"])
-            keep_mandatory_worker_children = False
-            if answer["childrens"] == "YES":
-                keep_mandatory_worker_children = True
-                
-            volunter_new = Volunteer.objects.create(tz_number=answer["identity"], first_name=answer["first_name"],
-                                     last_name=answer["last_name"],
-                                     email=answer["email"],
-                                     date_of_birth=answer["date_of_birth"], organization=answer['organization'],
-                                     phone_number=answer["phone_number"],
-                                     city=City.objects.get(name=answer["city"]), neighborhood=answer['neighborhood'],
-                                     address=answer["address"],
-                                     available_saturday=answer["available_on_saturday"],
-                                     notes=answer["notes"], moving_way=answer["transportation"],
-                                     hearing_way=answer["hearing_way"],
-                                     keep_mandatory_worker_children=keep_mandatory_worker_children, guiding=False)
-            volunter_new.languages.set(languagesGot)
-            volunter_new.areas.set(areasGot)
-            volunter_new.save()
+            languages = Language.objects.filter(name__in=answer["languages"])
+            areas = Area.objects.filter(name__in=answer["area"])
+
+            volunteer_new = Volunteer.objects.create(
+                tz_number=answer["id_number"],
+                first_name=answer["first_name"],
+                last_name=answer["last_name"],
+                email=answer["email"],
+                date_of_birth=answer["date_of_birth"],
+                organization=answer['organization'],
+                phone_number=answer["phone_number"],
+                city=City.objects.get(name=answer["city"]),
+                neighborhood=answer['neighborhood'],
+                address=answer["address"],
+                available_saturday=answer["available_on_saturday"],
+                notes=answer["notes"],
+                moving_way=answer["transportation"],
+                hearing_way=answer["hearing_way"],
+                keep_mandatory_worker_children=(answer["childrens"] == "YES"),
+                guiding=False
+            )
+            volunteer_new.languages.set(languages)
+            volunteer_new.areas.set(areas)
 
             # creating volunteer certificate
-            volunter_new.get_or_generate_valid_certificate()
+            volunteer_new.get_or_generate_valid_certificate()
 
             # process the data in form.cleaned_data as required
             # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunter_new.pk))
+            # redirect to a new URL:
+            # TODO Don't hardcode URLs, get them by view
+            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunteer_new.pk))
     # if a GET (or any other method) we'll create a blank form
     else:
         form = VolunteerForm(initial={'organization': organization})
@@ -189,13 +160,13 @@ def shopping_help(request):
     return render(request, 'help_pages/shopping.html', {'form': form})
 
 
-def get_certificate_view(request):
+def find_certificate_view(request):
     context = {'form': GetCertificateForm()}
     if request.method == 'POST':
         form = GetCertificateForm(request.POST)
         if form.is_valid():
             # TODO: change to 'get' instead of 'first' after fixing #50
-            volunteer = Volunteer.objects.filter(tz_number=form['tz_number'].data).first()
+            volunteer = Volunteer.objects.filter(tz_number=form['id_number'].data).first()
             if volunteer is not None:
                 '''
                  TODO: this a hotfix that generate a valid certificate to any user that requests one. 
@@ -205,7 +176,7 @@ def get_certificate_view(request):
                 active_certificate = volunteer.get_or_generate_valid_certificate()
 
                 if active_certificate is not None:
-                    context['certificate_id'] = active_certificate.id
+                    context['certificate'] = active_certificate
                 else:
                     context['error'] = 'לא נמצאה תעודה בתוקף!'
             else:
@@ -213,7 +184,17 @@ def get_certificate_view(request):
         else:
             context['error'] = 'יש למלא את השדות כנדרש!'
 
-    return render(request, 'get_certificate.html', context=context)
+    return render(request, 'find_certificate.html', context=context)
+
+
+def download_certificate_view(request, pk):
+    # We could've easily used the download attribute on <a> tags w/ the media URL directly,
+    # but this doesn't work on Firefox for some reason.
+    # This is only for development purposes - see VolunteerCertificate.image_download_url
+    with open(VolunteerCertificate.objects.get(id=pk).image.path, 'rb') as image_file:
+        response = HttpResponse(image_file.read(), content_type='image/png')
+        response['Content-Disposition'] = 'attachment; filename="{}.png"'.format(pk)
+        return response
 
 
 def medic_help(request):
@@ -226,7 +207,7 @@ def medic_help(request):
             answer = form.cleaned_data
             type_text = ""
             if (answer["need_prescription"]):
-                type_text = "\nתרופת מרשם"
+                type_text = "תרופת מרשם\n"
 
             areasGot = Area.objects.all().get(name=answer["area"])
             new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
@@ -269,33 +250,6 @@ def other_help(request):
         form = OtherForm()
 
     return render(request, 'help_pages/other.html', {'form': form})
-
-
-def home_help(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = HomeForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            answer = form.cleaned_data
-            areasGot = Area.objects.all().get(name=answer["area"])
-            new_request = HelpRequest(full_name=answer["full_name"], phone_number=answer["phone_number"],
-                                      city=City.objects.get(name=answer["city"]),
-                                      address=answer["address"], notes=answer["notes"], type="HOME_HEL",
-                                      type_text=answer["need_text"], area=areasGot)
-            new_request.save()
-
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:y
-            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = HomeForm()
-
-    return render(request, 'help_pages/home.html', {'form': form})
 
 
 def travel_help(request):
