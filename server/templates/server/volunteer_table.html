@@ -23,6 +23,8 @@
             <th scope="col">#</th>
             <th scope="col">שם פרטי</th>
             <th scope="col">שם משפחה</th>
+            <th scope="col">תאריך הצטרפות</th>
+            <th scope="col">ארגון</th>
             <th scope="col">סוג</th>
             <th scope="col">תאריך לידה/גיל</th>
             <th scope="col">אזור</th>
@@ -50,6 +52,8 @@
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.first_name }}</td>
                 <td>{{ volunteer.last_name }}</td>
+                <td>{{ volunteer.created_date|date:"d/m/Y" }}</td>
+                <td>{{ volunteer.organization }}</td>
                 <td>{{ volunteer.get_volunteer_type_display }} <br>
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal"
                        data-target="#edit_volu_type{{ volunteer.id }}"> ערוך</a>
@@ -212,6 +216,10 @@
                                 <input type="checkbox" name="area" id="area" value='סיוע טלפוני'>
                             </div>
 
+                        </div>
+                        <div>
+                            <p class="h5"><u>בחר עיר</u></p>
+                            <input type="text" name="city_name" id="city_name" />
                         </div>
                         <div>
 

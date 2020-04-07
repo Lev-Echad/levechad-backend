@@ -89,6 +89,7 @@ def show_all_volunteers(request, page=1):
     search_first_name = request.GET.getlist('search_first_name')
     search_last_name = request.GET.getlist('search_last_name')
     search_id = request.GET.getlist('search_id')
+    city_name = request.GET.getlist('city_name')
 
     if len(get_mandatory_areas(request)) != 0:
         filter_options['areas__name__in'] = get_mandatory_areas(request)
@@ -101,6 +102,9 @@ def show_all_volunteers(request, page=1):
 
     if len(guidings) != 0:
         filter_options['guiding'] = True
+
+    if len(city_name) != 0 and '' not in city_name:
+        filter_options['city__name'] = city_name[0]
 
     if len(search_first_name) != 0 and search_first_name[0] != '':
         q_option |= Q(first_name=search_first_name[0])
@@ -180,6 +184,7 @@ def show_all_help_request(request, page=1):
     search_name = request.GET.getlist('search_name')
     search_id = request.GET.getlist('search_id')
     create_date = request.GET.getlist('create_date')
+    city_name = request.GET.getlist('city_name')
 
     if len(statuses) != 0 and '' not in statuses:
         filter_options['status__in'] = statuses
@@ -203,6 +208,9 @@ def show_all_help_request(request, page=1):
         start_date = DateTimeField().to_python(create_date[0])
         end_date = start_date + datetime.timedelta(days=1)
         filter_options['created_date__range'] = (start_date, end_date)
+
+    if len(city_name) != 0 and '' not in city_name:
+        filter_options['city__name'] = city_name[0]
 
     match_qs = HelpRequest.objects.filter(q_option, **filter_options)
 

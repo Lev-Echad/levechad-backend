@@ -159,6 +159,16 @@ def find_certificate_view(request):
     return render(request, 'find_certificate.html', context=context)
 
 
+def download_certificate_view(request, pk):
+    # We could've easily used the download attribute on <a> tags w/ the media URL directly,
+    # but this doesn't work on Firefox for some reason.
+    # This is only for development purposes - see VolunteerCertificate.image_download_url
+    with open(VolunteerCertificate.objects.get(id=pk).image.path, 'rb') as image_file:
+        response = HttpResponse(image_file.read(), content_type='image/png')
+        response['Content-Disposition'] = 'attachment; filename="{}.png"'.format(pk)
+        return response
+
+
 # === HELP VIEWS ===
 def help_view(request, template_path, form_class, request_type_name, type_text_gen):
     """

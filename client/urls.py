@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf import settings
 from . import views
 
 
@@ -19,3 +20,6 @@ urlpatterns = [
     path('help/travel', views.travel_help),
     path('help/workers', views.workers_help),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [path('download_certificate/<int:pk>', views.download_certificate_view, name='download_certificate')]
