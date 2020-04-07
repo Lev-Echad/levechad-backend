@@ -323,12 +323,15 @@ class ParentalConsent(models.Model):
     volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE)
 
 
-@receiver(pre_save, sender=Volunteer)
-@receiver(pre_save, sender=VolunteerCertificate)
-@receiver(pre_save, sender=VolunteerSchedule)
-def pre_save_handler(sender, instance, *args, **kwargs):
-    """
-    Django doesn't validate fields before saving by calling clean functions because of compatibility issues. This does.
-    See https://docs.djangoproject.com/en/3.0/ref/models/instances/#validating-objects
-    """
-    instance.full_clean()
+# TODO: models validation is a good practice and should be added in the future - due to some inconsistency about our DB
+# TODO: constraints over the time, the model validation blocks lots of functionality the used to work. in the future,
+# TODO: when our data will be more normalized and standing with our constraints, this should be re-added.
+# @receiver(pre_save, sender=Volunteer)
+# @receiver(pre_save, sender=VolunteerCertificate)
+# @receiver(pre_save, sender=VolunteerSchedule)
+# def pre_save_handler(sender, instance, *args, **kwargs):
+#     """
+#     Django doesn't validate fields before saving by calling clean functions because of compatibility issues. This does.
+#     See https://docs.djangoproject.com/en/3.0/ref/models/instances/#validating-objects
+#     """
+#     instance.full_clean()
