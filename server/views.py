@@ -1,12 +1,14 @@
+import datetime
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from client.models import Volunteer, HelpRequest, Area
-from django.db.models import F, Q, Count
+from client.models import Volunteer, HelpRequest, Area, City
+from django.db.models import F, Q, Count, DateTimeField
 from django.core.paginator import Paginator
-import datetime
-from datetime import time, date
+
 from django.http import HttpResponse, HttpResponseBadRequest
-import xlwt
+
+import server.xls_exporter
 
 RESULTS_IN_PAGE = 50
 PAGINATION_SHORTCUT_NUMBER = 7
@@ -74,11 +76,6 @@ def get_close_pages(current_page, pages_count):
     return list_pages_before, list_pages_after
 
 
-"""
-also filters by filter
-"""
-
-
 @login_required
 def show_all_volunteers(request, page=1):
     filter_options = dict()
@@ -92,6 +89,7 @@ def show_all_volunteers(request, page=1):
     search_first_name = request.GET.getlist('search_first_name')
     search_last_name = request.GET.getlist('search_last_name')
     search_id = request.GET.getlist('search_id')
+    city_name = request.GET.getlist('city_name')
 
     if len(get_mandatory_areas(request)) != 0:
         filter_options['areas__name__in'] = get_mandatory_areas(request)
@@ -104,6 +102,9 @@ def show_all_volunteers(request, page=1):
 
     if len(guidings) != 0:
         filter_options['guiding'] = True
+
+    if len(city_name) != 0 and '' not in city_name:
+        filter_options['city__name'] = city_name[0]
 
     if len(search_first_name) != 0 and search_first_name[0] != '':
         q_option |= Q(first_name=search_first_name[0])
@@ -120,13 +121,13 @@ def show_all_volunteers(request, page=1):
     yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
     yesterday_day = yesterday.strftime("%A")
 
-    if is_time_between(time(7, 00), time(15, 00)):
+    if is_time_between(datetime.time(7, 00), datetime.time(15, 00)):
         schedule_filter = "schedule__" + now_day + "__contains"
         schedule_id = 1
-    elif is_time_between(time(15, 00), time(23, 00)):
+    elif is_time_between(datetime.time(15, 00), datetime.time(23, 00)):
         schedule_filter = "schedule__" + now_day + "__contains"
         schedule_id = 2
-    elif is_time_between(time(23, 00), time(00, 00)):
+    elif is_time_between(datetime.time(23, 00), datetime.time(00, 00)):
         schedule_filter = "schedule__" + now_day + "__contains"
         schedule_id = 3
     else:
@@ -147,7 +148,6 @@ def show_all_volunteers(request, page=1):
         match_qs = match_qs.order_by('id')
 
     # ----- build final data ----
-    paged_data = []
 
     paginator = Paginator(match_qs, RESULTS_IN_PAGE)
 
@@ -156,24 +156,21 @@ def show_all_volunteers(request, page=1):
     final_data = []
     for volunteer in paged_data:
         valid_certificate = volunteer.get_active_certificates().first()
-        final_data.append((volunteer, valid_certificate.id if valid_certificate is not None else -1))
+        final_data.append((volunteer, valid_certificate))
 
     list_pages_before, list_pages_after = get_close_pages(page, paginator.num_pages)
-
+    city_names = list(c.name for c in City.objects.all())
     context = {
         'volunteer_data': final_data,
         'availability_now_id': availability_now_id,
+        'city_names': city_names,
+        'default_volunteer_type': Volunteer.DEFAULT_TYPE,
         'page': page,
         'num_pages': paginator.num_pages,
         'pages_before': list_pages_before,
         'pages_after': list_pages_after
     }
     return render(request, 'server/volunteer_table.html', context)
-
-
-"""
-also filters by filter
-"""
 
 
 @login_required
@@ -186,6 +183,8 @@ def show_all_help_request(request, page=1):
     types = request.GET.getlist('type')
     search_name = request.GET.getlist('search_name')
     search_id = request.GET.getlist('search_id')
+    create_date = request.GET.getlist('create_date')
+    city_name = request.GET.getlist('city_name')
 
     if len(statuses) != 0 and '' not in statuses:
         filter_options['status__in'] = statuses
@@ -204,6 +203,14 @@ def show_all_help_request(request, page=1):
 
     if len(search_id) != 0 and search_id[0].strip():
         q_option |= Q(id=search_id[0])
+
+    if len(create_date) != 0 and '' not in create_date:
+        start_date = DateTimeField().to_python(create_date[0])
+        end_date = start_date + datetime.timedelta(days=1)
+        filter_options['created_date__range'] = (start_date, end_date)
+
+    if len(city_name) != 0 and '' not in city_name:
+        filter_options['city__name'] = city_name[0]
 
     match_qs = HelpRequest.objects.filter(q_option, **filter_options)
 
@@ -230,34 +237,6 @@ def show_all_help_request(request, page=1):
 """
 also filters by filter
 """
-
-
-@login_required
-def order_help_request(request):
-    # TODO: Do we need this function? It's not is use
-
-    qs = HelpRequest.objects.all()
-    statuses = request.POST.getlist('status')
-    type = request.POST.getlist('type')
-
-    status_qs = HelpRequest.objects.none()
-    type_qs = HelpRequest.objects.none()
-
-    if len(statuses) != 0:
-        status_qs = qs.filter(status__in=statuses)
-
-    if len(type) != 0:
-        type_qs = qs.filter(type__in=type)
-
-    # union matchings from both categoties
-    match_qs = status_qs.union(type_qs)
-
-    # if there were no matches display all
-    if len(match_qs) == 0:
-        match_qs = qs
-
-    context = {'help_requests': match_qs}
-    return render(request, 'server/help_table.html', context)
 
 
 @login_required
@@ -300,6 +279,32 @@ def volunteer_edit_notes(request, pk):
     to_edit.save()
     return redirect('show_all_volunteers')
 
+@login_required()
+def volunteer_edit_tz_num(request, pk):
+    to_edit = Volunteer.objects.get(id=pk)
+    if request.POST.get('tz_num') is not None:
+        to_edit.tz_number = request.POST.get('tz_num')
+    to_edit.save()
+    return redirect('show_all_volunteers')
+
+@login_required()
+def volunteer_edit_city(request, pk):
+    to_edit = Volunteer.objects.get(id=pk)
+    if request.POST.get('city_name') is not None:
+        city = City.objects.get(name=request.POST.get('city_name'))
+        to_edit.city = city
+    to_edit.save()
+    return redirect('show_all_volunteers')
+
+
+@login_required
+def volunteer_edit_type(request, pk):
+    to_edit = Volunteer.objects.get(id=pk)
+    if request.POST.get('volunteer_type') is not None:
+        to_edit.volunteer_type = request.POST.get('volunteer_type')
+    to_edit.save()
+    return redirect('show_all_volunteers')
+
 
 @login_required
 def delete_volunteer(request, pk):
@@ -329,23 +334,23 @@ def find_closes_persons(request, pk):
     availability_qs = []
 
     # check option 1
-    if is_time_between(time(7, 00), time(15, 00)):
+    if is_time_between(datetime.time(7, 00), datetime.time(15, 00)):
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 1})
 
     # check option 2
-    elif is_time_between(time(15, 00), time(23, 00)):
+    elif is_time_between(datetime.time(15, 00), datetime.time(23, 00)):
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 2})
 
 
     # check option 3 before midnight
-    elif is_time_between(time(23, 00), time(00, 00)):
+    elif is_time_between(datetime.time(23, 00), datetime.time(00, 00)):
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 3})
 
     # check option 3 after midnight
-    elif is_time_between(time(00, 00), time(7, 00)):
+    elif is_time_between(datetime.time(00, 00), datetime.time(7, 00)):
         filter = "schedule__" + yesterday_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 3})
 
@@ -386,79 +391,58 @@ def find_closes_persons(request, pk):
 
 
 def export_users_xls(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="volunteer_data.xls"'
+    fields_descriptions = {
+        'id': 'מזהה מתנדב',
+        'first_name': 'שם פרטי',
+        'last_name': 'שם משפחה',
+        'tz_number': 'תעודת זהות',
+        'volunteer_type': 'סוג מתנדב',
+        'date_of_birth': 'תאריך לידה',
+        'organization': 'ארגון',
+        'phone_number': 'מספר טלפון',
+        'areas': 'איזור מגורים',
+        'languages': 'שפות',
+        'email': 'אימייל',
+        'city': 'עיר',
+        'neighborhood': 'שכונת מגורים',
+        'address': 'כתובת',
+        'available_saturday': 'זמין בשבת?',
+        'keep_mandatory_worker_children': 'מעוניין לסייע לילדי עובדים חיוניים?',
+        'guiding': 'מדריך',
+        'notes': 'הערות',
+        'moving_way': 'דרך תחבורה',
+        'hearing_way': 'דרך הוותדעות על לב אחד',
+        'created_date': 'מועד הרשמות',
+    }
 
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('Volunteers')
-
-    # Sheet header, first row
-    row_num = 0
-
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-
-    columns = ['שם', 'שם פרטי', 'שם משפחה', 'תעודת זהות', 'סוג', 'גיל', 'טלפון', 'שפות' 'שם משפחה', 'איזור', 'עיר',
-               'אימייל', 'פנוי בשבת',
-               'משפחותונים', 'Notes', ]
-
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
-
-    # Sheet body, remaining rows
-    font_style = xlwt.XFStyle()
-
-    rows = Volunteer.objects.all().values_list('full_name', 'first_name', 'last_name', 'tz_number', 'volunteer_type',
-                                               'age',
-                                               'phone_number', 'areas', 'city', 'email', 'available_saturday',
-                                               'guiding', 'notes')
-    for row in rows:
-        row_num += 1
-        for col_num in range(len(row)):
-            ws.write(row_num, col_num, row[col_num], font_style)
-
-    wb.save(response)
-    return response
+    return server.xls_exporter.export_model_to_xls(Volunteer, fields_descriptions)
 
 
 @login_required
 def create_volunteer_certificate(request, volunteer_id):
     try:
         volunteer = Volunteer.objects.get(id=volunteer_id)
-        certificate = volunteer.get_or_generate_valid_certificate()
+        volunteer.get_or_generate_valid_certificate()
     except Volunteer.DoesNotExist:
         return HttpResponseBadRequest()
 
-    return redirect('volunteer_certificate', pk=certificate.id)
+    next_page_name = request.GET.get('next', 'index')
+    return redirect(next_page_name)
 
 
 def export_help_xls(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="help_request_data.xls"'
+    fields_descriptions = {
+        'id': 'מזהה בקשה',
+        'created_date': 'תאריך הבקשה',
+        'full_name': 'שם פונה',
+        'phone_number': 'טלפון',
+        'area': 'איזור',
+        'address': 'כתובת',
+        'city': 'עיר',
+        'type': 'סוג פנייה',
+        'notes': 'הערות',
+        'status': 'סטטוס',
+        'helping_volunteer': 'מתנדב שמטפל',
+    }
 
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('HelpRequests')
-
-    # Sheet header, first row
-    row_num = 0
-
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-
-    columns = ['שם פונה', 'טלפון', 'איזור', 'כתובת' 'עיר', 'סוג פנייה', 'הערות', 'סטטוס', 'מתנדב שמפטל']
-
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
-
-    # Sheet body, remaining rows
-    font_style = xlwt.XFStyle()
-
-    rows = HelpRequest.objects.all().values_list('full_name', 'phone_number', 'area', 'address', 'city', 'type',
-                                                 'notes', 'status', 'helping_volunteer')
-    for row in rows:
-        row_num += 1
-        for col_num in range(len(row)):
-            ws.write(row_num, col_num, row[col_num], font_style)
-
-    wb.save(response)
-    return response
+    return server.xls_exporter.export_model_to_xls(HelpRequest, fields_descriptions, spreadsheet_name='Help Requests')

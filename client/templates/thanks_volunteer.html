@@ -1,5 +1,4 @@
 {% extends "template.html" %}
-{% load static %}
 
 {% block title %}לב אחד - דף הבית{% endblock %}
 {% block extra_scripts %}
@@ -13,11 +12,8 @@
     <h1>תודה רבה מתנדב יקר!</h1>
     <h2>אנחנו מעבדים את הבקשה</h2>
 
-    <br><br>
-    <h3>תג זה הינו הכרחי עבור ביצוע ההתנדבות - שמור את התג בטלפון שלך</h3>
-    <img src="{% url 'volunteer_certificate' pk=certificate_id %}" alt="volunteer tag" width="400" />
-    <br />
-    <a href="{% url 'volunteer_certificate' pk=certificate_id %}" download>הורדת תג</a>
+    <br /><br />
+    {% include "components/get_certificate.html" %}
 {% endblock %}
 
 
