@@ -80,7 +80,7 @@ class Volunteer(Timestampable):
     MOVING_WAYS = (
         ("BIKE", "אופניים"),
         ("SCOOTER", "קטנוע"),
-        ("AUTOMOBILE", "מכונית"),
+        ("CAR", "מכונית"),
         ("PUBL", "תחבורה ציבורית"),
         ("FOOT", "רגלית")
     )
@@ -168,7 +168,7 @@ class Volunteer(Timestampable):
     last_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, default="")
     organization = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True, default=None)
-    gender = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=GENDERS, null=True, default=None)
+    gender = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=GENDERS, null=True, default=None, blank=True)
     date_of_birth = models.DateField(null=True, default=None)
     # What is volunteer_type? wanted_assignments is kind of the same...
     volunteer_type = models.CharField(
@@ -177,7 +177,7 @@ class Volunteer(Timestampable):
         null=True,
         default=DEFAULT_TYPE
     )
-    wanted_assignments = MultiSelectField(choices=WANTED_ASSIGNMENTS, default=1)
+    wanted_assignments = MultiSelectField(choices=WANTED_ASSIGNMENTS, default=WANTED_ASSIGNMENTS)
     week_assignments_capacity = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(10)])
     areas = models.ManyToManyField(Area, blank=True)
     languages = models.ManyToManyField(Language)
