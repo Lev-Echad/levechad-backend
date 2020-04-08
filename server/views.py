@@ -77,7 +77,14 @@ def get_close_pages(current_page, pages_count):
 
 
 @login_required
-def show_all_volunteers(request, page=1):
+def show_all_volunteers(request):
+    page = 1
+    if request.GET.get('page') is not None:
+        try:
+            page = int(request.GET.get('page'))
+        except ValueError:
+            pass
+
     filter_options = dict()
     q_option = Q()
 
@@ -174,7 +181,14 @@ def show_all_volunteers(request, page=1):
 
 
 @login_required
-def show_all_help_request(request, page=1):
+def show_all_help_request(request):
+    page = 1
+    if request.GET.get('page') is not None:
+        try:
+            page = int(request.GET.get('page'))
+        except ValueError:
+            pass
+
     filter_options = dict()
     q_option = Q()
 
@@ -240,7 +254,12 @@ also filters by filter
 
 
 @login_required
-def help_edit_stat(request, pk):
+def help_edit_stat(request):
+    try:
+        pk = int(request.GET.get('pk', ''))
+    except ValueError:
+        return HttpResponseBadRequest('No valid pk specified.')
+
     # get user objects
     to_edit = HelpRequest.objects.get(id=pk)
 
@@ -272,23 +291,40 @@ def help_edit_stat(request, pk):
 
 
 @login_required
-def volunteer_edit_notes(request, pk):
+def volunteer_edit_notes(request):
+    try:
+        pk = int(request.GET.get('pk', ''))
+    except ValueError:
+        return HttpResponseBadRequest('No valid pk specified.')
+
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('notes') is not None:
         to_edit.notes = request.POST.get('notes')
     to_edit.save()
     return redirect('show_all_volunteers')
 
-@login_required()
-def volunteer_edit_tz_num(request, pk):
+
+@login_required
+def volunteer_edit_tz_num(request):
+    try:
+        pk = int(request.GET.get('pk', ''))
+    except ValueError:
+        return HttpResponseBadRequest('No valid pk specified.')
+
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('tz_num') is not None:
         to_edit.tz_number = request.POST.get('tz_num')
     to_edit.save()
     return redirect('show_all_volunteers')
 
-@login_required()
-def volunteer_edit_city(request, pk):
+
+@login_required
+def volunteer_edit_city(request):
+    try:
+        pk = int(request.GET.get('pk', ''))
+    except ValueError:
+        return HttpResponseBadRequest('No valid pk specified.')
+
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('city_name') is not None:
         city = City.objects.get(name=request.POST.get('city_name'))
@@ -298,7 +334,12 @@ def volunteer_edit_city(request, pk):
 
 
 @login_required
-def volunteer_edit_type(request, pk):
+def volunteer_edit_type(request):
+    try:
+        pk = int(request.GET.get('pk', ''))
+    except ValueError:
+        return HttpResponseBadRequest('No valid pk specified.')
+
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('volunteer_type') is not None:
         to_edit.volunteer_type = request.POST.get('volunteer_type')
@@ -307,14 +348,24 @@ def volunteer_edit_type(request, pk):
 
 
 @login_required
-def delete_volunteer(request, pk):
+def delete_volunteer(request):
+    try:
+        pk = int(request.GET.get('pk', ''))
+    except ValueError:
+        return HttpResponseBadRequest('No valid pk specified.')
+
     to_delete = Volunteer.objects.get(id=pk)
     to_delete.delete()
     return redirect('show_all_volunteers')
 
 
 @login_required
-def find_closes_persons(request, pk):
+def find_closes_persons(request):
+    try:
+        pk = int(request.GET.get('pk', ''))
+    except ValueError:
+        return HttpResponseBadRequest('No valid pk specified.')
+
     request_person = HelpRequest.objects.get(id=pk)
 
     req_city = request_person.city
@@ -419,7 +470,12 @@ def export_users_xls(request):
 
 
 @login_required
-def create_volunteer_certificate(request, volunteer_id):
+def create_volunteer_certificate(request):
+    try:
+        volunteer_id = int(request.GET.get('volunteer_id', ''))
+    except ValueError:
+        return HttpResponseBadRequest('No valid volunteer_id specified.')
+
     try:
         volunteer = Volunteer.objects.get(id=volunteer_id)
         volunteer.get_or_generate_valid_certificate()

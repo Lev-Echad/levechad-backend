@@ -5,7 +5,7 @@
         <div class="modal-content">
 
 
-            <form method="post" action="{% url 'volunteer_edit_type' volunteer.id %}">
+            <form method="post" action="{% url 'volunteer_edit_type' %}?pk={{ volunteer.id }}">
                 {% csrf_token %}
                 <div class="modal-header">
                     <h4 class="modal-title w-100 font-weight-bold">עריכה</h4>
