@@ -197,12 +197,6 @@ class Volunteer(Timestampable):
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
     score = models.IntegerField(default=0)
 
-    def get_area_names(self):
-        return ', '.join([area.name for area in self.areas.all()])
-
-    def get_language_names(self):
-        return ', '.join([language.name for language in self.languages.all()])
-
     @property
     def times_volunteered(self):
         return HelpRequest.objects.filter(helping_volunteer=self).count()
@@ -337,7 +331,7 @@ class HamalUser(models.Model):
 class ParentalConsent(models.Model):
     parent_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     parent_id = models.CharField(max_length=9)
-    volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE)
+    volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE, related_name='parental_consent')
 
 
 # TODO: models validation is a good practice and should be added in the future - due to some inconsistency about our DB
