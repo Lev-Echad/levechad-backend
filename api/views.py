@@ -1,9 +1,11 @@
 import re
 import json
+from operator import gt, lt, eq
 
 from rest_framework import viewsets, generics, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django_filters import rest_framework as filters
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
@@ -65,7 +67,44 @@ class RegistrationAPIViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = RegistrationSerializer
 
 
+class VolunteerFilter(filters.FilterSet):
+    OPERATORS = {"eq": eq, "gt": gt, "lt": lt}
+
+    times_volunteered = filters.NumberFilter(method='get_times_volunteered', field_name='eq')
+    times_volunteered__gt = filters.NumberFilter(method='get_times_volunteered', field_name='gt')
+    times_volunteered__lt = filters.NumberFilter(method='get_times_volunteered', field_name='lt')
+
+    def get_times_volunteered(self, queryset, field_name, value, ):
+        if value and field_name in self.OPERATORS.keys():
+            ids = [volunteer.id for volunteer in queryset if
+                   self.OPERATORS[field_name](volunteer.times_volunteered, value)]
+            return queryset.filter(id__in=ids)
+        return queryset
+
+    class Meta:
+        model = Volunteer
+        fields = {
+            'id': ['exact'],
+            'first_name': ['exact', 'icontains'],
+            'last_name': ['exact', 'icontains'],
+            'tz_number': ['exact', 'icontains'],
+            'phone_number': ['exact', 'icontains'],
+            'date_of_birth': ['gt', 'lt', 'exact'],
+            'age': ['gt', 'lt', 'exact'],
+            'gender': ['exact'],
+            'city': ['exact'],
+            'neighborhood': ['exact', 'icontains'],
+            'areas': ['exact'],
+            'moving_way': ['exact'],
+            'week_assignments_capacity': ['exact', 'range'],
+            'wanted_assignments': ['exact'],
+            'score': ['exact'],
+            'created_date': ['gt', 'lt', 'exact']
+        }
+
+
 class ListVolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Volunteer.objects.all().order_by('-created_date')
     serializer_class = VolunteerSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = VolunteerFilter

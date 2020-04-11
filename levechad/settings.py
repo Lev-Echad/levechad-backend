@@ -82,7 +82,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'levechad.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 if 'RDS_HOSTNAME' in os.environ:
@@ -126,7 +125,7 @@ if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
         'version': 1,
         # Version of logging
         'disable_existing_loggers': False,
-        #disable logging
+        # disable logging
         # Handlers #############################################################
         'handlers': {
             'file': {
@@ -134,7 +133,7 @@ if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
                 'class': 'logging.FileHandler',
                 'filename': 'lev-debug.log',
             },
-        ########################################################################
+            ########################################################################
             'console': {
                 'class': 'logging.StreamHandler',
             },
@@ -148,7 +147,6 @@ if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
             },
         },
     }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -165,7 +163,6 @@ USE_TZ = True
 TIME_ZONE = "Asia/Jerusalem"
 
 LOGIN_REDIRECT_URL = '/server'
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -200,12 +197,12 @@ else:
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
 
-
 # Django Rest Framework configuration
 _renderer_classes = ['rest_framework.renderers.JSONRenderer']
 if ENV != 'PRODUCTION':
     _renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
 
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': _renderer_classes
+    'DEFAULT_RENDERER_CLASSES': _renderer_classes,
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
