@@ -4,9 +4,7 @@ from datetime import timedelta, date
 
 import boto3
 from PIL import Image, ImageDraw, ImageFont
-from bidi.algorithm import get_display
 
-from django.contrib.staticfiles import finders
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
@@ -18,6 +16,8 @@ from django.urls import reverse
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
 from multiselectfield import MultiSelectField
+
+from apps.certificate.certificate import create_certificate_image
 
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
@@ -210,49 +210,16 @@ class Volunteer(Timestampable):
 
 
 class VolunteerCertificate(models.Model):
-    CERTIFICATE_TEXT_COLOR = (3, 8, 12)  # (R, G, B)
-    CERTIFICATE_TEXT_SIZE = 40
-    CERTIFICATE_TEXT_POSITION = (700, 200)
-    IMAGE_PATH = 'certificates/{id}.png'
-    DOWNLOAD_LINK_EXPIRATION_SECONDS = 600
-
-    def _certificate_image_path(self, filename):
-        return type(self).IMAGE_PATH.format(id=self.id)
-
     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='certificates', null=False)
     expiration_date = models.DateField(default=date.today)
-    _image = models.FileField(blank=True, upload_to=_certificate_image_path)
+    _image = models.FileField(blank=True, upload_to=settings.CERTIFICATE_IMAGE_PATH)
+
+    def get_image_path(self):
+        return '{}/{}.png'.format( settings.CERTIFICATE_IMAGE_PATH, self.id)
 
     def create_image(self, save=True):
-        volunteer = self.volunteer
-        tag_filename = finders.find('client/tag.jpeg')
-        font_filename = finders.find('client/fonts/BN Amnesia.ttf')
-        photo = None
-        try:
-            photo = Image.open(tag_filename)
-            drawing = ImageDraw.Draw(photo)
-            font = ImageFont.truetype(font_filename, size=type(self).CERTIFICATE_TEXT_SIZE)
-
-            lines_to_insert = [
-                f'שם מתנדב: {volunteer.first_name} {volunteer.last_name}',
-                f'תעודת זהות: {volunteer.tz_number}',
-                f'תוקף התעודה: {self.expiration_date}',
-                f'מספר תעודה: {self.id}',
-            ]
-
-            drawing.text(
-                type(self).CERTIFICATE_TEXT_POSITION,
-                get_display('\n'.join(lines_to_insert)),
-                fill=type(self).CERTIFICATE_TEXT_COLOR,
-                font=font,
-                align='right'
-            )
-            with io.BytesIO() as output:
-                photo.save(output, format='png')
-                self._image.save(type(self).IMAGE_PATH.format(id=self.id), ContentFile(output.getvalue()), save=save)
-        finally:
-            if photo is not None:
-                photo.close()
+        image = create_certificate_image(self)
+        self._image.save(self.get_image_path(), ContentFile(image.getvalue()), save=save)
 
     def update_image_if_nonexistent(self, save=True):
         if not self._image.name:
@@ -275,7 +242,7 @@ class VolunteerCertificate(models.Model):
                     'Key': 'media/{}'.format(type(self).IMAGE_PATH.format(id=self.id)),
                     'ResponseContentDisposition': 'attachment;filename={}'.format(f'{self.id}.png'),
                 },
-                ExpiresIn=type(self).DOWNLOAD_LINK_EXPIRATION_SECONDS
+                ExpiresIn=settings.DOWNLOAD_LINK_EXPIRATION
             )
         else:
             return reverse('download_certificate', kwargs={'pk': self.id})

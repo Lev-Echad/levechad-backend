@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'storages',
     'django_extensions',
     'rest_framework',
+    
+    'apps.certificate',
 ]
 
 MIDDLEWARE = [
@@ -209,3 +211,7 @@ if ENV != 'PRODUCTION':
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': _renderer_classes
 }
+
+CERTIFICATE_IMAGE_PATH = 'certificates'
+CERTIFICATE_DOWNLOAD_LINK_EXPIRATION = 600 # in seconds
+
