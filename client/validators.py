@@ -26,6 +26,8 @@ def id_number_validator(value):
     for digit in even_digits:
         checksum += sum(digits_of(digit * 2))
     checksum = 10 - (checksum % 10)  # Get difference from upper round number
+    if checksum == 10:
+        checksum = 0
 
     if str(checksum) != value[-1]:
         raise ValidationError('Invalid ID number: Incorrect check digit')

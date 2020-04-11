@@ -306,6 +306,12 @@ class HelpRequest(Timestampable):
         ('NOT_DONE', 'לא טופל')
     )
 
+    REQUEST_REASONS = (
+        ('ISOLATION', 'בידוד'),
+        ('HIGH_RISK_GROUP', 'קבוצת סיכון גבוהה'),
+        ('OTHER', 'אחר'),
+    )
+
     full_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     phone_number = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
@@ -314,7 +320,8 @@ class HelpRequest(Timestampable):
     notes = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True, null=True)
     type = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=TYPES)
     type_text = models.CharField(max_length=5000)
-    status = models.CharField(max_length=25, choices=STATUSES, blank=True, default="WAITING")
+    request_reason = models.CharField(max_length=25, choices=REQUEST_REASONS, default='OTHER')
+    status = models.CharField(max_length=25, choices=STATUSES, blank=True, default='WAITING')
     status_updater = models.CharField(max_length=100, blank=True)
     helping_volunteer = models.ForeignKey(Volunteer, on_delete=models.SET_NULL, null=True, blank=True)
 
