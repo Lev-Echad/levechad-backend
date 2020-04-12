@@ -9,7 +9,7 @@ from django.contrib.staticfiles import finders
 from .forms import *
 from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
 from django.db.models.functions import Concat
-from django.db.models import Value, CharField, F, ExpressionWrapper
+from django.db.models import Value, CharField, F
 
 
 def thanks(request):
@@ -144,7 +144,7 @@ def find_certificate_view(request):
             # TODO: change to 'get' instead of 'first' after fixing #50
             volunteers_qs = Volunteer.objects.all()
             volunteers_qs = volunteers_qs.annotate(calc_full_name=Concat(F('first_name'), Value(' '), F('last_name'),
-                                                                    output_field=CharField()))
+                                                                         output_field=CharField()))
             volunteers_qs = volunteers_qs.filter(tz_number__exact=form['id_number'].data)
             volunteers_qs = volunteers_qs.filter(calc_full_name__iexact=form['signing'].data)
             volunteer = volunteers_qs.first()
@@ -161,7 +161,6 @@ def find_certificate_view(request):
                 else:
                     context['error'] = 'לא נמצאה תעודה בתוקף!'
             else:
-                print("Failed to find volunteer")
                 context['error'] = 'מתנדב לא נמצא, האם מילאת את הפרטים כמו שצריך?'
         else:
             context['error'] = 'יש למלא את השדות כנדרש!'
