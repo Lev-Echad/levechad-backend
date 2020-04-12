@@ -120,14 +120,15 @@ class VolunteerForm(forms.Form):
 
 class GetCertificateForm(forms.Form):
     id_number = forms.CharField(max_length=9, validators=[id_number_validator], required=True)
-    no_heat = forms.BooleanField(required=True)
+    no_fever = forms.BooleanField(required=True)
     routes = forms.BooleanField(required=True)
-    signing = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    signing = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id_number'].label = 'אנא הזן תעודת זהות'
-        self.fields['no_heat'].label = 'אני מאשר כי חום גופי אינו עולה על 38 מעלות וכי אני חש בטוב ללא תסמינים של חום, שיעול, כאבי גרון, צינון וכיוצא בזה.'
+        self.fields['no_fever'].label = \
+            'אני מאשר כי חום גופי אינו עולה על 38 מעלות וכי אני חש בטוב ללא תסמינים של חום, שיעול, כאבי גרון, צינון וכיוצא בזה.'
         self.fields['routes'].label = 'אני מאשר/ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם.'
         self.fields['signing'].label = 'הכנס שם מלא כדי לאשר:'
 
