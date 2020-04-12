@@ -46,7 +46,7 @@ And then log into the <http://localhost:8000/admin> and you will be able to see 
 
 Contributing
 ----------
-See the [CONTRIBUTING](https://github.com/Lev-Echad/levechad-backend/CONTRIBUTING.md) file for more information.
+See the [CONTRIBUTING](https://github.com/Lev-Echad/levechad-backend/blob/master/CONTRIBUTING.md) file for more information.
 
 Pulling issues
 -----------
@@ -71,9 +71,3 @@ For this, run the following commands:
 
     python manage.py migrate
 	
-
-Contributing
-------------
-The repository is open source and any contribution is appreciated !
-
-If  any part of this guide seems not to work no your machine, you are welcome to open an issue on the subject to receive help and resolve the problem.
