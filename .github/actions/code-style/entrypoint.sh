@@ -7,8 +7,8 @@ readonly COMMENT_MESSAGE=$2
 readonly MARKDOWN_CODE_WRAPPER='```'
 
 if [[ -z "$GITHUB_TOKEN" ]]; then
-	echo "The GITHUB_TOKEN is required."
-	echo "Submitting a comment will fail!"
+    echo "The GITHUB_TOKEN is required."
+    echo "Submitting a comment will fail!"
 fi
 
 cd $GITHUB_WORKSPACE
@@ -23,9 +23,11 @@ comment="${COMMENT_MESSAGE}${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CO
 if [ $pycode_retval -ne 0 ]; then
   payload=$(echo '{}' | jq --arg body "$comment" '.body = $body')
   comments_url=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
-  curl -s -S -H "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/json" --data-binary @<(echo "$payload") "$comments_url"
+  curl -s -S -H "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/json" --data-binary @<(echo "$payload") "$comm
+ents_url"
 else
   echo "There were no pycodestyle issues"
 fi
 
 exit $pycode_retval
+
