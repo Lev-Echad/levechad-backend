@@ -1,6 +1,6 @@
 import datetime
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area, City
 from django.db.models import F, Q, Count, DateTimeField
@@ -314,81 +314,14 @@ def delete_volunteer(request, pk):
 
 
 @login_required
-def find_closes_persons(request, pk):
-    request_person = HelpRequest.objects.get(id=pk)
+def find_closest_people(request, pk):
+    help_req = get_object_or_404(HelpRequest, pk=pk)
+    help_location = (help_req.city.x, help_req.city.y)
 
-    req_city = request_person.city
-    req_x = req_city.x
-    req_y = req_city.y
+    closest = HelpRequest.volunteers.all_by_distance(help_location)[:100]
 
-    closes_volunteer = Volunteer.objects.all()
-
-    # adding here a function that tell if the volunteer is aviavble
-    # --------- check time now --------
-    now = datetime.datetime.now()
-    now_day = now.strftime("%A")
-
-    yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-    yesterday_day = yesterday.strftime("%A")
-
-    availability_qs = []
-
-    # check option 1
-    if is_time_between(datetime.time(7, 00), datetime.time(15, 00)):
-        filter = "schedule__" + now_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 1})
-
-    # check option 2
-    elif is_time_between(datetime.time(15, 00), datetime.time(23, 00)):
-        filter = "schedule__" + now_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 2})
-
-
-    # check option 3 before midnight
-    elif is_time_between(datetime.time(23, 00), datetime.time(00, 00)):
-        filter = "schedule__" + now_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 3})
-
-    # check option 3 after midnight
-    elif is_time_between(datetime.time(00, 00), datetime.time(7, 00)):
-        filter = "schedule__" + yesterday_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 3})
-
-    # check for the persons that good timing if the day is good
-
-    availability_now_id = []
-    if availability_qs != []:
-        for volu in availability_qs:
-            availability_now_id.append(volu.id)
-
-    closes_volunteer = availability_qs
-
-    closes_volunteer = sorted(closes_volunteer,
-                              key=lambda volu: -HelpRequest.objects.filter(helping_volunteer=volu).count())
-    closes_volunteer = sorted(closes_volunteer,
-                              key=lambda volu: (volu.city.x - req_x) ** 2 + (volu.city.y - req_y) ** 2)
-
-    # closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
-
-    if len(closes_volunteer) > 100:
-        closes_volunteer = closes_volunteer[0:100]
-
-    # ----- check for each volunterr how much times he apper
-    appers_list = []
-    for volu in closes_volunteer:
-        appers_list.append(volu.times_volunteered)
-
-    final_data = []
-    for i in range(0, len(closes_volunteer)):
-        tot_x = (closes_volunteer[i].city.x - request_person.city.x) ** 2
-        tot_y = (closes_volunteer[i].city.y - request_person.city.y) ** 2
-        tot_value = int(((tot_x + tot_y) ** 0.5) / 100)
-        final_data.append((closes_volunteer[i], tot_value, appers_list[i]))
-
-    context = {'help_request': request_person, 'closes_volunteer': final_data,
-               'availability_now_id': availability_now_id}
+    context = {'help_request': help_req, 'closest_volunteer': closest}
     return render(request, 'server/closes_volunteer.html', context)
-
 
 def export_users_xls(request):
     fields_descriptions = {

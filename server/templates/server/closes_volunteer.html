@@ -170,7 +170,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for volunteer, distance, num_of_time in closes_volunteer %}
+        {% for volunteer in closest_volunteer %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.first_name }}</td>
@@ -206,8 +206,8 @@
                         לא פנוי
                     {% endif %}
                 </td>
-                <td>{{ distance }} ק"מ</td>
-                <td>{{ num_of_time }}</td>
+                <td>{{ volunteer.distance }} ק"מ</td>
+                <td>{{ volunteer.num_helped }}</td>
                 <td><a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#choose_volu{{ volunteer.id }}">בחר</a></td>
             </tr>
 
