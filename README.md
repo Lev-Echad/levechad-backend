@@ -44,6 +44,10 @@ To add admin user and see the databases:
 
 And then log into the <http://localhost:8000/admin> and you will be able to see the databases.
 
+Contributing
+----------
+See the [CONTRIBUTING](https://github.com/Lev-Echad/levechad-backend/CONTRIBUTING.md) file for more information.
+
 Pulling issues
 -----------
 When you pull an issue, you need to make sure your local repository is up to date with the latest changes in the code.
