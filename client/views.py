@@ -8,6 +8,8 @@ from django.contrib.staticfiles import finders
 
 from .forms import *
 from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
+from django.db.models.functions import Concat
+from django.db.models import Value
 
 
 def thanks(request):
@@ -46,7 +48,8 @@ def homepage(request):
     context = {
         "numbers": {
             "total_volunteers": Volunteer.objects.count() + 1786,
-            "total_help_requests": HelpRequest.objects.count() + 84     #added 1786 and 84 since those are the stats for before this app
+            "total_help_requests": HelpRequest.objects.count() + 84
+            # added 1786 and 84 since those are the stats for before this app
 
         }
     }
@@ -138,7 +141,10 @@ def find_certificate_view(request):
         form = GetCertificateForm(request.POST)
         if form.is_valid():
             # TODO: change to 'get' instead of 'first' after fixing #50
-            volunteer = Volunteer.objects.filter(tz_number=form['id_number'].data).first()
+            volunteers_qs = Volunteer.objects.all()
+            volunteers_qs.annotate(full_name_calc=Concat('first_name', Value(' '), 'last_name'))
+            volunteer = Volunteer.objects.filter(tz_number=form['id_number'].data,
+                                                 signing=form['full_name'].data).first()
             if volunteer is not None:
                 '''
                  TODO: this a hotfix that generate a valid certificate to any user that requests one. 
@@ -152,7 +158,7 @@ def find_certificate_view(request):
                 else:
                     context['error'] = 'לא נמצאה תעודה בתוקף!'
             else:
-                context['error'] = 'מתנדב לא נמצא!'
+                context['error'] = 'מתנדב לא נמצא, האם מילאת את הפרטים כמו שצריך?'
         else:
             context['error'] = 'יש למלא את השדות כנדרש!'
 
