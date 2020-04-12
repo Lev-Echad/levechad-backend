@@ -13,7 +13,7 @@ fi
 
 cd $GITHUB_WORKSPACE
 
-pycode_output=$(python3 -m pycodestyle ${LINTER_ARGS} .)
+pycode_output=$(python -m pycodestyle ${LINTER_ARGS} .)
 pycode_retval=$?
 echo $pycode_output
 
@@ -21,7 +21,8 @@ comment="${COMMENT_MESSAGE}\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_
 
 # If there were errors as part of linting, post a comment. Else, do nothing.
 if [ $pycode_retval -ne 0 ]; then
-  payload=$(echo '{}' | jq --arg body "$comment" '.body = $body')
+  payload=$(jq -Rn --arg body "$comment" '.body = $body')
+  echo $payload
   comments_url=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
   echo -e "$payload\n" | curl -s -S -H "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/json" --data-binary @- "$comments_url"
 else
