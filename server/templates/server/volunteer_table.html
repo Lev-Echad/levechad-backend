@@ -89,13 +89,13 @@
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
                 <td>
-                    {% if volunteer.id in availability_now_id %}
+                    {% if volunteer.is_available_now %}
                         פנוי
                     {% else %}
                         לא פנוי
                     {% endif %}
                 </td>
-                <td>{{ volunteer.appears_count }}</td>
+                <td>{{ volunteer.times_volunteered }}</td>
                 <td>{{ volunteer.guiding }}</td>
 
                 <td>

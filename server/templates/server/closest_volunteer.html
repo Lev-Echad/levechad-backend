@@ -170,7 +170,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for volunteer, distance, num_of_time in closes_volunteer %}
+        {% for volunteer in volunteers %}
             <tr>
                 <th scope="row">{{ volunteer.id }}</th>
                 <td>{{ volunteer.first_name }}</td>
@@ -200,14 +200,14 @@
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
                 <td>
-                    {% if volunteer.id in availability_now_id %}
+                    {% if volunteer.is_available_now %}
                         פנוי
                     {% else %}
                         לא פנוי
                     {% endif %}
                 </td>
-                <td>{{ distance }} ק"מ</td>
-                <td>{{ num_of_time }}</td>
+                <td>{{ volunteer.distance }} ק"מ</td>
+                <td>{{ volunteer.times_volunteered }}</td>
                 <td><a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#choose_volu{{ volunteer.id }}">בחר</a></td>
             </tr>
 

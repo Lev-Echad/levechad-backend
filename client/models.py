@@ -1,6 +1,7 @@
 # coding=utf-8
 import io
-from datetime import timedelta, date
+import math
+from datetime import timedelta, date, datetime, time
 
 import boto3
 from PIL import Image, ImageDraw, ImageFont
@@ -74,7 +75,46 @@ class VolunteerSchedule(Timestampable):
     Saturday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
 
 
+class AvailableVolunteerManager(models.Manager):
+    def get_queryset(self):
+        day, interval = self.current_day_and_interval()
+
+        filter = {'schedule__'  + day +  '__contains': interval}
+
+        return super().get_queryset().filter(**filter)
+
+    def current_day_and_interval(self):
+        '''
+        return a list [day, interval]
+        day - the current day mapped to an int (monday = 0,...,saturday = 5, sunday = 6)
+        interval - 1,2 or 3 depending on time of day
+        '''
+        in_interval = lambda t, interval: t > interval[0] and t < interval[1]
+        # FIX: should be changed to the actual intervals used
+        morning = (time(7,0), time(11, 59))
+        afternoon = (time(12,0), time(16,59))
+        evening = (time(17,0), time(23,59))
+
+        current = datetime.now().time()
+        if in_interval(current, morning):
+            current = "1"
+        elif in_interval(current, afternoon):
+            current = "2"
+        elif in_interval(current, evening):
+            current = "3"
+        else:
+            current = "<invalid>" # any non empty/non valid string should do
+
+        week_days = {6: 'Sunday', 0: 'Monday', 1: 'Tuestday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday'}
+
+        today = week_days[datetime.today().weekday()]
+
+        return [today, current]
+
 class Volunteer(Timestampable):
+    objects = models.Manager()
+    available = AvailableVolunteerManager()
+
     MOVING_WAYS = (
         ("BIKE", "אופניים"),
         ("SCOOTER", "קטנוע"),
@@ -197,6 +237,13 @@ class Volunteer(Timestampable):
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
     score = models.IntegerField(default=0)
 
+    def is_available_now(self):
+        try:
+            Volunteer.available.get(pk=self.id)
+            return True
+        except Volunteer.DoesNotExist:
+            return False
+
     @property
     def times_volunteered(self):
         return HelpRequest.objects.filter(helping_volunteer=self).count()
@@ -281,7 +328,34 @@ class VolunteerCertificate(models.Model):
             return reverse('download_certificate', kwargs={'pk': self.id})
 
 
+class HelpRequestVolunteerManager(models.Manager):
+    def _coord_distance(self, p1, p2):
+        ''' Haversine Formula '''
+        earth_radius =  6371
+        lat1 = math.radians(p1[0])
+        lat2 = math.radians(p2[0])
+        dLat = math.radians(p2[0]-p1[0])
+        dLon = math.radians(p2[1]-p1[1])
+
+        a = math.sin(dLat/2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dLon/2)**2;
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        return earth_radius * c
+
+    def all_by_distance(self, h_coord):
+        volunteers = []
+        for v in Volunteer.objects.all():
+            v_coord = (v.location_address_x, v.location_address_y)
+            v.distance = self._coord_distance(h_coord, v_coord)
+
+            v.num_helped = 10
+            volunteers.append(v)
+
+        return sorted(volunteers, key=lambda v: v.distance)
+
 class HelpRequest(Timestampable):
+    objects = models.Manager()
+    volunteers = HelpRequestVolunteerManager()
+
     TYPES = (
         ('BUYIN', 'קניות'),
         ('TRAVEL', 'איסוף'),
