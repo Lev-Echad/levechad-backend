@@ -1,13 +1,11 @@
 import re
-import json
 
 from rest_framework import viewsets, generics, mixins
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from client.models import Volunteer, VolunteerSchedule
+from client.models import Volunteer
 from api.serializers import VolunteerSerializer, RegistrationSerializer
 
 INVALID_PHONE_CHARACTER_REGEX = r'[^0-9\-+]'
