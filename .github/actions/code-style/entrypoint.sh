@@ -12,6 +12,7 @@ pycode_output=$(python -m pycodestyle ${LINTER_ARGS} .)
 
 comment="${COMMENT_MESSAGE}\\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}"
 
+comment="Test1"
 echo "::set-output name=comment::$(echo ${comment})"
 
 exit 0
