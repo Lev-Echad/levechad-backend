@@ -6,7 +6,7 @@ readonly COMMENT_MESSAGE=$2
 
 cd $GITHUB_WORKSPACE
 
-pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | | sed 's#^#\`#g' | sed 's#$#\`<br />#g')
+pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | sed 's#^#\`#g' | sed 's#$#\`<br />#g')
 
 # If output is empty then there are no linting errors
 if [ -z ${pycode_output} ]; then

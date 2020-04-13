@@ -15,6 +15,6 @@ jobs:
     - name: pycodestyle
       uses: ./.github/actions/code-style
       with:
-          comment-message: "PycodeStyle:"
+          comment-message: "Pycodestyle:"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
