@@ -1,12 +1,14 @@
-from django import forms
 import json
+
+from django import forms
 from django.core.validators import RegexValidator
-from client.models import Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
+
+from client.models import HelpRequest, Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
+from client.validators import id_number_validator
 
 FIELD_NAME_MAPPING = {
 }
 
-# Create your models here.
 AREAS = (
     ("צפון", "צפון"),
     ("ירושלים והסביבה", "ירושלים והסביבה"),
@@ -20,25 +22,31 @@ data = json.load(json_file)
 onlyNames = [a["name"] for a in data]
 onlyNames.sort()
 CITIES = [(str(x), str(x)) for x in onlyNames]
+
 json_file.close()
 
 
-# class NameForm(forms.Form):
-#     your_name = forms.CharField(label='Your name', max_length=100)
-
-
-# SEND HELP FORM
-# -------------------------------------------------------------------------------------------------------
-
-def get_the_lang_choices():
+def get_lang_choices():
     return [(str(x), str(x)) for x in Language.objects.all()]
+
+
+class NoDefaultChoiceField(forms.ChoiceField):
+    """
+    A choice field with a blank option at the beginning.
+    """
+    def __init__(self, *args, choices=None, **kwargs):
+        if choices is not None:
+            choices = [('', '')] + list(choices)
+        super().__init__(*args, choices=choices, initial='', **kwargs)
 
 
 class VolunteerForm(forms.Form):
     MOVING_WAYS = (
-        ("CAR", "רכב"),
-        ("PUBL", 'תחב"צ'),
-        ("FOOT", 'רגלית')
+        ("BIKE", "אופניים"),
+        ("SCOOTER", "קטנוע"),
+        ("CAR", "מכונית"),
+        ("PUBL", "תחבורה ציבורית"),
+        ("FOOT", "רגלית")
     )
 
     HEARING_WAYS = (
@@ -53,27 +61,25 @@ class VolunteerForm(forms.Form):
         ("NO", "לא"),
     )
 
-    my_validator = RegexValidator(r"^\d+$")
     first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    identity = forms.CharField(max_length=ID_LENGTH, validators=[my_validator])
+    id_number = forms.CharField(max_length=ID_LENGTH, validators=[id_number_validator])
     organization = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     date_of_birth = forms.DateField(input_formats=['%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%d.%m.%Y', '%d.%m.%y'],
                                     required=True)
     area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
-    languages = forms.MultipleChoiceField(choices=get_the_lang_choices, widget=forms.CheckboxSelectMultiple())
+    languages = forms.MultipleChoiceField(choices=get_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     email = forms.EmailField()
-    city = forms.ChoiceField(choices=CITIES)
+    city = NoDefaultChoiceField(choices=CITIES)
     neighborhood = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     available_on_saturday = forms.BooleanField(required=False)
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
-    transportation = forms.ChoiceField(choices=MOVING_WAYS)
-    hearing_way = forms.ChoiceField(choices=HEARING_WAYS)
-    area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
-    childrens = forms.ChoiceField(choices=BOOL)
-    chamal = forms.ChoiceField(choices=BOOL)
+    transportation = NoDefaultChoiceField(choices=MOVING_WAYS)
+    hearing_way = NoDefaultChoiceField(choices=HEARING_WAYS)
+    childrens = NoDefaultChoiceField(choices=BOOL)
+    chamal = NoDefaultChoiceField(choices=BOOL)
 
     no_corona1 = forms.BooleanField()
     no_corona2 = forms.BooleanField()
@@ -84,7 +90,7 @@ class VolunteerForm(forms.Form):
         super(forms.Form, self).__init__(*args, **kwargs)
         self.fields['first_name'].label = "שם פרטי"
         self.fields['last_name'].label = "שם משפחה"
-        self.fields['identity'].label = "מספר ת.ז"
+        self.fields['id_number'].label = "מספר ת.ז"
         self.fields['organization'].label = "ארגון"
         self.fields['organization'].widget.attrs['readonly'] = True
         self.fields['languages'].label = "שפות שאתה דובר"
@@ -99,28 +105,32 @@ class VolunteerForm(forms.Form):
         self.fields['notes'].label = "הערות"
         self.fields['transportation'].label = "דרכי התניידות"
         self.fields['hearing_way'].label = "איך שמעת עלינו"
-        self.fields['no_corona1'].label = "אני מאשר\ת כי לא חזרתי מחו''ל ב-14 הימים האחרונים"
-        self.fields[
-            'no_corona2'].label = "אני מאשר\ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
-        self.fields[
-            'no_corona3'].label = "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
-        self.fields[
-            'no_corona4'].label = "אני מאשר\ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
+        self.fields['no_corona1'].label = "אני מאשר/ת כי לא חזרתי מחו\"ל ב-14 הימים האחרונים"
+        self.fields['no_corona2'].label = "אני מאשר/ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
+        self.fields['no_corona3'].label = "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
+        self.fields['no_corona4'].label = "אני מאשר/ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
 
         self.fields['childrens'].label = (
-            "האם את\ה מעוניינ\ת לסייע לעובדים חיוניים (מסגרות חיוניות לילדי צוות רפואי)? - עדיפות ל-3 ימי התנדבות.  "
+            "האם את/ה מעוניינ/ת לסייע לעובדים חיוניים (מסגרות חיוניות לילדי צוות רפואי)? - עדיפות ל-3 ימי התנדבות."
         )
         self.fields['chamal'].label = (
-            " ?האם אתה מתנדב חמ''ל"
+            "?האם אתה מתנדב חמ\"ל"
         )
 
 
 class GetCertificateForm(forms.Form):
-    tz_number = forms.CharField(max_length=9, validators=[RegexValidator(r"^\d+$")], required=True)
+    id_number = forms.CharField(max_length=9, validators=[id_number_validator], required=True)
+    no_fever = forms.BooleanField(required=True)
+    routes = forms.BooleanField(required=True)
+    signing = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['tz_number'].label = 'אנא הזן תעודת זהות'
+        self.fields['id_number'].label = 'אנא הזן תעודת זהות'
+        self.fields['no_fever'].label = \
+            'אני מאשר כי חום גופי אינו עולה על 38 מעלות וכי אני חש בטוב ללא תסמינים של חום, שיעול, כאבי גרון, צינון וכיוצא בזה.'
+        self.fields['routes'].label = 'אני מאשר/ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם.'
+        self.fields['signing'].label = 'הכנס שם מלא כדי לאשר:'
 
 
 class ScheduleForm(forms.Form):
@@ -152,23 +162,15 @@ class ScheduleForm(forms.Form):
 # -------------------------------------------------------------------------------------------------------
 
 class BaseHelpForm(forms.Form):
-    """TYPES = (
-        ('BUYIN', 'קניות\\איסוף'),
-        ('MEDICI', 'תרופות'),
-        ('PHONE_HEL', 'תמיכה טלפונית'),
-        ('OTHER', 'אחר')
-    )"""
+    phone_number_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
 
-    my_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
     full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[my_validator])
-    area = forms.ChoiceField(choices=AREAS)
-    city = forms.ChoiceField(choices=CITIES)
+    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[phone_number_validator])
+    area = NoDefaultChoiceField(choices=AREAS)
+    city = NoDefaultChoiceField(choices=CITIES)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    request_reason = NoDefaultChoiceField(choices=HelpRequest.REQUEST_REASONS)
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
-
-    # type = forms.ChoiceField(choices=TYPES)
-    # type_text = forms.CharField(max_length=5000)
 
     def __init__(self, *args, **kwargs):
         super(forms.Form, self).__init__(*args, **kwargs)
@@ -178,20 +180,11 @@ class BaseHelpForm(forms.Form):
         self.fields['city'].label = "עיר מגורים"
         self.fields['address'].label = "כתובת מגורים"
         self.fields['notes'].label = "הערות"
+        self.fields['request_reason'].label = 'סיבת הבקשה'
 
 
-# class HomeForm(BaseHelpForm):
-#     need_text = forms.CharField(widget=forms.Textarea, max_length=5000)
-
-#     def __init__(self, *args, **kwargs):
-#         super(BaseHelpForm, self).__init__(*args, **kwargs)
-#         self.fields['full_name'].label = "שם מלא"
-#         self.fields['phone_number'].label = "מספר פלאפון"
-#         self.fields['area'].label = "אזור"
-#         self.fields['city'].label = "עיר מגורים"
-#         self.fields['address'].label = "כתובת מגורים"
-#         self.fields['notes'].label = "הערות"
-#         self.fields['need_text'].label = "מהי העזרה שאתה צריך"
+class PhoneHelpForm(BaseHelpForm):
+    pass
 
 
 class MedicForm(BaseHelpForm):
@@ -199,13 +192,7 @@ class MedicForm(BaseHelpForm):
     medic_name = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
-        self.fields['notes'].label = "הערות"
+        super().__init__(*args, **kwargs)
         self.fields['need_prescription'].label = "האם מדובר בתרופת מרשם"
         self.fields['medic_name'].label = "שם תרופה"
 
@@ -214,29 +201,18 @@ class OtherForm(BaseHelpForm):
     other_need = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
-        self.fields['notes'].label = "הערות"
-        self.fields[
-            'other_need'].label = "פרט לאיזו עזרה אתה זקוק" + "\n" + \
-                                  "(הארגון אינו תומך בסיוע כלכלי,נוכל להפנות לגורמים הרלוונטיים)"
+        super().__init__(*args, **kwargs)
+        self.fields['other_need'].label = '\n'.join([
+            'פרט לאיזו עזרה אתה זקוק',
+            '(הארגון אינו תומך בסיוע כלכלי,נוכל להפנות לגורמים הרלוונטיים)',
+        ])
 
 
 class ShoppingForm(BaseHelpForm):
     to_buy = forms.CharField(max_length=5000, widget=forms.Textarea)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
-        self.fields['notes'].label = "הערות"
+        super().__init__(*args, **kwargs)
         self.fields['to_buy'].label = "הכנס את רשימת הקניות שלך"
 
 
@@ -244,14 +220,8 @@ class TravelForm(BaseHelpForm):
     travel_need = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
-        self.fields['notes'].label = "הערות"
-        self.fields['travel_need'].label = "'פרט את מסלול הנסיעה הנדרש"
+        super().__init__(*args, **kwargs)
+        self.fields['travel_need'].label = "פרט את מסלול הנסיעה הנדרש"
 
 
 class WorkersForm(BaseHelpForm):
@@ -259,12 +229,7 @@ class WorkersForm(BaseHelpForm):
     workplace_need = forms.CharField(widget=forms.Textarea, max_length=5000)
 
     def __init__(self, *args, **kwargs):
-        super(BaseHelpForm, self).__init__(*args, **kwargs)
-        self.fields['full_name'].label = "שם מלא"
-        self.fields['phone_number'].label = "מספר פלאפון"
-        self.fields['area'].label = "אזור"
-        self.fields['city'].label = "עיר מגורים"
-        self.fields['address'].label = "כתובת מגורים"
+        super().__init__(*args, **kwargs)
         self.fields['notes'].label = "הערות"
 
         self.fields['workplace_name'].label = "שם המוסד בו את/ה עובד"
