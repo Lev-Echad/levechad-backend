@@ -2,6 +2,7 @@
 
 import client.models
 from django.db import migrations, models
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -14,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='volunteercertificate',
             name='image',
-            field=models.FileField(blank=True, upload_to=client.models.VolunteerCertificate._certificate_image_path),
+            field=models.FileField(blank=True, upload_to=settings.CERTIFICATE_IMAGE_PATH),
         ),
     ]
