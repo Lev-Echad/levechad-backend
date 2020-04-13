@@ -19,7 +19,7 @@ pycode_retval=$?
 #pycode_retval=1
 echo $pycode_output
 
-comment=$(echo -E "${COMMENT_MESSAGE}\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}" | sed 's/\\n/\\\\n/g')
+comment=$(echo -E "${COMMENT_MESSAGE}\\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}" | sed 's/\\n/\\\\n/g')
 
 # If there were errors as part of linting, post a comment. Else, do nothing.
 if [ $pycode_retval -ne 0 ]; then
