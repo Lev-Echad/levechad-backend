@@ -16,14 +16,10 @@ jobs:
       uses: ./.github/actions/code-style
       with:
           comment-message: "PycodeStyle:"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: comment PR
       uses: unsplash/comment-on-pr@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          msg: ${{ steps.pycodestyle.outputs.comment }}
-
-        
+          msg: ${{ steps.pycodestyle.outputs.COMMENT }}

@@ -10,7 +10,7 @@ inputs:
       required: false
       default: ''
 outputs:
-    comment:
+    COMMENT:
         description: 'Generated Command to post'
 runs:
   using: 'docker'
