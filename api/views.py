@@ -18,7 +18,7 @@ MIN_PHONE_NUMBER_LENGTH = 9
 class SendVerificationCodeViewSet(viewsets.ViewSet):
     def create(self, request):
         def _is_valid_phone_number(string):
-            # TODO think of better validation, make the client forms & this one use the same phone validation after refactor
+            # TODO add better validation, make the client forms & this one use the same phone validation after refactor
             return len(re.findall(INVALID_PHONE_CHARACTER_REGEX, string)) == 0 and \
                    MIN_PHONE_NUMBER_LENGTH <= len(string) <= MAX_PHONE_NUMBER_LENGTH
 
