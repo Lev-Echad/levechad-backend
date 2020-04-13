@@ -8,13 +8,13 @@ cd $GITHUB_WORKSPACE
 
 # Replace newlines with line break
 # sed 1 explained:
+#    Start backtick section (replace each line start with `)
+# sed 2 explained:
 #    'a:' label named "a"
-#    'N' Append the next line to the pattern ( pattern = `<br />)
+#    'N' Append the next line to space pattern
 #    '$!' if not the last line 'ba' branch (goto) label a
 #    's' substitue
-# sed 2 explained:
-#    Complete the backtick started by sed 1
-pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | sed ':a;N;$!ba;s#\n#`<br />#g' | sed 's#^#`#g')
+pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | sed 's#^#\`#g' | sed ':a;N;$!ba;s#\n#\`<br />#g')
 
 # If output is empty then there are no linting errors
 if [ -z ${pycode_output} ]; then
