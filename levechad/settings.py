@@ -38,6 +38,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'client.apps.ClientConfig',
     'server.apps.ServerConfig',
+    'api.apps.ApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'mathfilters',
     'storages',
     'django_extensions',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -197,3 +199,13 @@ else:
     # In development, let django serve static files (and media files in urls.py)
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
+
+
+# Django Rest Framework configuration
+_renderer_classes = ['rest_framework.renderers.JSONRenderer']
+if ENV != 'PRODUCTION':
+    _renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': _renderer_classes
+}
