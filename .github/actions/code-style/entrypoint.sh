@@ -21,7 +21,7 @@ comments_url=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
 echo ${comments_url}
 cat ${GITHUB_EVENT_PATH}
 
-curl -sS -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: Application/json" --data-binary @comment.json ${comments_url}
+curl -sS -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: Application/json" --data-binary @payload.json ${comments_url}
 
 exit 0
 
