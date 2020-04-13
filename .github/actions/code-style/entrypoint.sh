@@ -4,7 +4,6 @@
 readonly LINTER_ARGS=$1
 readonly COMMENT_MESSAGE=$2
 
-readonly MARKDOWN_CODE_WRAPPER='```'
 cd $GITHUB_WORKSPACE
 
 # Replace newlines with line break
@@ -13,9 +12,9 @@ cd $GITHUB_WORKSPACE
 #    'N' Append the next line to the pattern (<br />)
 #    '$!' if not the last line 'ba' branch (goto) label a
 #    's' substitue
-pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | sed ':a;N;$!ba;s/\n/<br \/>/g')
+pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | sed ':a;N;$!ba;s#\n#<br />#g')
 
-comment="{\"body\": \"${COMMENT_MESSAGE}<br />${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}\"}"
+comment="{\"body\": \"${COMMENT_MESSAGE}<br />${pycode_output}\"}"
 echo -En ${comment} > payload.json
 cat payload.json
 
