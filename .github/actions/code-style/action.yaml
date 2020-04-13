@@ -9,9 +9,6 @@ inputs:
       description: 'Message to add in the begining of the comment'
       required: false
       default: ''
-outputs:
-    COMMENT:
-        description: 'Generated Command to post'
 runs:
   using: 'docker'
   image: 'Dockerfile'
