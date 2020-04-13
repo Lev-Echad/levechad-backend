@@ -18,8 +18,10 @@ cat payload.json
 sed -i "s#\\#\\\\#g" payload.json
 
 comments_url=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
+cat ${comments_url}
+cat ${GITHUN_EVENT_PATH}
 
-curl -sS -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: Application/json" --data-binary @comment.json $comments_url
+curl -sS -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: Application/json" --data-binary @comment.json ${comments_url}
 
 exit 0
 
