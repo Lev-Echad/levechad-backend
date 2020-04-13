@@ -11,7 +11,7 @@ cd $GITHUB_WORKSPACE
 pycode_output=$(python -m pycodestyle ${LINTER_ARGS} .)
 
 comment="\{\"body\": \"${COMMENT_MESSAGE}\\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}\"\}"
-comment="\{\"body\": \"test self json\"\}"
+comment='{"body": "test self json"}'
 echo -E $comment | tee comment.json 
 
 comments_url=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
