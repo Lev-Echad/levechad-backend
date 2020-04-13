@@ -5,12 +5,13 @@ readonly LINTER_ARGS=$1
 readonly COMMENT_MESSAGE=$2
 
 readonly MARKDOWN_CODE_WRAPPER='```'
+readonly MARKDOWN_LINEBREAK='<br />'
 
 cd $GITHUB_WORKSPACE
 
-pycode_output=$(python -m pycodestyle ${LINTER_ARGS} .)
+pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | sed 's#\\#${MARKDOWN_LINEBREAK}#g')
 
-comment="{\"body\": \"${COMMENT_MESSAGE}\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}\"}"
+comment="{\"body\": \"${COMMENT_MESSAGE}${MARKDOWN_LINEBREAK}${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}\"}"
 echo -En ${comment} > payload.json
 cat payload.json
 
