@@ -11,9 +11,9 @@ cd $GITHUB_WORKSPACE
 pycode_output=$(python -m pycodestyle ${LINTER_ARGS} .)
 
 comment="${COMMENT_MESSAGE}\\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}"
+echo "This is comment: ${comment}"
 
-comment="Test1"
-echo "::set-output name=comment::$(echo ${comment})"
+echo "::set-output name=comment::${comment}"
 
 exit 0
 
