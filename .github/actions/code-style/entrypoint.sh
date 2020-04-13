@@ -14,7 +14,7 @@ comment="${COMMENT_MESSAGE}\\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN
 echo "This is comment: ${comment}"
 
 #echo "::set-output name=comment::${comment}"
-echo ::set-output name=COMMENT::"inline-test"
+echo "::set-output name=COMMENT::inline-test"
 
 exit 0
 
