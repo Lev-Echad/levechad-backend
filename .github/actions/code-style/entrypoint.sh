@@ -26,7 +26,7 @@ if [ $pycode_retval -ne 0 ]; then
   payload=$(jq -Rn --arg body "$comment" '.body = $body')
   echo $payload
   comments_url=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
-  echo -e "$payload\n" | curl -s -S -H "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/json" --data-binary @- "$comments_url"
+  echo -E "$payload\\n" | curl -s -S -H "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/json" --data-binary @- "$comments_url"
 else
   echo "There were no pycodestyle issues"
 fi
