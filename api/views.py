@@ -7,10 +7,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django_filters import rest_framework as filters
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from client.models import Volunteer, VolunteerSchedule
+from client.models import Volunteer, VolunteerSchedule, City
 from api.serializers import VolunteerSerializer, RegistrationSerializer
+from server.forms import CITIES
 
 INVALID_PHONE_CHARACTER_REGEX = r'[^0-9\-+]'
 MAX_PHONE_NUMBER_LENGTH = 20
@@ -74,7 +75,7 @@ class VolunteerFilter(filters.FilterSet):
     times_volunteered__gt = filters.NumberFilter(method='get_times_volunteered', field_name='gt')
     times_volunteered__lt = filters.NumberFilter(method='get_times_volunteered', field_name='lt')
 
-    def get_times_volunteered(self, queryset, field_name, value, ):
+    def get_times_volunteered(self, queryset, field_name, value):
         if value and field_name in self.OPERATORS.keys():
             ids = [volunteer.id for volunteer in queryset if
                    self.OPERATORS[field_name](volunteer.times_volunteered, value)]
@@ -92,19 +93,20 @@ class VolunteerFilter(filters.FilterSet):
             'date_of_birth': ['gt', 'lt', 'exact'],
             'age': ['gt', 'lt', 'exact'],
             'gender': ['exact'],
-            'city': ['exact'],
+            'city': ['exact', 'in'],
             'neighborhood': ['exact', 'icontains'],
             'areas': ['exact'],
             'moving_way': ['exact'],
             'week_assignments_capacity': ['exact', 'range'],
             'wanted_assignments': ['exact'],
             'score': ['exact'],
-            'created_date': ['gt', 'lt', 'exact']
+            'created_date': ['gt', 'lt', 'exact'],
+            'organization': ['exact', 'in']
         }
 
 
 class ListVolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Volunteer.objects.all().order_by('-created_date')
     serializer_class = VolunteerSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filterset_class = VolunteerFilter
