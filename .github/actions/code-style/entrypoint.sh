@@ -13,7 +13,7 @@ if [ -z ${pycode_output} ]; then
 	exit 0
 fi
 
-mment="{\"body\": \"${COMMENT_MESSAGE}\r\n\n${pycode_output}\"}"
+comment="{\"body\": \"${COMMENT_MESSAGE}\r\n\n${pycode_output}\"}"
 echo -En ${comment} > payload.json
 cat payload.json
 
@@ -23,7 +23,11 @@ sed -i 's#\\#\\\\#g' payload.json
 # Endpoint for posting comments
 comments_endpoint=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
 
-curl -sS -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: Application/json" --data-binary @payload.json ${comments_endpoint}
+curl -sS \
+	-H "Authorization: token ${GITHUB_TOKEN}" \
+	-H "Content-Type: Application/json" \
+	--data-binary @payload.json \
+	${comments_endpoint}
 
-# Always fail, if we reach here ther are e linting errors
+# Always fail, if we reach here there are linting errors
 exit 1
