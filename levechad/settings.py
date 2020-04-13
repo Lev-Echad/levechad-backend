@@ -124,22 +124,17 @@ AUTH_PASSWORD_VALIDATORS = [
 if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
     LOGGING = {
         'version': 1,
-        # Version of logging
         'disable_existing_loggers': False,
-        #disable logging
-        # Handlers #############################################################
         'handlers': {
             'file': {
                 'level': 'DEBUG',
                 'class': 'logging.FileHandler',
                 'filename': 'lev-debug.log',
             },
-        ########################################################################
             'console': {
                 'class': 'logging.StreamHandler',
             },
         },
-        # Loggers ####################################################################
         'loggers': {
             'django': {
                 'handlers': ['file', 'console'],

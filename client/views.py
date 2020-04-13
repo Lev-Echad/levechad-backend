@@ -1,10 +1,5 @@
-import io
-from PIL import Image, ImageDraw, ImageFont
-from bidi.algorithm import get_display
-
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from django.contrib.staticfiles import finders
 
 from .forms import *
 from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
