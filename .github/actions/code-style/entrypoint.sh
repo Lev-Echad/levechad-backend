@@ -10,7 +10,11 @@ cd $GITHUB_WORKSPACE
 
 pycode_output=$(python -m pycodestyle ${LINTER_ARGS} .)
 
-comment="{\"body\": \"${COMMENT_MESSAGE}\\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}\"}"
+comment="{\"body\": \"${COMMENT_MESSAGE}\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}\"}"
+
+# Escape backspaces
+escaped_comment=$(echo -nE ${comment} | sed "s#\\#\\\\#g")
+
 #comment='{"body": "test self json"}'
 echo -E $comment | tee comment.json 
 
