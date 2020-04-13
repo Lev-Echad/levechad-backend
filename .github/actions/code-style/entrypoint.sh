@@ -13,7 +13,7 @@ if [ -z ${pycode_output} ]; then
 	exit 0
 fi
 
-comment="{\"body\": \"${COMMENT_MESSAGE}<br />${pycode_output}\`\"}"
+comment="{\"body\": \"${COMMENT_MESSAGE}<br />${pycode_output}\"}"
 echo -En ${comment} > payload.json
 cat payload.json
 
