@@ -6,22 +6,14 @@ readonly COMMENT_MESSAGE=$2
 
 cd $GITHUB_WORKSPACE
 
-# Replace newlines with line break
-# sed 1 explained:
-#    Start backtick section (replace each line start with `)
-# sed 2 explained:
-#    'a:' label named "a"
-#    'N' Append the next line to space pattern
-#    '$!' if not the last line 'ba' branch (goto) label a
-#    's' substitue
-pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | sed 's#^#\`#g' | sed ':a;N;$!ba;s#\n#\`<br />#g')
+pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | | sed 's#^#\`#g' | sed 's#$#\`<br />#g')
 
 # If output is empty then there are no linting errors
 if [ -z ${pycode_output} ]; then
 	exit 0
 fi
 
-comment="{\"body\": \"${COMMENT_MESSAGE}<br />${pycode_output}\"}"
+comment="{\"body\": \"${COMMENT_MESSAGE}<br />${pycode_output}\`\"}"
 echo -En ${comment} > payload.json
 cat payload.json
 
