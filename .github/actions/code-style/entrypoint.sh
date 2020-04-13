@@ -15,11 +15,11 @@ cd $GITHUB_WORKSPACE
 
 pycode_output=$(python -m pycodestyle ${LINTER_ARGS} .)
 pycode_retval=$?
-#pycode_output="asd\n"
+#pycode_output='asd\n'
 #pycode_retval=1
 echo $pycode_output
 
-comment=$(printf "%q" "${COMMENT_MESSAGE}\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}")
+comment=$(echo -E "${COMMENT_MESSAGE}\n${MARKDOWN_CODE_WRAPPER}${pycode_output}${MARKDOWN_CODE_WRAPPER}" | sed 's/\\n/\\\\n/g')
 
 # If there were errors as part of linting, post a comment. Else, do nothing.
 if [ $pycode_retval -ne 0 ]; then
