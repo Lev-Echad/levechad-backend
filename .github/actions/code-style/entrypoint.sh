@@ -6,14 +6,14 @@ readonly COMMENT_MESSAGE=$2
 
 cd $GITHUB_WORKSPACE
 
-pycode_output=$(python -m pycodestyle ${LINTER_ARGS} . | sed 's#^#\`#g' | sed 's#$#\`<br />#g')
+pycode_output="$(python -m pycodestyle ${LINTER_ARGS} . | sed 's#^#*#g')"
 
 # If output is empty then there are no linting errors
 if [ -z ${pycode_output} ]; then
 	exit 0
 fi
 
-comment="{\"body\": \"${COMMENT_MESSAGE}<br />${pycode_output}\"}"
+mment="{\"body\": \"${COMMENT_MESSAGE}\r\n\n${pycode_output}\"}"
 echo -En ${comment} > payload.json
 cat payload.json
 
