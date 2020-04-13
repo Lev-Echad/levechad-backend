@@ -1,17 +1,14 @@
 import re
-import json
 from operator import gt, lt, eq
 
-from rest_framework import viewsets, generics, mixins
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from django_filters import rest_framework as filters
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import viewsets, mixins
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
-from client.models import Volunteer, VolunteerSchedule, City
 from api.serializers import VolunteerSerializer, RegistrationSerializer
-from server.forms import CITIES
+from client.models import Volunteer
 
 INVALID_PHONE_CHARACTER_REGEX = r'[^0-9\-+]'
 MAX_PHONE_NUMBER_LENGTH = 20
