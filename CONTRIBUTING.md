@@ -64,9 +64,10 @@ of the admins (including @astar26 and @stavlocker).
 * When finished, create a pull request (PR) to the `develop` branch. Remember to assign yourself to the PR. Also make
 sure to link the issue to the PR.
 
-### Fixing Pull Requests (Answering Code Reviews)
+### Pull Requests (Answering Code Reviews)
 _After creating a PR, you must answer the code review (CR) given. There must be an approving reviewer on a PR to merge
 it to the target branch._
+* **The reviewer is not expected to test that your code works** (although they may). You must do this before submitting any changes.
 * Make sure to address all the comments in your CR, by fixing them or commenting why you think they shouldn't be done.
 * You will not be able to merge to the traget branch (usually `develop`) before you fix all the conflicts by merging
 from the target branch to your branch. GitHub also shows if there are conflicts at the bottom of the pull request page.
