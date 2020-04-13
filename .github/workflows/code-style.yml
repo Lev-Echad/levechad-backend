@@ -24,7 +24,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          msg: "Test" 
-          #msg: ${{ steps.pycodestyle.outputs.comment }}
+          msg: ${{ steps.pycodestyle.outputs.comment }}
 
         
