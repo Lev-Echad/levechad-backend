@@ -33,7 +33,7 @@ class Timestampable(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
+        # Update timestamps on save
         if not self.id:
             self.created_date = timezone.now()
         self.updated_date = timezone.now()
