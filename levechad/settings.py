@@ -82,7 +82,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'levechad.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 if 'RDS_HOSTNAME' in os.environ:
@@ -144,7 +143,6 @@ if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
         },
     }
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -160,7 +158,6 @@ USE_TZ = True
 TIME_ZONE = "Asia/Jerusalem"
 
 LOGIN_REDIRECT_URL = '/server'
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -195,7 +192,6 @@ else:
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
 
-
 # Django Rest Framework configuration
 _renderer_classes = ['rest_framework.renderers.JSONRenderer']
 if ENV != 'PRODUCTION':
@@ -204,4 +200,5 @@ if ENV != 'PRODUCTION':
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': _renderer_classes,
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.DefaultPagination',
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
