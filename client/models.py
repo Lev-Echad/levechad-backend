@@ -342,7 +342,8 @@ class ParentalConsent(models.Model):
 # @receiver(pre_save, sender=VolunteerSchedule)
 # def pre_save_handler(sender, instance, *args, **kwargs):
 #     """
-#     Django doesn't validate fields before saving by calling clean functions because of compatibility issues. This does.
+#     Django doesn't validate fields before saving by calling clean functions because of compatibility issues.
+#     This does.
 #     See https://docs.djangoproject.com/en/3.0/ref/models/instances/#validating-objects
 #     """
 #     instance.full_clean()
