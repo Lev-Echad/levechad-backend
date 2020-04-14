@@ -1,0 +1,17 @@
+name: 'Code Style'
+description: 'Check styling of the code'
+inputs:
+  linter-args:
+      description: 'Arguments to supply the linter with'
+      required: false
+      default: ''
+  comment-message:
+      description: 'Message to add in the begining of the comment'
+      required: false
+      default: ''
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.linter-args }}
+    - ${{ inputs.comment-message}}
