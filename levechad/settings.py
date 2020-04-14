@@ -202,5 +202,6 @@ if ENV != 'PRODUCTION':
     _renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
 
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': _renderer_classes
+    'DEFAULT_RENDERER_CLASSES': _renderer_classes,
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.DefaultPagination',
 }
