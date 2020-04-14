@@ -279,7 +279,8 @@ def volunteer_edit_notes(request, pk):
     to_edit.save()
     return redirect('show_all_volunteers')
 
-@login_required()
+
+@login_required
 def volunteer_edit_tz_num(request, pk):
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('tz_num') is not None:
@@ -287,7 +288,8 @@ def volunteer_edit_tz_num(request, pk):
     to_edit.save()
     return redirect('show_all_volunteers')
 
-@login_required()
+
+@login_required
 def volunteer_edit_city(request, pk):
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('city_name') is not None:

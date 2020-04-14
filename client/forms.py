@@ -106,9 +106,15 @@ class VolunteerForm(forms.Form):
         self.fields['transportation'].label = "דרכי התניידות"
         self.fields['hearing_way'].label = "איך שמעת עלינו"
         self.fields['no_corona1'].label = "אני מאשר/ת כי לא חזרתי מחו\"ל ב-14 הימים האחרונים"
-        self.fields['no_corona2'].label = "אני מאשר/ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
-        self.fields['no_corona3'].label = "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
-        self.fields['no_corona4'].label = "אני מאשר/ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
+        self.fields['no_corona2'].label = (
+            "אני מאשר/ת כי חשתי בטוב ב-14 הימים האחרונים - ללא תסמינים של שיעול, חום, צינון, כאב גרון וכיוצא בזה"
+        )
+        self.fields['no_corona3'].label = (
+            "לא הייתי בבידוד ב-14 הימים האחרונים ולא שהיתי באותו הבית עם מישהו שנדרש בידוד"
+        )
+        self.fields['no_corona4'].label = (
+            "אני מאשר/ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם"
+        )
 
         self.fields['childrens'].label = (
             "האם את/ה מעוניינ/ת לסייע לעובדים חיוניים (מסגרות חיוניות לילדי צוות רפואי)? - עדיפות ל-3 ימי התנדבות."
@@ -120,10 +126,21 @@ class VolunteerForm(forms.Form):
 
 class GetCertificateForm(forms.Form):
     id_number = forms.CharField(max_length=9, validators=[id_number_validator], required=True)
+    no_fever = forms.BooleanField(required=True)
+    routes = forms.BooleanField(required=True)
+    signing = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id_number'].label = 'אנא הזן תעודת זהות'
+        self.fields['no_fever'].label = ''.join([
+            'אני מאשר כי חום גופי אינו עולה על 38 מעלות וכי אני חש בטוב ללא תסמינים של חום, שיעול, ',
+            'כאבי גרון, צינון וכיוצא בזה.'
+        ])
+        self.fields['routes'].label = (
+            'אני מאשר/ת כי עברתי על המסלולים המעודכנים ביותר של החולים המאומתים, ולא באתי במגע עם אף אחד מהם.'
+        )
+        self.fields['signing'].label = 'הכנס שם מלא כדי לאשר:'
 
 
 class ScheduleForm(forms.Form):
@@ -158,7 +175,11 @@ class BaseHelpForm(forms.Form):
     phone_number_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
 
     full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=True, validators=[phone_number_validator])
+    phone_number = forms.CharField(
+        max_length=DEFAULT_MAX_FIELD_LENGTH,
+        required=True,
+        validators=[phone_number_validator]
+    )
     area = NoDefaultChoiceField(choices=AREAS)
     city = NoDefaultChoiceField(choices=CITIES)
     address = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
