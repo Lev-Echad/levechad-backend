@@ -23,6 +23,7 @@ echo -En "${comment}" > payload.json
 # Endpoint for posting comments
 comments_endpoint=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
 
+set -x
 response_code="$(curl -sS \
 	-H "Authorization: token ${GITHUB_TOKEN}" \
 	-H "Content-Type: Application/json" \
@@ -36,7 +37,7 @@ if [  ${response_code} -ne 201 ]; then
 	curl -sS \
 		-H "Authorization: token ${GITHUB_TOKEN}" \
 		-H "Content-Type: Application/json" \
-		--data '{"body": "Something went wrong! Please check this workflow!"}' \
+		--data '{"body": "Something went wrong! Please check code-style workflow!"}' \
 		${comments_endpoint}
 fi
 
