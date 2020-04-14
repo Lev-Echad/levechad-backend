@@ -25,12 +25,12 @@ comments_endpoint=$(cat ${GITHUB_EVENT_PATH} | jq -r .pull_request.comments_url)
 
 set -x
 curl_ouput="$(curl -sS \
-	-H 'Authorization: token ${GITHUB_TOKEN}' \
+	-H 'Authorization: token '${GITHUB_TOKEN} \
 	-H 'Content-Type: Application/json' \
 	--data-binary @payload.json \
 	-w '%{http_code}\n' \
 	${comments_endpoint})"
-	response_code="$(echo ${curl_ouput} | tail -1)"
+	response_code="$(echo "${curl_ouput}" | tail -1)"
 
 # If something went wrong, try notfiying with a comment (201 - Created is expected)
 if [  ${response_code} -ne 201 ]; then
