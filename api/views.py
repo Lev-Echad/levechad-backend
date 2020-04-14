@@ -5,7 +5,7 @@ from django.db.models import Count
 from django_filters import rest_framework as filters
 from rest_framework import status
 from rest_framework import viewsets, mixins
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.serializers import VolunteerSerializer, RegistrationSerializer
@@ -103,5 +103,5 @@ class VolunteerFilter(filters.FilterSet):
 class ListVolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Volunteer.objects.all().order_by('-created_date').annotate(time_volunteered=Count('helprequest'))
     serializer_class = VolunteerSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     filterset_class = VolunteerFilter
