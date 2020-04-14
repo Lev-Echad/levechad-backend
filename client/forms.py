@@ -1,11 +1,9 @@
 import json
 
 from django import forms
-from django.core.validators import RegexValidator
 
 from client.models import HelpRequest, Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
-from client.validators import id_number_validator, unique_id_number_validator
-
+from client.validators import id_number_validator, unique_id_number_validator, phone_number_validator
 
 FIELD_NAME_MAPPING = {
 }
@@ -68,7 +66,7 @@ class VolunteerForm(forms.Form):
                                     required=True)
     area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
     languages = forms.MultipleChoiceField(choices=get_lang_choices, widget=forms.CheckboxSelectMultiple())
-    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, validators=[phone_number_validator])
     email = forms.EmailField()
     city = NoDefaultChoiceField(choices=CITIES)
     neighborhood = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
@@ -171,7 +169,6 @@ class ScheduleForm(forms.Form):
 # -------------------------------------------------------------------------------------------------------
 
 class BaseHelpForm(forms.Form):
-    phone_number_validator = RegexValidator(r"^\+?(972|0)(\-)?0?(([23489]{1}\d{7})|[5]{1}\d{8})$")
 
     full_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     phone_number = forms.CharField(
