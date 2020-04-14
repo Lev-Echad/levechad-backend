@@ -1,6 +1,7 @@
 import re
 from operator import gt, lt, eq
 
+from django.db.models import Count
 from django_filters import rest_framework as filters
 from rest_framework import status
 from rest_framework import viewsets, mixins
@@ -66,18 +67,15 @@ class RegistrationAPIViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 class VolunteerFilter(filters.FilterSet):
-    OPERATORS = {"eq": eq, "gt": gt, "lt": lt}
+    time_volunteered = filters.NumberFilter(lookup_expr='exact')
+    time_volunteered__gt = filters.NumberFilter(method='time_volunteered_gt')
+    time_volunteered__lt = filters.NumberFilter(method='time_volunteered_lt')
 
-    times_volunteered = filters.NumberFilter(method='get_times_volunteered', field_name='eq')
-    times_volunteered__gt = filters.NumberFilter(method='get_times_volunteered', field_name='gt')
-    times_volunteered__lt = filters.NumberFilter(method='get_times_volunteered', field_name='lt')
+    def time_volunteered_gt(self, queryset, field_name, value):
+        return queryset.filter(time_volunteered__gt=value)
 
-    def get_times_volunteered(self, queryset, field_name, value):
-        if value and field_name in self.OPERATORS.keys():
-            ids = [volunteer.id for volunteer in queryset if
-                   self.OPERATORS[field_name](volunteer.times_volunteered, value)]
-            return queryset.filter(id__in=ids)
-        return queryset
+    def time_volunteered_lt(self, queryset, field_name, value):
+        return queryset.filter(time_volunteered__lt=value)
 
     class Meta:
         model = Volunteer
@@ -103,7 +101,7 @@ class VolunteerFilter(filters.FilterSet):
 
 
 class ListVolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Volunteer.objects.all().order_by('-created_date')
+    queryset = Volunteer.objects.all().order_by('-created_date').annotate(time_volunteered=Count('helprequest'))
     serializer_class = VolunteerSerializer
     permission_classes = [AllowAny]
     filterset_class = VolunteerFilter
