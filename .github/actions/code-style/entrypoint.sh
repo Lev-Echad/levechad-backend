@@ -7,7 +7,11 @@ readonly COMMENT_MESSAGE=$2
 cd $GITHUB_WORKSPACE
 
 # Execute pycodestyle, escape the literal '\.' (might occur in W605), prepend each line with '`*', and append '`'
-pycode_output="$(python -m pycodestyle ${LINTER_ARGS} . | sed 's#\\.#\\\\.#g' | sed 's#^#* \`#g' | sed 's#$#\`#g')"
+pycode_output="$(python -m pycodestyle ${LINTER_ARGS} . | \
+	sed 's#\\.#\\\\.#g' | \
+	sed 's#^#* \`#g' | \
+	sed 's#$#\`#g' | \
+	sed 's#\n#\\n#g')"
 
 # If output is empty then there are no linting errors
 if [ -z "${pycode_output}" ]; then
