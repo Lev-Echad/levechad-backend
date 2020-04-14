@@ -20,25 +20,25 @@ ENV = os.environ.get('ENV', 'DEVELOPMENT')
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-if ENV == 'DEVELOPMENT':
-    SECRET_KEY = 'MYSECRET'
 if ENV == 'PRODUCTION':
     SECRET_KEY = os.environ.get('SECRET_KEY')
+else:
+    SECRET_KEY = 'MYSECRET'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENV == 'DEVELOPMENT':
-    DEBUG = True
-elif ENV == 'PRODUCTION':
+if ENV == 'PRODUCTION':
     DEBUG = False
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
 INSTALLED_APPS = [
     'client.apps.ClientConfig',
     'server.apps.ServerConfig',
+    'api.apps.ApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,7 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrapform',
-    'mathfilters'
+    'mathfilters',
+    'storages',
+    'django_extensions',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -121,22 +124,17 @@ AUTH_PASSWORD_VALIDATORS = [
 if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
     LOGGING = {
         'version': 1,
-        # Version of logging
         'disable_existing_loggers': False,
-        #disable logging
-        # Handlers #############################################################
         'handlers': {
             'file': {
                 'level': 'DEBUG',
                 'class': 'logging.FileHandler',
                 'filename': 'lev-debug.log',
             },
-        ########################################################################
             'console': {
                 'class': 'logging.StreamHandler',
             },
         },
-        # Loggers ####################################################################
         'loggers': {
             'django': {
                 'handlers': ['file', 'console'],
@@ -159,12 +157,51 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+TIME_ZONE = "Asia/Jerusalem"
+
+LOGIN_REDIRECT_URL = '/server'
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = "/static/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-LOGIN_REDIRECT_URL = '/server'
+if ENV == 'PRODUCTION':
+    # Redirect http request to https
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+
+    # In production, use S3 to serve static & media files
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+
+    AWS_DEFAULT_ACL = None
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+
+    # s3 static settings
+    STATIC_LOCATION = 'static'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
+    STATICFILES_STORAGE = 'levechad.storage_backends.StaticStorage'
+
+    # s3 public media settings
+    PUBLIC_MEDIA_LOCATION = 'media'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+    DEFAULT_FILE_STORAGE = 'levechad.storage_backends.PublicMediaStorage'
+else:
+    # In development, let django serve static files (and media files in urls.py)
+    STATIC_URL = '/static/'
+    MEDIA_URL = '/media/'
+
+
+# Django Rest Framework configuration
+_renderer_classes = ['rest_framework.renderers.JSONRenderer']
+if ENV != 'PRODUCTION':
+    _renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': _renderer_classes,
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.DefaultPagination',
+}

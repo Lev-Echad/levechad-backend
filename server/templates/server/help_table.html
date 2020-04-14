@@ -22,6 +22,7 @@
             <th scope="col">אזור</th>
             <th scope="col">עיר</th>
             <th scope="col">תאריך הבקשה</th>
+            <th scope="col">סיבת הבקשה</th>
             <th scope="col">כתובת</th>
             <th scope="col">הערות</th>
             <th scope="col">סוג</th>
@@ -58,6 +59,7 @@
                 </td>
                 <td>{{ help_request.city }}</td>
                 <td>{{ help_request.created_date|date:"d/m/Y H:i" }}</td>
+                <td>{{ help_request.get_request_reason_display }}</td>
                 <td>{{ help_request.address }}</td>
                 <td>{{ help_request.notes }}</td>
                 <td>{{ help_request.get_type_display }}</td>
@@ -180,6 +182,10 @@
                                       <input type="text" name="search_id" id="search_id" placeholder="מספר פניה">
                                   </div>
                                   <div>
+                                      <p class="h5"><u>חיפוש לפי זמן יצירת הפניה</u></p>
+                                      <input type="date" name="create_date" id="create_date">
+                                  </div>
+                                  <div>
                                     <p class="h5"><u>בחר סטטוסים להצגה</u></p>
 
                                     <div>
@@ -251,6 +257,10 @@
                                     </div>
 
                                 </div>
+                                  <div>
+                                      <p class="h5"><u>בחר עיר</u></p>
+                                      <input type="text" name="city_name" id="city_name" />
+                                  </div>
 
                                   <div>
                                     <p class="h5"><u>בחר סוג עזרה</u></p>

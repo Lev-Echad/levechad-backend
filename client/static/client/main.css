@@ -1,12 +1,7 @@
 @import url(http://fonts.googleapis.com/earlyaccess/alefhebrew.css);
 
-
 a.nav-link {
     color: rgba(155, 0, 11, 1);
-}
-
-ul {
- list-style-type: none;
 }
 
 .control-label {
@@ -15,30 +10,24 @@ ul {
 }
 
 .form-group {
-    margin: 30px 0px;
+    margin: 30px 0;
     text-align: center;
 }
 
 .logo {
     width: 150px;
     border-radius: 10px;
-        margin: 5px 5px;
-
+    margin: 5px 5px;
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
 }
 
 body {
-    font-family: "Alef Hebrew",
-    "Helvetica Neue",
-    Helvetica,
-    Arial,
-    sans-serif;
+    font-family: "Alef Hebrew", "Helvetica Neue", Helvetica, Arial, sans-serif;
     background-color: rgba(0, 0, 0, 0.05);
 }
 
@@ -47,16 +36,18 @@ body * {
 }
 
 form {
-    align : center
+    align: center
     text-align: center;
+}
+
+form ul {
+    list-style: none;
 }
 
 input[type=submit] {
     text-align:center;
     margin: 0 0 200px 0px;
 }
-
-
 
 .box {
     padding-bottom: 3em;
@@ -138,7 +129,6 @@ nav {
     background-color: rgba(155, 0, 11, 1);
 }
 
-
 a {
   font-size: 20px;
   text-align: center;
@@ -150,19 +140,17 @@ a:hover {
   color: rgba(200, 0, 11, 1);
 }
 
-a:hover, a:visited, a:link, a:active
-{
+a:hover, a:visited, a:link, a:active {
     text-decoration: none;
 }
 
 div.center {
-  text-align: center;
+    text-align: center;
 }
 
 .gflag{
- margin: 10px;
+    margin: 10px;
 }
-
 
 .navbar-toggler {
     background-color: rgba(255, 255, 255, 1);
@@ -184,7 +172,6 @@ h4 {
     line-height: 5vh;
 
 }
-
 
 .exp {
     width: 150px;
@@ -224,62 +211,66 @@ div {
 }
 
 .page-wrapper {
-  position: relative;
-  min-height: 100%;
-  /* equal to footer height */
-  margin-bottom: -23px;
+    position: relative;
+    min-height: 100%;
+    /* equal to footer height */
+    margin-bottom: -23px;
 }
 
 .page-footer {
-  position:relative; /* This is a footer that is contained by a positioned main container */
-  bottom:0;
-  height: 23px;
-  width: 100%;
-  background-color: #efefef;
-  text-align: center;
+    position:relative; /* This is a footer that is contained by a positioned main container */
+    bottom:0;
+    height: 23px;
+    width: 100%;
+    background-color: #efefef;
+    text-align: center;
 }
 
 .page-footer p {
-  margin: 0px;
+    margin: 0;
 }
+
+#aboutvolu {
+    border: 5px solid #9B000B;
+    border-radius: 15%;
+    color: #9B000B;
+    padding: 7px;
+    margin: 10px;
+    overflow-y: auto;
+}
+
 @media only screen and (max-width: 400px) {
-
     #aboutvolu{
-    font-size:8px;
-    max-height:350px;
+        font-size: 8px;
+        max-height: 350px;
     }
-
 }
+
 @media only screen and (max-width: 600px) {
-  .tag {
-    left:25%;
-    width:250px;
-     margin:10px;
-  }
-  .taginfo{
-      font-size:10px;
-    |
+    .tag {
+        left: 25%;
+        width: 250px;
+        margin: 10px;
+    }
+    .taginfo{
+        font-size: 10px;
     }
     #aboutvolu{
-    font-size:8px;
-    max-height:350px;
+        font-size: 8px;
+        max-height: 350px;
     }
-    
 }
+
 @media only screen and (max-width: 800px) {
-
     #aboutvolu{
-    font-size:8px;
-    max-height:350px;
+        font-size: 8px;
+        max-height: 350px;
     }
-
 }
+
 @media only screen and (max-width: 1000px) {
-
     #aboutvolu{
-    font-size:10px;
-    max-height:350px;
+        font-size: 10px;
+        max-height: 350px;
     }
-
 }
-
