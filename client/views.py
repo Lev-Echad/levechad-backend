@@ -1,10 +1,5 @@
-import io
-from PIL import Image, ImageDraw, ImageFont
-from bidi.algorithm import get_display
-
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from django.contrib.staticfiles import finders
 
 from .forms import *
 from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
@@ -150,7 +145,7 @@ def find_certificate_view(request):
             volunteer = volunteers_qs.first()
             if volunteer is not None:
                 '''
-                 TODO: this a hotfix that generate a valid certificate to any user that requests one. 
+                 TODO: this a hotfix that generate a valid certificate to any user that requests one.
                  it should be reverted to the commented part  when #52 is solved
                 '''
                 # active_certificate = volunteer.get_active_certificates().first()
