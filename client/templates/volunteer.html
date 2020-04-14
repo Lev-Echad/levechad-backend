@@ -44,11 +44,6 @@
     </ul>
     <strong>כל מעשה קטן, הוא למעשה מעשה גדול של חסד שבאמצעותו נצליח כחברה לעבור את המשבר, כי כולנו לב אחד.</strong>
 </div>
-<div style="text-align: center; color: red; font-weight: bold">
-    {% for key, value in form.errors.items %}
-        {{ value }}
-    {% endfor %}
-</div>
 <form action="{% url 'client_volunteer' %}" method="post">
     {% csrf_token %}
     {{ form|bootstrap }}
