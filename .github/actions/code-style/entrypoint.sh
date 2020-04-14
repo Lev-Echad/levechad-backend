@@ -16,6 +16,7 @@ fi
 
 comment="{\"body\": \"${COMMENT_MESSAGE}\r\n\n${pycode_output}\"}"
 echo -En "${comment}" > payload.json
+cat payload.json
 
 # Escape backslashes if any
 #sed -i 's#\\#\\\\#g' payload.json
