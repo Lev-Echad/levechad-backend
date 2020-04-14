@@ -1,13 +1,10 @@
-import io
-from PIL import Image, ImageDraw, ImageFont
-from bidi.algorithm import get_display
-
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from django.contrib.staticfiles import finders
 
 from .forms import *
 from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
+from django.db.models.functions import Concat
+from django.db.models import Value, CharField, F
 
 
 def thanks(request):
@@ -46,7 +43,8 @@ def homepage(request):
     context = {
         "numbers": {
             "total_volunteers": Volunteer.objects.count() + 1786,
-            "total_help_requests": HelpRequest.objects.count() + 84     #added 1786 and 84 since those are the stats for before this app
+            "total_help_requests": HelpRequest.objects.count() + 84
+            # added 1786 and 84 since those are the stats for before this app
 
         }
     }
@@ -133,15 +131,21 @@ def schedule(request):
 
 
 def find_certificate_view(request):
-    context = {'form': GetCertificateForm()}
+    context = {}
+    form = GetCertificateForm()
     if request.method == 'POST':
         form = GetCertificateForm(request.POST)
         if form.is_valid():
             # TODO: change to 'get' instead of 'first' after fixing #50
-            volunteer = Volunteer.objects.filter(tz_number=form['id_number'].data).first()
+            volunteers_qs = Volunteer.objects.all()
+            volunteers_qs = volunteers_qs.annotate(calc_full_name=Concat(F('first_name'), Value(' '), F('last_name'),
+                                                                         output_field=CharField()))
+            volunteers_qs = volunteers_qs.filter(tz_number__exact=form['id_number'].data)
+            volunteers_qs = volunteers_qs.filter(calc_full_name__iexact=form['signing'].data)
+            volunteer = volunteers_qs.first()
             if volunteer is not None:
                 '''
-                 TODO: this a hotfix that generate a valid certificate to any user that requests one. 
+                 TODO: this a hotfix that generate a valid certificate to any user that requests one.
                  it should be reverted to the commented part  when #52 is solved
                 '''
                 # active_certificate = volunteer.get_active_certificates().first()
@@ -152,10 +156,10 @@ def find_certificate_view(request):
                 else:
                     context['error'] = 'לא נמצאה תעודה בתוקף!'
             else:
-                context['error'] = 'מתנדב לא נמצא!'
+                context['error'] = 'מתנדב לא נמצא, האם מילאת את הפרטים כמו שצריך?'
         else:
             context['error'] = 'יש למלא את השדות כנדרש!'
-
+    context['form'] = form
     return render(request, 'find_certificate.html', context=context)
 
 

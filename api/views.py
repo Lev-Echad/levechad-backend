@@ -1,27 +1,21 @@
 import re
-from operator import gt, lt, eq
 
 from django.db.models import Count
-from django_filters import rest_framework as filters
-from rest_framework import status
-from rest_framework import viewsets, mixins
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, generics, mixins
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
-from api.serializers import VolunteerSerializer, RegistrationSerializer
+import django_filters as filters
 from client.models import Volunteer
-
-INVALID_PHONE_CHARACTER_REGEX = r'[^0-9\-+]'
-MAX_PHONE_NUMBER_LENGTH = 20
-MIN_PHONE_NUMBER_LENGTH = 9
+from client.validators import PHONE_NUMBER_REGEX
+from api.serializers import VolunteerSerializer, RegistrationSerializer
 
 
 class SendVerificationCodeViewSet(viewsets.ViewSet):
     def create(self, request):
         def _is_valid_phone_number(string):
-            # TODO think of better validation, make the client forms & this one use the same phone validation after refactor
-            return len(re.findall(INVALID_PHONE_CHARACTER_REGEX, string)) == 0 and \
-                   MIN_PHONE_NUMBER_LENGTH <= len(string) <= MAX_PHONE_NUMBER_LENGTH
+            return PHONE_NUMBER_REGEX.search(string) is not None
 
         if request.data is None or len(request.data) == 0:
             return Response({'success': False, 'message': 'No data specified.'}, status=status.HTTP_400_BAD_REQUEST)

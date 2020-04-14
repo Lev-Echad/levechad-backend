@@ -279,7 +279,8 @@ def volunteer_edit_notes(request, pk):
     to_edit.save()
     return redirect('show_all_volunteers')
 
-@login_required()
+
+@login_required
 def volunteer_edit_tz_num(request, pk):
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('tz_num') is not None:
@@ -287,7 +288,8 @@ def volunteer_edit_tz_num(request, pk):
     to_edit.save()
     return redirect('show_all_volunteers')
 
-@login_required()
+
+@login_required
 def volunteer_edit_city(request, pk):
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('city_name') is not None:
@@ -342,7 +344,6 @@ def find_closes_persons(request, pk):
     elif is_time_between(datetime.time(15, 00), datetime.time(23, 00)):
         filter = "schedule__" + now_day + "__contains"
         availability_qs = closes_volunteer.filter(**{filter: 2})
-
 
     # check option 3 before midnight
     elif is_time_between(datetime.time(23, 00), datetime.time(00, 00)):

@@ -33,7 +33,7 @@ class Timestampable(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
+        # Update timestamps on save
         if not self.id:
             self.created_date = timezone.now()
         self.updated_date = timezone.now()
@@ -342,7 +342,8 @@ class ParentalConsent(models.Model):
 # @receiver(pre_save, sender=VolunteerSchedule)
 # def pre_save_handler(sender, instance, *args, **kwargs):
 #     """
-#     Django doesn't validate fields before saving by calling clean functions because of compatibility issues. This does.
+#     Django doesn't validate fields before saving by calling clean functions because of compatibility issues.
+#     This does.
 #     See https://docs.djangoproject.com/en/3.0/ref/models/instances/#validating-objects
 #     """
 #     instance.full_clean()
