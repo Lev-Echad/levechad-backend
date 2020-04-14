@@ -16,8 +16,6 @@ fi
 
 comment="{\"body\": \"${COMMENT_MESSAGE}\r\n\n${pycode_output}\"}"
 echo -En "${comment}" > payload.json
-cat payload.json
-#cat payload.json
 
 # Escape backslashes if any
 #sed -i 's#\\#\\\\#g' payload.json
@@ -34,13 +32,14 @@ response_code="$(curl -sS \
 
 # If something went wrong, try notfiying with a comment (201 - Created is expected)
 if [  ${response_code} -ne 201 ]; then
+	echo "Something went wrong, post a warning comment!"
 	curl -sS \
 		-H "Authorization: token ${GITHUB_TOKEN}" \
 		-H "Content-Type: Application/json" \
-		--data '{"body": "Something went wrong! Please check this workflow!"}'
+		--data '{"body": "Something went wrong! Please check this workflow!"}' \
 		${comments_endpoint}
 fi
-	
+
 
 # Always fail, if we reach here there are linting errors
 exit 1
