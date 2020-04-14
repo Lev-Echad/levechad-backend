@@ -23,6 +23,7 @@ with open('./client/city.json', encoding="utf-8") as json_file:
     only_names.sort()
     CITIES = [(str(x), str(x)) for x in only_names]
 
+
 def get_lang_choices():
     return [(str(x), str(x)) for x in Language.objects.all()]
 
