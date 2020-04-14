@@ -1,5 +1,7 @@
 #!/bin/sh -l
 
+set -x
+
 # Get args
 readonly LINTER_ARGS=$1
 readonly COMMENT_MESSAGE=$2
