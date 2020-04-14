@@ -6,13 +6,16 @@ readonly COMMENT_MESSAGE=$2
 
 cd $GITHUB_WORKSPACE
 
-# Execute pycodestyle, escape the literal '\.' (might occur in W605), prepend each line with '`*', and append '`'
+# 1. Execute pycodestyle
+# 2. Escape the literal '\.' (it's invalid in json)
+# 3. Prepend each line with 
 pycode_output="$(python -m pycodestyle ${LINTER_ARGS} . | \
 	sed 's#\\.#\\\\.#g' | \
-	sed 's#^#* \`#g' | \
-	sed 's#$#\`#g' | \
-	awk 1 ORS='\n')"
-	#sed ':a;N;$!ba;s#\n#\\n#g')"
+	awk '{print "* \`", $0, "\`"; }' ORS='\\n')"
+	#sed 's#^#* \`#g' | \
+	#sed 's#$#\`#g' | \
+	#awk 1 ORS='\n')"
+	##sed ':a;N;$!ba;s#\n#\\n#g')"
 
 # If output is empty then there are no linting errors
 if [ -z "${pycode_output}" ]; then
