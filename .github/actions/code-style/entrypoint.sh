@@ -1,7 +1,5 @@
 #!/bin/sh -l
 
-set -x
-
 # Get args
 readonly LINTER_ARGS=$1
 readonly COMMENT_MESSAGE=$2
@@ -12,12 +10,13 @@ cd $GITHUB_WORKSPACE
 pycode_output="$(python -m pycodestyle ${LINTER_ARGS} . | sed 's#\\.#\\\\.#g' | sed 's#^#* \`#g' | sed 's#$#\`#g')"
 
 # If output is empty then there are no linting errors
-if [ -z ${pycode_output} ]; then
+if [ -z "${pycode_output}" ]; then
 	exit 0
 fi
 
 comment="{\"body\": \"${COMMENT_MESSAGE}\r\n\n${pycode_output}\"}"
-echo -En ${comment} > payload.json
+echo -En "${comment}" > payload.json
+cat payload.json
 #cat payload.json
 
 # Escape backslashes if any
@@ -33,8 +32,8 @@ response_code="$(curl -sS \
 	-w "%{http_code}\n" \
 	${comments_endpoint} | tail -1)"
 
-# If something went wrong, try notfiying with a comment
-if [  ${response_code} -eq 200 ]; then
+# If something went wrong, try notfiying with a comment (201 - Created is expected)
+if [  ${response_code} -ne 201 ]; then
 	curl -sS \
 		-H "Authorization: token ${GITHUB_TOKEN}" \
 		-H "Content-Type: Application/json" \
