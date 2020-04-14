@@ -2,10 +2,9 @@ import json
 
 from django import forms
 from django.core.validators import RegexValidator
-from client.models import Volunteer
 
 from client.models import HelpRequest, Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
-from client.validators import id_number_validator
+from client.validators import id_number_validator, unique_id_number_validator
 
 
 FIELD_NAME_MAPPING = {
@@ -63,7 +62,7 @@ class VolunteerForm(forms.Form):
 
     first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    id_number = forms.CharField(max_length=ID_LENGTH, validators=[id_number_validator])
+    id_number = forms.CharField(max_length=ID_LENGTH, validators=[id_number_validator, unique_id_number_validator])
     organization = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     date_of_birth = forms.DateField(input_formats=['%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%d.%m.%Y', '%d.%m.%y'],
                                     required=True)
@@ -122,14 +121,6 @@ class VolunteerForm(forms.Form):
         self.fields['chamal'].label = (
             "?האם אתה מתנדב חמ\"ל"
         )
-
-    def clean_identity(self):
-        value = self.cleaned_data.get('identity')
-        # id is restricted to be a unique field
-        if Volunteer.objects.filter(tz_number=value).count() > 0:
-            raise forms.ValidationError('המתנדב רשום כבר למערכת!')
-
-        return value
 
 
 class GetCertificateForm(forms.Form):

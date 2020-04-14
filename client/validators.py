@@ -1,7 +1,17 @@
 import re
 from django.core.exceptions import ValidationError
 
+from client.models import Volunteer
+
 ID_NUMBER_REGEX = r'^\d{8,9}$'
+
+
+def unique_id_number_validator(id_number):
+    """
+    Validates the given ID number does not exist under any volunteer (see #50)
+    """
+    if Volunteer.objects.filter(tz_number=id_number).count() > 0:
+        raise ValidationError('המתנדב רשום כבר למערכת!')
 
 
 def id_number_validator(value):
