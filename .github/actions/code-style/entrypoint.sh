@@ -11,7 +11,8 @@ pycode_output="$(python -m pycodestyle ${LINTER_ARGS} . | \
 	sed 's#\\.#\\\\.#g' | \
 	sed 's#^#* \`#g' | \
 	sed 's#$#\`#g' | \
-	sed ':a;N;$!ba;s#\n#\\n#g')"
+	awk 1 ORS='\n')"
+	#sed ':a;N;$!ba;s#\n#\\n#g')"
 
 # If output is empty then there are no linting errors
 if [ -z "${pycode_output}" ]; then
