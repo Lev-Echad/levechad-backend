@@ -163,7 +163,6 @@
             <th scope="col">עיר</th>
             <th scope="col">כתובת</th>
             <th scope="col">דרכי התניידות</th>
-            <th scope="col">האם זמין עכשיו?</th>
             <th scope="col">מרחק מהיעד</th>
             <th scope="col">מספר הפעמים שעזר</th>
             <th scope="col">אפשרויות</th>
@@ -199,13 +198,6 @@
                 <td>{{ volunteer.city }}</td>
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
-                <td>
-                    {% if volunteer.is_available_now %}
-                        פנוי
-                    {% else %}
-                        לא פנוי
-                    {% endif %}
-                </td>
                 <td>{{ volunteer.distance }} ק"מ</td>
                 <td>{{ volunteer.times_volunteered }}</td>
                 <td><a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#choose_volu{{ volunteer.id }}">בחר</a></td>
