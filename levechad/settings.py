@@ -50,17 +50,27 @@ INSTALLED_APPS = [
     'storages',
     'django_extensions',
     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_URLS_REGEX = r'^/api/.*$'
+if ENV == 'DEVELOPMENT':
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    # TODO fill with deployment address when it's created (#267)
+    CORS_ORIGIN_WHITELIST = []
 
 ROOT_URLCONF = 'levechad.urls'
 
@@ -204,4 +214,7 @@ if ENV != 'PRODUCTION':
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': _renderer_classes,
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.DefaultPagination',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
 }
