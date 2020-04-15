@@ -30,10 +30,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return volunteer
 
 
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['name', 'x', 'y']
+
+
 class VolunteerSerializer(serializers.ModelSerializer):
     gender = serializers.CharField(source='get_gender_display')
     moving_way = serializers.CharField(source='get_moving_way_display')
     wanted_assignments = serializers.ListField(source='get_wanted_assignments_list')
+    city = CitySerializer()
 
     class Meta:
         model = Volunteer
