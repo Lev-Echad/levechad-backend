@@ -34,7 +34,7 @@ class SendVerificationCodeViewSet(viewsets.ViewSet):
             )
 
         # TODO STUB - Implement in #198
-        return Response({'success': True, 'message': ''})
+        return Response({'success': True, 'verified': True})
 
 
 class CheckVerificationCodeViewSet(viewsets.ViewSet):
