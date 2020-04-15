@@ -1,5 +1,6 @@
-from client.models import Volunteer, ParentalConsent, City, Language
 from rest_framework import serializers
+
+from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area
 
 
 class ParentalConsentSerializer(serializers.ModelSerializer):
@@ -30,10 +31,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return volunteer
 
 
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['name', 'x', 'y']
+
+
 class VolunteerSerializer(serializers.ModelSerializer):
     gender = serializers.CharField(source='get_gender_display')
     moving_way = serializers.CharField(source='get_moving_way_display')
     wanted_assignments = serializers.ListField(source='get_wanted_assignments_list')
+    city = CitySerializer()
 
     class Meta:
         model = Volunteer
@@ -41,3 +49,23 @@ class VolunteerSerializer(serializers.ModelSerializer):
                   'gender', 'city', 'address', 'areas', 'organization', 'moving_way',
                   'week_assignments_capacity', 'wanted_assignments', 'email', 'email_verified', 'score',
                   'created_date', 'times_volunteered', 'languages']
+
+
+class ShortVolunteerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Volunteer
+        fields = ['id', 'full_name']
+
+
+class HelpRequestSerializer(serializers.ModelSerializer):
+    city = CitySerializer()
+    area = serializers.PrimaryKeyRelatedField(queryset=Area.objects.all())
+    type = serializers.CharField(source='get_type_display')
+    request_reason = serializers.CharField(source='get_request_reason_display')
+    status = serializers.CharField(source='get_status_display')
+    helping_volunteer = ShortVolunteerSerializer()
+
+    class Meta:
+        model = HelpRequest
+        fields = ['id', 'full_name', 'phone_number', 'area', 'city', 'address', 'notes', 'type', 'type_text',
+                  'request_reason', 'status', 'status_updater', 'helping_volunteer', 'created_date']

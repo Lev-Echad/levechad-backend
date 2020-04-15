@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from client.models import Volunteer
+from client.models import Volunteer, HelpRequest
 from client.validators import PHONE_NUMBER_REGEX
-from api.serializers import VolunteerSerializer, RegistrationSerializer
+from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer
 
 
 class SendVerificationCodeViewSet(viewsets.ViewSet):
@@ -61,4 +61,10 @@ class RegistrationAPIViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 class ListVolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Volunteer.objects.all().order_by('-created_date')
     serializer_class = VolunteerSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class ListHelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = HelpRequest.objects.all().order_by('-created_date')
+    serializer_class = HelpRequestSerializer
     permission_classes = [IsAuthenticated]
