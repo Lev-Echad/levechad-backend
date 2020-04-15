@@ -1,5 +1,5 @@
 from django.db.models import Count
-from rest_framework import viewsets, generics, mixins
+from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -93,6 +93,18 @@ class VolunteerFilter(filters.FilterSet):
         }
 
 
+class HelpRequestsFilter(filters.FilterSet):
+    class Meta:
+        model = HelpRequest
+        fields = {
+            'id': ['exact'],
+            'city': ['exact', 'in'],
+            'area': ['exact', 'in'],
+            'status': ['exact', 'in'],
+            'type': ['exact', 'in']
+        }
+
+
 class ListVolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Volunteer.objects.all().order_by('-created_date').annotate(time_volunteered=Count('helprequest'))
     serializer_class = VolunteerSerializer
@@ -104,3 +116,4 @@ class ListHelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = HelpRequest.objects.all().order_by('-created_date')
     serializer_class = HelpRequestSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = HelpRequestsFilter
