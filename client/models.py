@@ -74,6 +74,7 @@ class VolunteerSchedule(Timestampable):
     Friday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
     Saturday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
 
+
 class Volunteer(Timestampable):
     MOVING_WAYS = (
         ("BIKE", "אופניים"),
@@ -283,15 +284,15 @@ class VolunteerCertificate(models.Model):
 
 class HelpRequestVolunteerManager(models.Manager):
     def _coord_distance(self, p1, p2):
-        ''' Haversine Formula '''
-        earth_radius =  6371
+        """ Haversine Formula """
+        earth_radius = 6371
         lat1 = math.radians(p1[0])
         lat2 = math.radians(p2[0])
-        dLat = math.radians(p2[0]-p1[0])
-        dLon = math.radians(p2[1]-p1[1])
+        dLat = math.radians(p2[0] - p1[0])
+        dLon = math.radians(p2[1] - p1[1])
 
-        a = math.sin(dLat/2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dLon/2)**2;
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        a = math.sin(dLat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dLon / 2) ** 2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         return earth_radius * c
 
     def all_by_distance(self, h_coord):
@@ -303,6 +304,7 @@ class HelpRequestVolunteerManager(models.Manager):
             volunteers.append(v)
 
         return sorted(volunteers, key=lambda v: v.distance)
+
 
 class HelpRequest(Timestampable):
     objects = models.Manager()
@@ -358,7 +360,6 @@ class ParentalConsent(models.Model):
     parent_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     parent_id = models.CharField(max_length=9)
     volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE, related_name='parental_consent')
-
 
 # TODO: models validation is a good practice and should be added in the future - due to some inconsistency about our DB
 # TODO: constraints over the time, the model validation blocks lots of functionality the used to work. in the future,
