@@ -72,7 +72,7 @@ def get_close_pages(current_page, pages_count):
     :return: (list of pages to link to before current page, list of pages to link to after current page)
     """
     list_pages_before = range(max(1, current_page - PAGINATION_SHORTCUT_NUMBER), current_page)
-    list_pages_after = range(current_page + 1, min(current_page + PAGINATION_SHORTCUT_NUMBER + 1, pages_count)+1)
+    list_pages_after = range(current_page + 1, min(current_page + PAGINATION_SHORTCUT_NUMBER + 1, pages_count) + 1)
     return list_pages_before, list_pages_after
 
 
@@ -322,6 +322,7 @@ def find_closest_people(request, pk):
     closest = HelpRequest.volunteers.all_by_distance(help_location)[:100]
     context = {'help_request': help_req, 'volunteers': closest}
     return render(request, 'server/closest_volunteer.html', context)
+
 
 def export_users_xls(request):
     fields_descriptions = {

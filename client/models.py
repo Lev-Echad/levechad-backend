@@ -285,20 +285,28 @@ class VolunteerCertificate(models.Model):
 class HelpRequestVolunteerManager(models.Manager):
     def _coord_distance(self, p1, p2):
         """ Haversine Formula """
-        earth_radius = 6371
-        lat1 = math.radians(p1[0])
-        lat2 = math.radians(p2[0])
-        dLat = math.radians(p2[0] - p1[0])
-        dLon = math.radians(p2[1] - p1[1])
+        USE_NEW_FORMULA = False
+        if USE_NEW_FORMULA:
+            # Note: This formula does not pass testing yet, returns wrong distances (also unsuitable for sorting).
+            earth_radius = 6371
+            lat1 = math.radians(p1[0])
+            lat2 = math.radians(p2[0])
+            dLat = math.radians(p2[0] - p1[0])
+            dLon = math.radians(p2[1] - p1[1])
 
-        a = math.sin(dLat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dLon / 2) ** 2
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return earth_radius * c
+            a = math.sin(dLat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dLon / 2) ** 2
+            c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+            return earth_radius * c / 100
+        else:
+            x_diff = (p1[0] - p2[0]) ** 2.0
+            y_diff = (p1[1] - p2[1]) ** 2.0
+            return int(((x_diff+y_diff) ** 0.5) / 100)
 
     def all_by_distance(self, h_coord):
         volunteers = []
         for v in Volunteer.objects.all():
             v_coord = (v.location_address_x, v.location_address_y)
+            v_coord = (v.city.x, v.city.y)
             v.distance = self._coord_distance(h_coord, v_coord)
 
             volunteers.append(v)
