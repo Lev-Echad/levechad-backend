@@ -3,7 +3,7 @@ import json
 from django import forms
 
 from client.models import HelpRequest, Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
-from client.validators import id_number_validator, phone_number_validator
+from client.validators import id_number_validator, unique_id_number_validator, phone_number_validator
 
 FIELD_NAME_MAPPING = {
 }
@@ -16,13 +16,12 @@ AREAS = (
     ("דרום", "דרום")
 )
 
-json_file = open('./client/city.json', encoding="utf-8")
-data = json.load(json_file)
-onlyNames = [a["name"] for a in data]
-onlyNames.sort()
-CITIES = [(str(x), str(x)) for x in onlyNames]
-
-json_file.close()
+# TODO: refactor this
+with open('./client/city.json', encoding="utf-8") as json_file:
+    cities_dict = json.load(json_file)
+    only_names = [city["name"] for city in cities_dict]
+    only_names.sort()
+    CITIES = [(str(x), str(x)) for x in only_names]
 
 
 def get_lang_choices():
@@ -62,7 +61,7 @@ class VolunteerForm(forms.Form):
 
     first_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     last_name = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    id_number = forms.CharField(max_length=ID_LENGTH, validators=[id_number_validator])
+    id_number = forms.CharField(max_length=ID_LENGTH, validators=[id_number_validator, unique_id_number_validator])
     organization = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     date_of_birth = forms.DateField(input_formats=['%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%d.%m.%Y', '%d.%m.%y'],
                                     required=True)
@@ -86,7 +85,7 @@ class VolunteerForm(forms.Form):
     no_corona4 = forms.BooleanField()
 
     def __init__(self, *args, **kwargs):
-        super(forms.Form, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['first_name'].label = "שם פרטי"
         self.fields['last_name'].label = "שם משפחה"
         self.fields['id_number'].label = "מספר ת.ז"
@@ -157,7 +156,7 @@ class ScheduleForm(forms.Form):
     saturday = forms.MultipleChoiceField(choices=TIMES, widget=forms.CheckboxSelectMultiple(), required=False)
 
     def __init__(self, *args, **kwargs):
-        super(forms.Form, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['sunday'].label = "ראשון"
         self.fields['monday'].label = "שני"
         self.fields['tuesday'].label = "שלישי"
@@ -185,7 +184,7 @@ class BaseHelpForm(forms.Form):
     notes = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
 
     def __init__(self, *args, **kwargs):
-        super(forms.Form, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['full_name'].label = "שם מלא"
         self.fields['phone_number'].label = "מספר פלאפון"
         self.fields['area'].label = "אזור"
