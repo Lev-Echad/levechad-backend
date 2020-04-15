@@ -1,4 +1,5 @@
 import re
+from datetime import date
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
@@ -12,6 +13,8 @@ ID_NUMBER_REGEX = r'^\d{8,9}$'
 # 3. a mobile number - 5 and afterwards 8 digits.
 PHONE_NUMBER_REGEX = re.compile(r"^(\+972[- ]?|0)([23489]|[57]\d)[- ]?((\d{3}-?\d{4})|(\d{4}-?\d{3}))$")
 phone_number_validator = RegexValidator(PHONE_NUMBER_REGEX)
+
+LEGAL_AGE = 18
 
 
 def unique_id_number_validator(id_number):
@@ -49,3 +52,28 @@ def id_number_validator(value):
 
     if str(checksum) != value[-1]:
         raise ValidationError('Invalid ID number: Incorrect check digit')
+
+
+def parental_consent_validator(new_volunteer):
+    """
+    If volunteer age is under LEGAL_AGE, check that received parental_consent details.
+    :raise: ValidationError if volunteer is underage and given data is missing
+    parental_consent or any parental_consent details.
+    """
+    today = date.today()
+    date_of_birth = new_volunteer['date_of_birth']
+
+    years_difference = today.year - date_of_birth.year
+    if (today.month, today.day) < (date_of_birth.month, date_of_birth.day):
+        volunteer_age = years_difference - 1
+    else:
+        volunteer_age = years_difference
+
+    if volunteer_age < LEGAL_AGE:
+        try:
+            parental_consent = new_volunteer['parental_consent']
+            parent_id = parental_consent['parent_id']
+            parent_name = parental_consent['parent_name']
+
+        except KeyError:
+            raise ValidationError("Volunteers aged 16-18 must enter parental consent details.")
