@@ -77,7 +77,41 @@ class VolunteerSchedule(Timestampable):
     Saturday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
 
 
+class ExtendedVolunteerManager(models.Manager):
+    @staticmethod
+    def _add_distance(qs, helprequest_coordinate, as_int=False):
+        qs = qs.annotate(y_distance=(F('city__y') - helprequest_coordinate[1]) ** 2)
+        qs = qs.annotate(x_distance=(F('city__x') - helprequest_coordinate[0]) ** 2)
+        qs = qs.annotate(distance=models.ExpressionWrapper(((F('x_distance') + F('y_distance')) ** 0.5) / 100,
+                                                           output_field=models.IntegerField() if as_int
+                                                           else models.FloatField()))
+        return qs
+
+    @staticmethod
+    def _add_num_helprequests(qs):
+        qs = qs.annotate(num_helprequests=Count('helprequest'))
+        return qs
+
+    def all_by_distance(self, helprequest_coordinate):
+        volunteers_qs = self.get_queryset()
+        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinate)
+        return volunteers_qs.order_by('distance')
+
+    def all_by_score(self, helprequest_coordinate):
+        # In the future, add more parameters
+        volunteers_qs = self.get_queryset()
+        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinate, as_int=True)
+        volunteers_qs = self._add_num_helprequests(volunteers_qs)
+        return volunteers_qs.order_by('distance', 'num_helprequests')
+
+    def all_with_helprequests_count(self):
+        volunteers_qs = self.get_queryset()
+        volunteers_qs = self._add_num_helprequests(volunteers_qs)
+        return volunteers_qs
+
+
 class Volunteer(Timestampable):
+    objects = ExtendedVolunteerManager()
     MOVING_WAYS = (
         ("BIKE", "אופניים"),
         ("SCOOTER", "קטנוע"),
@@ -284,62 +318,7 @@ class VolunteerCertificate(models.Model):
             return reverse('download_certificate', kwargs={'pk': self.id})
 
 
-class HelpRequestVolunteerManager(models.Manager):
-    def _coord_distance(self, p1, p2):
-        """ Haversine Formula """
-        if USE_NEW_DISTANCE_FORMULA:
-            # Note: This formula does not pass testing yet, returns wrong distances (also unsuitable for sorting).
-            earth_radius = 6371
-            lat1 = math.radians(p1[0])
-            lat2 = math.radians(p2[0])
-            dLat = math.radians(p2[0] - p1[0])
-            dLon = math.radians(p2[1] - p1[1])
-
-            a = math.sin(dLat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dLon / 2) ** 2
-            c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-            return earth_radius * c / 100
-        else:
-            x_diff = (p1[0] - p2[0]) ** 2.0
-            y_diff = (p1[1] - p2[1]) ** 2.0
-            return int(((x_diff + y_diff) ** 0.5) / 100)
-
-    def all_by_distance(self, h_coord):
-        volunteers_qs = Volunteer.objects.all()
-        volunteers_qs = self._add_distance(volunteers_qs, h_coord)
-        # return sorted(volunteers, key=lambda v: v.distance)
-        return volunteers_qs.order_by('distance')
-
-    @staticmethod
-    def _add_distance(qs, h_coord, as_int=False):
-        qs = qs.annotate(y_distance=(F('city__y') - h_coord[1]) ** 2)
-        qs = qs.annotate(x_distance=(F('city__x') - h_coord[0]) ** 2)
-        qs = qs.annotate(distance=models.ExpressionWrapper(((F('x_distance') + F('y_distance')) ** 0.5) / 100,
-                                                           output_field=models.IntegerField() if as_int
-                                                           else models.FloatField()))
-        return qs
-
-    @staticmethod
-    def _add_num_errands(qs):
-        qs = qs.annotate(num_errands=Count('helprequest'))
-        return qs
-
-    def all_by_score(self, h_coord):
-        # In the future, add more parameters
-        volunteers_qs = Volunteer.objects.all()
-        volunteers_qs = self._add_distance(volunteers_qs, h_coord, as_int=True)
-        volunteers_qs = self._add_num_errands(volunteers_qs)
-        return volunteers_qs.order_by('distance', 'num_errands')
-
-    def all_with_num_errands(self):
-        volunteers_qs = Volunteer.objects.all()
-        volunteers_qs = self._add_num_errands(volunteers_qs)
-        return volunteers_qs
-
-
 class HelpRequest(Timestampable):
-    objects = models.Manager()
-    volunteers = HelpRequestVolunteerManager()
-
     TYPES = (
         ('BUYIN', 'קניות'),
         ('TRAVEL', 'איסוף'),
