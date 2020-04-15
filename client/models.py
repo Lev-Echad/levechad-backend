@@ -10,6 +10,7 @@ from bidi.algorithm import get_display
 from django.contrib.staticfiles import finders
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import F, Count
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -24,6 +25,7 @@ DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
 ID_LENGTH = 11
 DAY_NAME_LENGTH = 3
+USE_NEW_DISTANCE_FORMULA = False
 
 
 class Timestampable(models.Model):
@@ -285,8 +287,7 @@ class VolunteerCertificate(models.Model):
 class HelpRequestVolunteerManager(models.Manager):
     def _coord_distance(self, p1, p2):
         """ Haversine Formula """
-        USE_NEW_FORMULA = False
-        if USE_NEW_FORMULA:
+        if USE_NEW_DISTANCE_FORMULA:
             # Note: This formula does not pass testing yet, returns wrong distances (also unsuitable for sorting).
             earth_radius = 6371
             lat1 = math.radians(p1[0])
@@ -303,15 +304,33 @@ class HelpRequestVolunteerManager(models.Manager):
             return int(((x_diff+y_diff) ** 0.5) / 100)
 
     def all_by_distance(self, h_coord):
-        volunteers = []
-        for v in Volunteer.objects.all():
-            v_coord = (v.location_address_x, v.location_address_y)
-            v_coord = (v.city.x, v.city.y)
-            v.distance = self._coord_distance(h_coord, v_coord)
+        # volunteers = []
+        # for v in Volunteer.objects.all():
+        #     # v_coord = (v.location_address_x, v.location_address_y)
+        #     v_coord = (v.city.x, v.city.y)
+        #     v.distance = self._coord_distance(h_coord, v_coord)
+        #
+        #     volunteers.append(v)
+        volunteers_qs = Volunteer.objects.all()
+        volunteers_qs = self._add_distance(volunteers_qs, h_coord)
+        # return sorted(volunteers, key=lambda v: v.distance)
+        return volunteers_qs.order_by('distance')
 
-            volunteers.append(v)
+    def _add_distance(self, qs, h_coord):
+        qs = qs.annotate(y_distance=(F('city__y')-h_coord[1])**2)
+        qs = qs.annotate(x_distance=(F('city__x')-h_coord[0])**2)
+        qs = qs.annotate(distance=((F('x_distance') + F('y_distance'))**0.5)/100)
+        return qs
 
-        return sorted(volunteers, key=lambda v: v.distance)
+    def _add_num_errands(self, qs):
+        qs = qs.annotate(num_errands=Count('helprequest'))
+        return qs
+
+    def all_by_score(self, h_coord):
+        volunteers_qs = Volunteer.objects.all()
+        volunteers_qs = self._add_distance(volunteers_qs, h_coord)
+        volunteers_qs = self._add_num_errands(volunteers_qs)
+        return volunteers_qs.order_by('distance', 'num_errands')
 
 
 class HelpRequest(Timestampable):

@@ -319,7 +319,8 @@ def delete_volunteer(request, pk):
 def find_closest_people(request, pk):
     help_req = get_object_or_404(HelpRequest, pk=pk)
     help_location = (help_req.city.x, help_req.city.y)
-    closest = HelpRequest.volunteers.all_by_distance(help_location)[:100]
+    # closest = HelpRequest.volunteers.all_by_distance(help_location)[:100]
+    closest = HelpRequest.volunteers.all_by_score(help_location)[:100]
     context = {'help_request': help_req, 'volunteers': closest}
     return render(request, 'server/closest_volunteer.html', context)
 
