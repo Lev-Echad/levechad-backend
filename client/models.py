@@ -301,36 +301,39 @@ class HelpRequestVolunteerManager(models.Manager):
         else:
             x_diff = (p1[0] - p2[0]) ** 2.0
             y_diff = (p1[1] - p2[1]) ** 2.0
-            return int(((x_diff+y_diff) ** 0.5) / 100)
+            return int(((x_diff + y_diff) ** 0.5) / 100)
 
     def all_by_distance(self, h_coord):
-        # volunteers = []
-        # for v in Volunteer.objects.all():
-        #     # v_coord = (v.location_address_x, v.location_address_y)
-        #     v_coord = (v.city.x, v.city.y)
-        #     v.distance = self._coord_distance(h_coord, v_coord)
-        #
-        #     volunteers.append(v)
         volunteers_qs = Volunteer.objects.all()
         volunteers_qs = self._add_distance(volunteers_qs, h_coord)
         # return sorted(volunteers, key=lambda v: v.distance)
         return volunteers_qs.order_by('distance')
 
-    def _add_distance(self, qs, h_coord):
-        qs = qs.annotate(y_distance=(F('city__y')-h_coord[1])**2)
-        qs = qs.annotate(x_distance=(F('city__x')-h_coord[0])**2)
-        qs = qs.annotate(distance=((F('x_distance') + F('y_distance'))**0.5)/100)
+    @staticmethod
+    def _add_distance(qs, h_coord, as_int=False):
+        qs = qs.annotate(y_distance=(F('city__y') - h_coord[1]) ** 2)
+        qs = qs.annotate(x_distance=(F('city__x') - h_coord[0]) ** 2)
+        qs = qs.annotate(distance=models.ExpressionWrapper(((F('x_distance') + F('y_distance')) ** 0.5) / 100,
+                                                           output_field=models.IntegerField() if as_int
+                                                           else models.FloatField()))
         return qs
 
-    def _add_num_errands(self, qs):
+    @staticmethod
+    def _add_num_errands(qs):
         qs = qs.annotate(num_errands=Count('helprequest'))
         return qs
 
     def all_by_score(self, h_coord):
+        # In the future, add more parameters
         volunteers_qs = Volunteer.objects.all()
-        volunteers_qs = self._add_distance(volunteers_qs, h_coord)
+        volunteers_qs = self._add_distance(volunteers_qs, h_coord, as_int=True)
         volunteers_qs = self._add_num_errands(volunteers_qs)
         return volunteers_qs.order_by('distance', 'num_errands')
+
+    def all_with_num_errands(self):
+        volunteers_qs = Volunteer.objects.all()
+        volunteers_qs = self._add_num_errands(volunteers_qs)
+        return volunteers_qs
 
 
 class HelpRequest(Timestampable):
