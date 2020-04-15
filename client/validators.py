@@ -60,7 +60,15 @@ def parental_consent_validator(new_volunteer):
     :raise: ValidationError if volunteer is underage and given data is missing
     parental_consent or any parental_consent details.
     """
-    volunteer_age = (date.today() - new_volunteer['date_of_birth']).days / 365
+    today = date.today()
+    date_of_birth = new_volunteer['date_of_birth']
+
+    years_difference = today.year - date_of_birth.year
+    if (today.month, today.day) < (date_of_birth.month, date_of_birth.day):
+        volunteer_age = years_difference - 1
+    else:
+        volunteer_age = years_difference
+
     if volunteer_age < LEGAL_AGE:
         try:
             parental_consent = new_volunteer['parental_consent']
@@ -68,4 +76,4 @@ def parental_consent_validator(new_volunteer):
             parent_name = parental_consent['parent_name']
 
         except KeyError:
-            raise ValidationError("Enter parental consent details, as you are underage.")
+            raise ValidationError("Volunteers aged 16-18 must enter parental consent details.")
