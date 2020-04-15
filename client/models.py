@@ -78,9 +78,9 @@ class VolunteerSchedule(Timestampable):
 
 class ExtendedVolunteerManager(models.Manager):
     @staticmethod
-    def _add_distance(qs, helprequest_coordinate, as_int=False):
-        qs = qs.annotate(y_distance=(F('city__y') - helprequest_coordinate[1]) ** 2)
-        qs = qs.annotate(x_distance=(F('city__x') - helprequest_coordinate[0]) ** 2)
+    def _add_distance(qs, helprequest_coordinates, as_int=False):
+        qs = qs.annotate(y_distance=(F('city__y') - helprequest_coordinates[1]) ** 2)
+        qs = qs.annotate(x_distance=(F('city__x') - helprequest_coordinates[0]) ** 2)
         qs = qs.annotate(distance=models.ExpressionWrapper(((F('x_distance') + F('y_distance')) ** 0.5) / 100,
                                                            output_field=models.IntegerField() if as_int
                                                            else models.FloatField()))
@@ -91,15 +91,15 @@ class ExtendedVolunteerManager(models.Manager):
         qs = qs.annotate(num_helprequests=Count('helprequest'))
         return qs
 
-    def all_by_distance(self, helprequest_coordinate):
+    def all_by_distance(self, helprequest_coordinates):
         volunteers_qs = self.get_queryset()
-        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinate)
+        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates)
         return volunteers_qs.order_by('distance')
 
-    def all_by_score(self, helprequest_coordinate):
+    def all_by_score(self, helprequest_coordinates):
         # In the future, add more parameters
         volunteers_qs = self.get_queryset()
-        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinate, as_int=True)
+        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates, as_int=True)
         volunteers_qs = self._add_num_helprequests(volunteers_qs)
         return volunteers_qs.order_by('distance', 'num_helprequests')
 
