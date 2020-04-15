@@ -54,6 +54,23 @@ Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
 Also see the [TokenAuthentication Django REST framework
 documentation](https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication). 
 
+### Filtering
+Some views have filtering available on them. These should contain an `Available Filters` section in their documentation.
+This section contains the fields you can filter on, and what filters you can apply on each one.
+
+For example, to filter on the `phone_number` field with the `icontains` filter, specify the GET parameter
+`phone_number__icontains` (notice the double underscore).
+
+| Filter    | Description                   | GET parameter    | Value specification     | Comments                               |
+|-----------|-------------------------------|------------------|-------------------------|----------------------------------------|
+| exact     | Field is exactly value        | field            |                         | Can be specified multiple times, OR-ed |
+| icontains | String contains, ignore case  | field__icontains |                         |                                        |
+| gt        | Greater than (numbers, dates) | field__gt        |                         |                                        |
+| lt        | Lower than (numbers, dates)   | field__lt        |                         |                                        |
+| range     | Is between <low> and <high>   | field__range     | <low>,<high>            |                                        |
+| in        | Value is one of given options | field__in        | <optionA>,<optionB>,... |                                        |
+
+
 ## API Endpoints
 
 ### `/api/volunteers`
@@ -61,6 +78,7 @@ documentation](https://www.django-rest-framework.org/api-guide/authentication/#t
 * _This view is pageable. See "Paginating" section for more details. Results described here will be contained in the
 `results` item of the pagination response._
 * _This view requires authentication. See "Token Authentication" section for more details._
+* _This view is filterable. See "Filtering" section above for more details & the filters available here._
 
 **Description**: Returns a list of all volunteers (paginated (#209) & filtered (#211)).
 
@@ -106,6 +124,28 @@ documentation](https://www.django-rest-framework.org/api-guide/authentication/#t
   ...
 ]
 ```
+
+#### Available Filters
+```
+'id': ['exact'],
+'first_name': ['exact', 'icontains'],
+'last_name': ['exact', 'icontains'],
+'tz_number': ['exact', 'icontains'],
+'phone_number': ['exact', 'icontains'],
+'date_of_birth': ['gt', 'lt', 'exact'],
+'age': ['gt', 'lt', 'exact'],
+'gender': ['exact'],
+'city': ['exact', 'in'],
+'neighborhood': ['exact', 'icontains'],
+'areas': ['exact'],
+'moving_way': ['exact'],
+'week_assignments_capacity': ['exact', 'range'],
+'wanted_assignments': ['exact'],
+'score': ['exact'],
+'created_date': ['gt', 'lt', 'exact'],
+'organization': ['exact', 'in']
+```
+
 
 ### `/api/register`
 
