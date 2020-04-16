@@ -1,14 +1,15 @@
 from django.db.models import Count
-from rest_framework import viewsets, mixins
+from rest_framework.exceptions import ValidationError
+from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 import django_filters as filters
 
-from client.models import Volunteer, HelpRequest
+from client.models import Volunteer, HelpRequest, City
 from client.validators import PHONE_NUMBER_REGEX
-from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer
+from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer
 
 
 class SendVerificationCodeViewSet(viewsets.ViewSet):
@@ -105,15 +106,47 @@ class HelpRequestsFilter(filters.FilterSet):
         }
 
 
-class ListVolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class VolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Volunteer.objects.all().order_by('-created_date').annotate(time_volunteered=Count('helprequest'))
     serializer_class = VolunteerSerializer
     permission_classes = [IsAuthenticated]
     filterset_class = VolunteerFilter
 
 
-class ListHelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = HelpRequest.objects.all().order_by('-created_date')
     serializer_class = HelpRequestSerializer
     permission_classes = [IsAuthenticated]
     filterset_class = HelpRequestsFilter
+
+
+class CityAutocompleteViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    MINIMUM_FILTER_LENGTH = 2
+    STARTSWITH_QUERY_PARAMETER = 'name__startswith'
+
+    pagination_class = None
+    serializer_class = ShortCitySerializer
+
+    def get_queryset(self):
+        """
+        Requires the "startswith" parameter to exist & not be below MINIMUM_FILTER_LENGTH
+        """
+        startswith = self.request.query_params.get(type(self).STARTSWITH_QUERY_PARAMETER, None)
+        if startswith is None or len(startswith) < type(self).MINIMUM_FILTER_LENGTH:
+            raise ValidationError(''.join([
+                f'{type(self).STARTSWITH_QUERY_PARAMETER} parameter must be ',
+                f'above {type(self).MINIMUM_FILTER_LENGTH} characters.'
+            ]))
+
+        return City.objects.all().filter(name__startswith=startswith)
+
+    def list(self, request):
+        try:
+            response = super().list(request)
+            response.data = [city['name'] for city in response.data]
+            return response
+        except ValidationError as err:
+            return Response(
+                {'detail': err.detail},
+                status=status.HTTP_400_BAD_REQUEST
+            )

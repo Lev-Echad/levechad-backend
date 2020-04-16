@@ -244,3 +244,41 @@ response:
         "verified": true  // whether the code sent is verified or not
     }
     ```
+
+### `/api/cityautocomplete`
+
+**Description**: Provides city autocomplete for two characters and up.
+
+**Allowed methods**: GET
+
+##### Parameters
+
+This view accepts query parameters:
+
+* `name__startswith`: the string to autocomplete with city names. Must be above two characters. _Notice the double
+underscore!_
+
+##### Response
+
+* On invalid input, returns status code `400 Bad Request`. Response (if `name__startswith` is missing/below two
+characters):
+    ```json
+    {
+        "detail": [
+            "name__startswith parameter must be above 2 characters."
+        ]
+    }
+    ```
+  
+* On valid input, returns status code `200 OK`, with a list of all city names that match. Example response (for
+`name__startswith=אב`):
+
+    ```json
+    [
+        "אבירים",
+        "אבו עבדון (שבט)",
+        ...
+    ]
+    ```
+  
+  The list will be empty if no results were found.
