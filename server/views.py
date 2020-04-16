@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 
 from django.http import HttpResponse, HttpResponseBadRequest
 
-import server.xls_exporter
+from server.resources import VolunteerResource, HelpRequestResource
 
 RESULTS_IN_PAGE = 50
 PAGINATION_SHORTCUT_NUMBER = 7
@@ -325,31 +325,11 @@ def find_closest_people(request, pk):
 
 
 def export_users_xls(request):
-    fields_descriptions = {
-        'id': 'מזהה מתנדב',
-        'first_name': 'שם פרטי',
-        'last_name': 'שם משפחה',
-        'tz_number': 'תעודת זהות',
-        'volunteer_type': 'סוג מתנדב',
-        'date_of_birth': 'תאריך לידה',
-        'organization': 'ארגון',
-        'phone_number': 'מספר טלפון',
-        'areas': 'איזור מגורים',
-        'languages': 'שפות',
-        'email': 'אימייל',
-        'city': 'עיר',
-        'neighborhood': 'שכונת מגורים',
-        'address': 'כתובת',
-        'available_saturday': 'זמין בשבת?',
-        'keep_mandatory_worker_children': 'מעוניין לסייע לילדי עובדים חיוניים?',
-        'guiding': 'מדריך',
-        'notes': 'הערות',
-        'moving_way': 'אמצעי תחבורה',
-        'hearing_way': 'איך שמע על לב אחד',
-        'created_date': 'מועד הרשמה',
-    }
+    current_time = datetime.datetime.now().strftime('%Y_%m_%d-%H%M%S')
+    response = HttpResponse(VolunteerResource().export().xls, 'application/vnd.ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="Volunteers_data-{current_time}.xls"'
 
-    return server.xls_exporter.export_model_to_xls(Volunteer, fields_descriptions)
+    return response
 
 
 @login_required
@@ -365,19 +345,8 @@ def create_volunteer_certificate(request, volunteer_id):
 
 
 def export_help_xls(request):
-    fields_descriptions = {
-        'id': 'מזהה בקשה',
-        'created_date': 'תאריך הבקשה',
-        'full_name': 'שם פונה',
-        'phone_number': 'טלפון',
-        'area': 'איזור',
-        'address': 'כתובת',
-        'request_reason': 'סיבת הבקשה',
-        'city': 'עיר',
-        'type': 'סוג פנייה',
-        'notes': 'הערות',
-        'status': 'סטטוס',
-        'helping_volunteer': 'מתנדב שמטפל',
-    }
+    current_time = datetime.datetime.now().strftime('%Y_%m_%d-%H%M%S')
+    response = HttpResponse(HelpRequestResource().export().xls, 'application/vnd.ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="HelpRequests_data-{current_time}.xls"'
 
-    return server.xls_exporter.export_model_to_xls(HelpRequest, fields_descriptions, spreadsheet_name='Help Requests')
+    return response
