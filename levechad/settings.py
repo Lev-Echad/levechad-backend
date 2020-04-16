@@ -218,4 +218,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_THROTTLE_RATES': {
+        'hamal-data': '1/second',
+        'login': '1/second',
+        'registration': '',  # overridden in throttling.py
+        'send-sms': '',  # overridden in throttling.py
+        'check-sms': '',  # overridden in throttling.py
+    },
 }
