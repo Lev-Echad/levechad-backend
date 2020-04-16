@@ -60,6 +60,7 @@ class City(models.Model):
     name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, primary_key=True)
     x = models.FloatField()
     y = models.FloatField()
+    region = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name
