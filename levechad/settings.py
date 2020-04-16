@@ -35,6 +35,8 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+
 INSTALLED_APPS = [
     'client.apps.ClientConfig',
     'server.apps.ServerConfig',
@@ -52,7 +54,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'django_filters'
+    'django_filters',
+    'import_export'
 ]
 
 MIDDLEWARE = [
