@@ -13,7 +13,7 @@ class LoginThrottle(AnonRateThrottle):
 
 class RegistrationThrottle(AnonRateThrottle):
     scope = 'register'
-    THROTTLE_SECONDS = 10
+    THROTTLE_SECONDS = 5
 
     def parse_rate(self, rate):
         """

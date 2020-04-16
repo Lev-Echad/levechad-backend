@@ -221,7 +221,7 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'hamal-data': '1/second',
         'login': '1/second',
-        'registration': '',  # overridden in throttling.py
+        'register': '',  # overridden in throttling.py
         'send-sms': '',  # overridden in throttling.py
         'check-sms': '',  # overridden in throttling.py
     },
