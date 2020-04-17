@@ -8,6 +8,7 @@ from bidi.algorithm import get_display
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -249,8 +250,7 @@ class Volunteer(Timestampable):
     def delete(self, using=None, keep_parents=False):
         requests_qs = HelpRequest.objects.all().filter(Q(helping_volunteer=self) & ~Q(status='DONE'))
         if requests_qs.exists():
-            raise Exception("Volunteer has pending requests and therefor cannot be deleted.")
-
+            raise ValidationError("Volunteer has pending requests and therefor cannot be deleted.")
         self.disabled = True
         self.save()
 
