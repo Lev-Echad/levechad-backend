@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from client.validators import parental_consent_validator
+from client.validators import parental_consent_validator, minimum_age_validator
 
 from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area
 
@@ -28,6 +28,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
                   'week_assignments_capacity', 'wanted_assignments', 'phone_number', 'email', 'parental_consent',
                   'languages']
 
+    def validate_date_of_birth(self, date_of_birth):
+        """
+        Validates the volunteer old enough to volunteer.
+        """
+        minimum_age_validator(date_of_birth)
+        return date_of_birth
+
     def validate(self, data):
         parental_consent_validator(data)
 
@@ -44,9 +51,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class CitySerializer(serializers.ModelSerializer):
+    region = serializers.PrimaryKeyRelatedField(queryset=Area.objects.all())
+
     class Meta:
         model = City
-        fields = ['name', 'x', 'y']
+        fields = ['name', 'x', 'y', 'region']
+
+
+class ShortCitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['name']
 
 
 class VolunteerSerializer(serializers.ModelSerializer):

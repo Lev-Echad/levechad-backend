@@ -3,7 +3,9 @@ import json
 from django import forms
 
 from client.models import HelpRequest, Language, DEFAULT_MAX_FIELD_LENGTH, ID_LENGTH
-from client.validators import id_number_validator, unique_id_number_validator, phone_number_validator
+from client.validators import (
+    id_number_validator, unique_id_number_validator, phone_number_validator, minimum_age_validator
+)
 
 FIELD_NAME_MAPPING = {
 }
@@ -64,7 +66,7 @@ class VolunteerForm(forms.Form):
     id_number = forms.CharField(max_length=ID_LENGTH, validators=[id_number_validator, unique_id_number_validator])
     organization = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, required=False)
     date_of_birth = forms.DateField(input_formats=['%Y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%d.%m.%Y', '%d.%m.%y'],
-                                    required=True)
+                                    required=True, validators=[minimum_age_validator])
     area = forms.MultipleChoiceField(choices=AREAS, widget=forms.CheckboxSelectMultiple())
     languages = forms.MultipleChoiceField(choices=get_lang_choices, widget=forms.CheckboxSelectMultiple())
     phone_number = forms.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, validators=[phone_number_validator])

@@ -6,8 +6,9 @@ import api.views
 router = routers.DefaultRouter()
 router.register(r'registration', api.views.RegistrationViewSet, basename='registration')
 router.register(r'createhelprequest', api.views.CreateHelpRequestViewSet, basename='create_help_request')
-router.register(r'volunteers', api.views.ListVolunteersViewSet, basename='volunteer_list')
-router.register(r'helprequests', api.views.ListHelpRequestsViewSet, basename='help_request_list')
+router.register(r'volunteers', api.views.VolunteersViewSet, basename='volunteer_list')
+router.register(r'helprequests', api.views.HelpRequestsViewSet, basename='help_request_list')
+router.register(r'cityautocomplete', api.views.CityAutocompleteViewSet, basename='city_autocomplete')
 router.register(r'sendverificationcode', api.views.SendVerificationCodeViewSet, basename='send_verification_code')
 router.register(r'checkverificationcode', api.views.CheckVerificationCodeViewSet, basename='check_verification_code')
 
