@@ -70,13 +70,11 @@ class CheckVerificationCodeViewSet(viewsets.ViewSet):
 
 
 class RegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = Volunteer.objects.all()
     serializer_class = RegistrationSerializer
     throttle_classes = [api.throttling.RegistrationThrottle]
 
 
 class CreateHelpRequestViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = HelpRequest.objects.all()
     serializer_class = CreateHelpRequestSerializer
     throttle_classes = [api.throttling.RegistrationThrottle]
 
