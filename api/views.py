@@ -156,7 +156,7 @@ class CityAutocompleteViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 f'above {type(self).MINIMUM_FILTER_LENGTH} characters.'
             ]))
 
-        return City.objects.all().filter(name__startswith=startswith)
+        return City.objects.all().filter(name__startswith=startswith).order_by('name')
 
     def list(self, request):
         try:
