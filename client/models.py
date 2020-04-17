@@ -15,6 +15,7 @@ from django.db import models
 from django.db.models import F, Count, Q
 from django.urls import reverse
 from django.utils import timezone
+
 from multiselectfield import MultiSelectField
 
 DEFAULT_MAX_FIELD_LENGTH = 200
