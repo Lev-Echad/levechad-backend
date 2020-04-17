@@ -84,6 +84,14 @@ class ShortVolunteerSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name']
 
 
+class CreateHelpRequestSerializer(serializers.ModelSerializer):
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
+
+    class Meta:
+        model = HelpRequest
+        fields = ['full_name', 'phone_number', 'city', 'address', 'notes', 'type', 'type_text', 'request_reason']
+
+
 class HelpRequestSerializer(serializers.ModelSerializer):
     city = CitySerializer()
     area = serializers.PrimaryKeyRelatedField(queryset=Area.objects.all())
@@ -96,3 +104,15 @@ class HelpRequestSerializer(serializers.ModelSerializer):
         model = HelpRequest
         fields = ['id', 'full_name', 'phone_number', 'area', 'city', 'address', 'notes', 'type', 'type_text',
                   'request_reason', 'status', 'status_updater', 'helping_volunteer', 'created_date']
+
+
+class AreaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Area
+        fields = ['name']
+
+
+class LanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Language
+        fields = ['name']

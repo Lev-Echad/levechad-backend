@@ -15,6 +15,7 @@ from django.db import models
 from django.db.models import F, Count, Q
 from django.urls import reverse
 from django.utils import timezone
+
 from multiselectfield import MultiSelectField
 
 DEFAULT_MAX_FIELD_LENGTH = 200
@@ -230,7 +231,7 @@ class Volunteer(Timestampable):
     keep_mandatory_worker_children = models.BooleanField(default=False, blank=True, null=True)
     guiding = models.BooleanField(default=False, null=True, blank=True)
     notes = models.CharField(max_length=5000, null=True, blank=True)
-    moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS)
+    moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS, blank=True, null=True)
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS, blank=True, null=True)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
     score = models.IntegerField(default=0)
