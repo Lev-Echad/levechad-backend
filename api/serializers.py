@@ -96,3 +96,15 @@ class HelpRequestSerializer(serializers.ModelSerializer):
         model = HelpRequest
         fields = ['id', 'full_name', 'phone_number', 'area', 'city', 'address', 'notes', 'type', 'type_text',
                   'request_reason', 'status', 'status_updater', 'helping_volunteer', 'created_date']
+
+
+class AreaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Area
+        fields = ['name']
+
+
+class LanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Language
+        fields = ['name']
