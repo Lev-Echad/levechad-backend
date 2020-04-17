@@ -1,6 +1,7 @@
 # coding=utf-8
 import io
-from datetime import timedelta, date
+import math
+from datetime import timedelta, date, datetime, time
 
 import boto3
 from PIL import Image, ImageDraw, ImageFont
@@ -9,6 +10,7 @@ from bidi.algorithm import get_display
 from django.contrib.staticfiles import finders
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import F, Count
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -58,6 +60,7 @@ class City(models.Model):
     name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, primary_key=True)
     x = models.FloatField()
     y = models.FloatField()
+    region = models.ForeignKey(Area, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
         return self.name
@@ -74,7 +77,41 @@ class VolunteerSchedule(Timestampable):
     Saturday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
 
 
+class ExtendedVolunteerManager(models.Manager):
+    @staticmethod
+    def _add_distance(qs, helprequest_coordinates, as_int=False):
+        qs = qs.annotate(y_distance=(F('city__y') - helprequest_coordinates[1]) ** 2)
+        qs = qs.annotate(x_distance=(F('city__x') - helprequest_coordinates[0]) ** 2)
+        qs = qs.annotate(distance=models.ExpressionWrapper(((F('x_distance') + F('y_distance')) ** 0.5) / 100,
+                                                           output_field=models.IntegerField() if as_int
+                                                           else models.FloatField()))
+        return qs
+
+    @staticmethod
+    def _add_num_helprequests(qs):
+        qs = qs.annotate(num_helprequests=Count('helprequest'))
+        return qs
+
+    def all_by_distance(self, helprequest_coordinates):
+        volunteers_qs = self.get_queryset()
+        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates)
+        return volunteers_qs.order_by('distance')
+
+    def all_by_score(self, helprequest_coordinates):
+        # In the future, add more parameters
+        volunteers_qs = self.get_queryset()
+        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates, as_int=True)
+        volunteers_qs = self._add_num_helprequests(volunteers_qs)
+        return volunteers_qs.order_by('distance', 'num_helprequests')
+
+    def all_with_helprequests_count(self):
+        volunteers_qs = self.get_queryset()
+        volunteers_qs = self._add_num_helprequests(volunteers_qs)
+        return volunteers_qs
+
+
 class Volunteer(Timestampable):
+    objects = ExtendedVolunteerManager()
     MOVING_WAYS = (
         ("BIKE", "אופניים"),
         ("SCOOTER", "קטנוע"),
@@ -332,7 +369,6 @@ class ParentalConsent(models.Model):
     parent_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     parent_id = models.CharField(max_length=9)
     volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE, related_name='parental_consent')
-
 
 # TODO: models validation is a good practice and should be added in the future - due to some inconsistency about our DB
 # TODO: constraints over the time, the model validation blocks lots of functionality the used to work. in the future,

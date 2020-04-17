@@ -36,7 +36,6 @@
             <th scope="col">עיר</th>
             <th scope="col">כתובת</th>
             <th scope="col">דרכי התניידות</th>
-            <th scope="col">האם זמין עכשיו?</th>
             <th scope="col">מספר הפעמים שעזר</th>
             <th scope="col">רוצה חוגים</th>
             <th scope="col">ערוך הערות</th>
@@ -88,14 +87,7 @@
                 </td>
                 <td>{{ volunteer.address }}</td>
                 <td>{{ volunteer.get_moving_way_display }}</td>
-                <td>
-                    {% if volunteer.id in availability_now_id %}
-                        פנוי
-                    {% else %}
-                        לא פנוי
-                    {% endif %}
-                </td>
-                <td>{{ volunteer.appears_count }}</td>
+                <td>{{ volunteer.times_volunteered }}</td>
                 <td>{{ volunteer.guiding }}</td>
 
                 <td>

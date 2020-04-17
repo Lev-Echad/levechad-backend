@@ -80,7 +80,7 @@ For example, to filter on the `phone_number` field with the `icontains` filter, 
 * _This view requires authentication. See "Token Authentication" section for more details._
 * _This view is filterable. See "Filtering" section above for more details & the filters available here._
 
-**Description**: Returns a list of all volunteers (paginated (#209) & filtered (#211)).
+**Description**: Returns a list of all volunteers (paginated & filtered).
 
 **Allowed methods**: GET
 
@@ -146,6 +146,56 @@ For example, to filter on the `phone_number` field with the `icontains` filter, 
 'organization': ['exact', 'in']
 ```
 
+### `/api/helprequests`
+* _This view is pageable. See "Paginating" section for more details. Results described here will be contained in the
+`results` item of the pagination response._
+* _This view requires authentication. See "Token Authentication" section for more details._
+* _This view is filterable. See "Filtering" section above for more details & the filters available here._
+
+**Description**: Returns a list of all help requests (paginated & filtered)
+
+**Allowed methods**: GET
+
+**Parameters**: None
+
+##### Response
+```json
+[
+  {
+    "id": 0,
+    "full_name": "",
+    "phone_number": "",
+    "area": "", // one of: צפון, ירושלים והסביבה, מרכז, יהודה ושומרון, דרום, סיוע טלפוני
+    "city": {
+        "name": "",
+        "x": 0,
+        "y": 0
+    },
+    "address": "",
+    "notes": "",
+    "type": "", // one of: קניות, איסוף, תרופות, עזרה בבית, תמיכה טלפונית, סיוע לעובדים חיוניים, אחר
+    "type_text": "",
+    "request_reason": "", // one of: בידוד, קבוצת סיכון גבוהה, אחר
+    "status": "", // one of: התקבלה, בטיפול, הועבר למתנדב, טופל, לא טופל
+    "status_updater": "",
+    "helping_volunteer": {
+      "id": 0,
+      "full_name": ""
+    },
+    "created_date": ""
+  },
+  ...
+]
+```
+
+#### Available Filters
+```
+'id': ['exact'],
+'city': ['exact', 'in'],
+'area': ['exact', 'in'],
+'status': ['exact', 'in'],
+'type': ['exact', 'in']
+```
 
 ### `/api/register`
 
