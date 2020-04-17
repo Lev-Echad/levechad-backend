@@ -51,9 +51,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class CitySerializer(serializers.ModelSerializer):
+    region = serializers.PrimaryKeyRelatedField(queryset=Area.objects.all())
+
     class Meta:
         model = City
-        fields = ['name', 'x', 'y']
+        fields = ['name', 'x', 'y', 'region']
+
+
+class ShortCitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['name']
 
 
 class VolunteerSerializer(serializers.ModelSerializer):
