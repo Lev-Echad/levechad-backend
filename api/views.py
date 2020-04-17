@@ -8,10 +8,11 @@ from rest_framework.authtoken.views import ObtainAuthToken
 
 import django_filters as filters
 
-from client.models import Volunteer, HelpRequest, City
+from client.models import Volunteer, HelpRequest, City, Area, Language
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
-                            CreateHelpRequestSerializer
+                            CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer
+
 import api.throttling
 
 
@@ -44,8 +45,8 @@ class SendVerificationCodeViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # TODO STUB - Implement in #198
-        return Response({'success': True, 'verified': True})
+        # TODO STUB - Implement in #198 - we might want to remove success and use status codes to indicate errors
+        return Response({'success': True})
 
 
 class CheckVerificationCodeViewSet(viewsets.ViewSet):
@@ -64,8 +65,8 @@ class CheckVerificationCodeViewSet(viewsets.ViewSet):
         phone_number = request.data['phoneNumber']
         code_received = request.data['codeReceived']
 
-        # TODO STUB - Implement in #198
-        return Response({'success': True, 'message': ''})
+        # TODO STUB - Implement in #198 - we might want to remove success and use status codes to indicate errors
+        return Response({'success': True, 'message': '', 'verified': True})
 
 
 class RegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -144,12 +145,27 @@ class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     throttle_classes = [api.throttling.HamalDataListThrottle]
 
 
-class CityAutocompleteViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class ListByNameViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    pagination_class = None
+
+    def list(self, request):
+        try:
+            response = super().list(request)
+            response.data = [item['name'] for item in response.data]
+            return response
+        except ValidationError as err:
+            return Response(
+                {'detail': err.detail},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class CityAutocompleteViewSet(ListByNameViewSet):
     MINIMUM_FILTER_LENGTH = 2
     STARTSWITH_QUERY_PARAMETER = 'name__startswith'
 
-    pagination_class = None
     serializer_class = ShortCitySerializer
+    throttle_classes = [api.throttling.CityAutocompleteThrottle]
 
     def get_queryset(self):
         """
@@ -164,13 +180,16 @@ class CityAutocompleteViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
         return City.objects.all().filter(name__startswith=startswith).order_by('name')
 
-    def list(self, request):
-        try:
-            response = super().list(request)
-            response.data = [city['name'] for city in response.data]
-            return response
-        except ValidationError as err:
-            return Response(
-                {'detail': err.detail},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+
+class AreasViewSet(ListByNameViewSet):
+    queryset = Area.objects.all().order_by('name')
+    serializer_class = AreaSerializer
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [api.throttling.UserChoicesListThrottle]
+
+
+class LanguagesViewSet(ListByNameViewSet):
+    queryset = Language.objects.all().order_by('name')
+    serializer_class = LanguageSerializer
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [api.throttling.UserChoicesListThrottle]
