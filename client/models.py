@@ -11,7 +11,7 @@ from django.contrib.staticfiles import finders
 from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import F, Count
+from django.db.models import F, Count, Q
 from django.urls import reverse
 from django.utils import timezone
 from multiselectfield import MultiSelectField
@@ -86,6 +86,9 @@ class ExtendedVolunteerManager(models.Manager):
     def _add_num_helprequests(qs):
         qs = qs.annotate(num_helprequests=Count('helprequest'))
         return qs
+
+    def get_queryset(self):
+        return super().get_queryset().filter(disabled=False)
 
     def all_by_distance(self, helprequest_coordinates):
         volunteers_qs = self.get_queryset()
@@ -230,6 +233,7 @@ class Volunteer(Timestampable):
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS, blank=True, null=True)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
     score = models.IntegerField(default=0)
+    disabled = models.BooleanField(default=False)
 
     @property
     def times_volunteered(self):
@@ -241,6 +245,14 @@ class Volunteer(Timestampable):
 
     def __str__(self):
         return self.full_name
+
+    def delete(self, using=None, keep_parents=False):
+        requests_qs = HelpRequest.objects.all().filter(Q(helping_volunteer=self) & ~Q(status='DONE'))
+        if requests_qs.exists():
+            raise Exception("Volunteer has pending requests and therefor cannot be deleted.")
+
+        self.disabled = True
+        self.save()
 
 
 class VolunteerCertificate(models.Model):
