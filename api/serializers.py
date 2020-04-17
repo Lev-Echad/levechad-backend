@@ -8,8 +8,8 @@ class ParentalConsentSerializer(serializers.ModelSerializer):
     # Currently, nested serializer field required=False doesn't work.
     # Link to bug in DRF: https://github.com/encode/django-rest-framework/issues/2719
     # Declaring these fields as required=False is the workaround so ParentalConsent won't be required.
-    parent_name = serializers.CharField(required=False)
-    parent_id = serializers.CharField(required=False)
+    parent_name = serializers.CharField(required=False, allow_blank=True)
+    parent_id = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = ParentalConsent
