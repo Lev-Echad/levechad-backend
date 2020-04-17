@@ -70,6 +70,42 @@ For example, to filter on the `phone_number` field with the `icontains` filter, 
 | range     | Is between <low> and <high>   | field__range     | <low>,<high>            |                                        |
 | in        | Value is one of given options | field__in        | <optionA>,<optionB>,... |                                        |
 
+### Throttling (Rate Limiting)
+Most views should have throttling enabled. This makes it so they can only be accessed a certain amount of times in a certain
+timeframe.
+
+There are two types of throttling:
+
+ * Anonymous throttling - only works for unauthenticated users (unlimited access for authenticated users), throttles by
+ IP address
+ * User throttling - always works, throttles by username (or IP address for unauthenticated users if the view doesn't
+ require authentication)
+ 
+Throttling is divided by `scopes` - if two endpoints share the same throttling scope that means they share the limit of
+requests (if 5 requests are allowed per minute in a certain scope, and two views share this scope, it's 5 requests per
+minute for both together).
+
+Each endpoint with throttling has their scope declared in the documentation below, and whether they're anonymous or user
+throttles.
+
+Available scopes:
+
+| Throttle scopes   | Amount of requests allowed | per...    |
+|-------------------|----------------------------|-----------|
+| hamal-data        | 1                          | 1 second  |
+| login             | 1                          | 1 second  |
+| user-choices-list | 2                          | 1 second  |
+| city-autocomplete | 2                          | 1 second  |
+| register          | 1                          | 5 seconds |
+| send-sms          | 1                          | 5 minutes |
+| check-sms         | 1                          | 2 seconds | 
+
+Requests denied by throttling have the `429 Too Many Requests` status code and the following response (where X is the
+no. of seconds left):
+
+```json
+{"detail":"Request was throttled. Expected available in X seconds."}
+```
 
 ## API Endpoints
 
@@ -83,6 +119,8 @@ For example, to filter on the `phone_number` field with the `icontains` filter, 
 **Description**: Returns a list of all volunteers (paginated & filtered).
 
 **Allowed methods**: GET
+
+**Throttling**: `hamal-data`, user throttle
 
 **Parameters**: None
 
@@ -156,6 +194,8 @@ For example, to filter on the `phone_number` field with the `icontains` filter, 
 
 **Allowed methods**: GET
 
+**Throttling**: `hamal-data`, user throttle
+
 **Parameters**: None
 
 ##### Response
@@ -203,6 +243,8 @@ For example, to filter on the `phone_number` field with the `icontains` filter, 
 
 **Allowed methods**: POST
 
+**Throttling**: `register`, anonymous throttle
+
 ##### Parameters
 
 _Access `/api/register` with OPTIONS to see accepted request (in development, click the OPTIONS button in the
@@ -236,6 +278,8 @@ response:
 
 **Allowed methods**: POST
 
+**Throttling**: `send-sms`, anonymous throttle
+
 ##### Parameters
 
 ```json
@@ -266,6 +310,8 @@ response:
 **Description**: Checks the verfication code sent be `/api/sendverificationcode`. **Currently a stub, see #198**
 
 **Allowed methods**: POST
+
+**Throttling**: `check-sms`, anonymous throttle
 
 ##### Parameters
 
@@ -301,6 +347,8 @@ response:
 
 **Allowed methods**: GET
 
+**Throttling**: `city-autocomplete`, anonymous throttle
+
 ##### Parameters
 
 This view accepts query parameters:
@@ -332,3 +380,50 @@ characters):
     ```
   
   The list will be empty if no results were found.
+  
+### `/api/areas`
+
+* _This view requires authentication. See "Token Authentication" section for more details._
+
+**Description**: Returns all available areas (hamals).
+
+**Allowed methods**: GET
+
+**Throttling**: `user-choices-list`, user throttle
+
+**Parameters**: None
+
+##### Example response
+
+```json
+[
+  "צפון",
+  "ירושלים והסביבה",
+  "מרכז",
+  "יהודה ושומרון",
+  "דרום",
+  "סיוע טלפוני"
+]
+```
+
+### `/api/languages`
+
+* _This view requires authentication. See "Token Authentication" section for more details._
+
+**Description**: Returns all available languages.
+
+**Allowed methods**: GET
+
+**Throttling**: `user-choices-list`, user throttle
+
+**Parameters**: None
+
+##### Example response
+
+```json
+[
+  "עברית",
+  "אנגלית",
+  ...
+]
+```

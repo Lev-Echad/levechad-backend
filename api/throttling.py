@@ -3,6 +3,14 @@ from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 # TODO find a way to do this with metaclasses to reduce code duplication
 
 
+class CityAutocompleteThrottle(AnonRateThrottle):
+    scope = 'city-autocomplete'
+
+
+class UserChoicesListThrottle(UserRateThrottle):
+    scope = 'user-choices-list'
+
+
 class HamalDataListThrottle(UserRateThrottle):
     scope = 'hamal-data'
 
