@@ -95,4 +95,3 @@ def minimum_age_validator(date_of_birth):
     volunteer_age = _calculate_age(date_of_birth)
     if volunteer_age < MINIMUM_AGE:
         raise ValidationError(f"Volunteers must be at least {MINIMUM_AGE} years old.")
-
