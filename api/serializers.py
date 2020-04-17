@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from client.validators import parental_consent_validator
+from client.validators import parental_consent_validator, minimum_age_validator
 
 from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area
 
@@ -27,6 +27,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'tz_number', 'date_of_birth', 'gender', 'city', 'address', 'moving_way',
                   'week_assignments_capacity', 'wanted_assignments', 'phone_number', 'email', 'parental_consent',
                   'languages']
+
+    def validate_date_of_birth(self, date_of_birth):
+        """
+        Validates the volunteer old enough to volunteer.
+        """
+        minimum_age_validator(date_of_birth)
+        return date_of_birth
 
     def validate(self, data):
         parental_consent_validator(data)

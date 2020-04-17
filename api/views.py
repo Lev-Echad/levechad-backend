@@ -4,6 +4,7 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.views import ObtainAuthToken
 
 import django_filters as filters
 
@@ -11,8 +12,18 @@ from client.models import Volunteer, HelpRequest, City
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer
 
+import api.throttling
+
+
+class CustomAuthToken(ObtainAuthToken):
+    throttle_classes = [api.throttling.LoginThrottle]
+
+
+# === Non-restricted API endpoints ===
 
 class SendVerificationCodeViewSet(viewsets.ViewSet):
+    throttle_classes = [api.throttling.SendSMSThrottle]
+
     def create(self, request):
         def _is_valid_phone_number(string):
             return PHONE_NUMBER_REGEX.search(string) is not None
@@ -38,6 +49,8 @@ class SendVerificationCodeViewSet(viewsets.ViewSet):
 
 
 class CheckVerificationCodeViewSet(viewsets.ViewSet):
+    throttle_classes = [api.throttling.CheckSMSThrottle]
+
     def create(self, request):
         if request.data is None or len(request.data) == 0:
             return Response({'success': False, 'message': 'No data specified.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -58,7 +71,10 @@ class CheckVerificationCodeViewSet(viewsets.ViewSet):
 class RegistrationAPIViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Volunteer.objects.all()
     serializer_class = RegistrationSerializer
+    throttle_classes = [api.throttling.RegistrationThrottle]
 
+
+# === Authentication required API endpoints ===
 
 class VolunteerFilter(filters.FilterSet):
     time_volunteered = filters.NumberFilter(lookup_expr='exact')
@@ -111,6 +127,7 @@ class VolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = VolunteerSerializer
     permission_classes = [IsAuthenticated]
     filterset_class = VolunteerFilter
+    throttle_classes = [api.throttling.HamalDataListThrottle]
 
 
 class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -118,6 +135,7 @@ class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = HelpRequestSerializer
     permission_classes = [IsAuthenticated]
     filterset_class = HelpRequestsFilter
+    throttle_classes = [api.throttling.HamalDataListThrottle]
 
 
 class CityAutocompleteViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

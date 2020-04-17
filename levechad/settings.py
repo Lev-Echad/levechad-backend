@@ -35,6 +35,8 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+
 INSTALLED_APPS = [
     'client.apps.ClientConfig',
     'server.apps.ServerConfig',
@@ -52,7 +54,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'django_filters'
+    'django_filters',
+    'import_export'
 ]
 
 MIDDLEWARE = [
@@ -215,4 +218,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_THROTTLE_RATES': {
+        'hamal-data': '1/second',
+        'login': '1/second',
+        'register': '',  # overridden in throttling.py
+        'send-sms': '',  # overridden in throttling.py
+        'check-sms': '',  # overridden in throttling.py
+    },
 }
