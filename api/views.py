@@ -9,7 +9,8 @@ import django_filters as filters
 
 from client.models import Volunteer, HelpRequest
 from client.validators import PHONE_NUMBER_REGEX
-from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer
+from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, \
+                            CreateHelpRequestSerializer
 
 import api.throttling
 
@@ -67,9 +68,15 @@ class CheckVerificationCodeViewSet(viewsets.ViewSet):
         return Response({'success': True, 'message': ''})
 
 
-class RegistrationAPIViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+class RegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Volunteer.objects.all()
     serializer_class = RegistrationSerializer
+    throttle_classes = [api.throttling.RegistrationThrottle]
+
+
+class CreateHelpRequestViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = HelpRequest.objects.all()
+    serializer_class = CreateHelpRequestSerializer
     throttle_classes = [api.throttling.RegistrationThrottle]
 
 

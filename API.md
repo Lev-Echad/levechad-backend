@@ -230,6 +230,40 @@ response:
   ```
 * On success, returns status code `201 Created`. Returns the request data.
 
+### `/api/createhelprequest`
+
+**Description**: Creates a help request.
+
+**Allowed methods**: POST
+
+##### Parameters
+
+_Access `/api/createhelprequest` with OPTIONS to see accepted request (in development, click the OPTIONS button in the
+`/api/createhelprequest` web view)._
+
+##### Response
+
+* On invalid input, returns status code `400 Bad Request`. Specifies all invalid fields & their error messages. Example
+response:
+
+  ```json
+  {
+    "full_name": [
+      "This field may not be blank."
+    ],
+    "phone_number": [
+      "This field may not be blank."
+    ],
+    "address": [
+      "This field may not be blank."
+    ],
+    "request_reason": [
+        "\"invalidchoice\" is not a valid choice."
+    ]
+  }
+  ```
+* On success, returns status code `201 Created`. Returns the request data.
+
 ### `/api/sendverificationcode`
 
 **Description**: Sends an SMS verification code to the given number. **Currently a stub, see #198**

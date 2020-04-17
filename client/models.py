@@ -1,7 +1,6 @@
 # coding=utf-8
 import io
-import math
-from datetime import timedelta, date, datetime, time
+from datetime import date
 
 import boto3
 from PIL import Image, ImageDraw, ImageFont
@@ -17,8 +16,6 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.urls import reverse
 
-from django.dispatch import receiver
-from django.db.models.signals import pre_save
 from multiselectfield import MultiSelectField
 
 DEFAULT_MAX_FIELD_LENGTH = 200
