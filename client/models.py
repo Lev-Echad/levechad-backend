@@ -1,24 +1,19 @@
 # coding=utf-8
 import io
-import math
-from datetime import timedelta, date, datetime, time
+from datetime import date
 
 import boto3
 from PIL import Image, ImageDraw, ImageFont
 from bidi.algorithm import get_display
-
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
+from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import F, Count
-from django.utils import timezone
-from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.conf import settings
 from django.urls import reverse
-
-from django.dispatch import receiver
-from django.db.models.signals import pre_save
+from django.utils import timezone
 from multiselectfield import MultiSelectField
 
 DEFAULT_MAX_FIELD_LENGTH = 200
@@ -223,8 +218,10 @@ class Volunteer(Timestampable):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     neighborhood = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    location_address_x = models.FloatField(default=0)
-    location_address_y = models.FloatField(default=0)
+    location_latitude = models.FloatField(default=0)
+    location_longitude = models.FloatField(default=0)
+    # Flag used to prevent recurring attempts to resolve broken address and for debugging.
+    location_failed = models.BooleanField(default=False)
     available_saturday = models.BooleanField(default=False)
     keep_mandatory_worker_children = models.BooleanField(default=False, blank=True, null=True)
     guiding = models.BooleanField(default=False, null=True, blank=True)
@@ -348,6 +345,10 @@ class HelpRequest(Timestampable):
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    location_latitude = models.FloatField(default=0)
+    location_longitude = models.FloatField(default=0)
+    # Flag used to prevent recurring attempts to resolve broken address and for debugging.
+    location_failed = models.BooleanField(default=False)
     notes = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True, null=True)
     type = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=TYPES)
     type_text = models.CharField(max_length=5000)
