@@ -1,24 +1,20 @@
 # coding=utf-8
 import io
-import math
-from datetime import timedelta, date, datetime, time
+from datetime import date
 
 import boto3
 from PIL import Image, ImageDraw, ImageFont
 from bidi.algorithm import get_display
-
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import F, Count
-from django.utils import timezone
-from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.conf import settings
+from django.db.models import F, Count, Q
 from django.urls import reverse
-
-from django.dispatch import receiver
-from django.db.models.signals import pre_save
+from django.utils import timezone
 from multiselectfield import MultiSelectField
 
 DEFAULT_MAX_FIELD_LENGTH = 200
@@ -91,6 +87,9 @@ class ExtendedVolunteerManager(models.Manager):
     def _add_num_helprequests(qs):
         qs = qs.annotate(num_helprequests=Count('helprequest'))
         return qs
+
+    def get_queryset(self):
+        return super().get_queryset().filter(disabled=False)
 
     def all_by_distance(self, helprequest_coordinates):
         volunteers_qs = self.get_queryset()
@@ -223,8 +222,10 @@ class Volunteer(Timestampable):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     neighborhood = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    location_address_x = models.FloatField(default=0)
-    location_address_y = models.FloatField(default=0)
+    location_latitude = models.FloatField(default=0)
+    location_longitude = models.FloatField(default=0)
+    # Flag used to prevent recurring attempts to resolve broken address and for debugging.
+    location_failed = models.BooleanField(default=False)
     available_saturday = models.BooleanField(default=False)
     keep_mandatory_worker_children = models.BooleanField(default=False, blank=True, null=True)
     guiding = models.BooleanField(default=False, null=True, blank=True)
@@ -233,6 +234,7 @@ class Volunteer(Timestampable):
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS, blank=True, null=True)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
     score = models.IntegerField(default=0)
+    disabled = models.BooleanField(default=False)
 
     @property
     def times_volunteered(self):
@@ -244,6 +246,13 @@ class Volunteer(Timestampable):
 
     def __str__(self):
         return self.full_name
+
+    def delete(self, using=None, keep_parents=False):
+        requests_qs = HelpRequest.objects.all().filter(Q(helping_volunteer=self) & ~Q(status='DONE'))
+        if requests_qs.exists():
+            raise ValidationError("Volunteer has pending requests and therefor cannot be deleted.")
+        self.disabled = True
+        self.save()
 
 
 class VolunteerCertificate(models.Model):
@@ -348,6 +357,10 @@ class HelpRequest(Timestampable):
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    location_latitude = models.FloatField(default=0)
+    location_longitude = models.FloatField(default=0)
+    # Flag used to prevent recurring attempts to resolve broken address and for debugging.
+    location_failed = models.BooleanField(default=False)
     notes = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True, null=True)
     type = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=TYPES)
     type_text = models.CharField(max_length=5000)
