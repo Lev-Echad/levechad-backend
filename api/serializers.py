@@ -84,6 +84,15 @@ class ShortVolunteerSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name']
 
 
+class MatchingVolunteerSerializer(serializers.ModelSerializer):
+    moving_way = serializers.CharField(source='get_moving_way_display')
+
+    class Meta:
+        model = Volunteer
+        fields = ['id', 'full_name', 'city', 'address', 'phone_number', 'email', 'location_latitude',
+                  'location_longitude', 'moving_way']
+
+
 class CreateHelpRequestSerializer(serializers.ModelSerializer):
     city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
 
