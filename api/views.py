@@ -166,7 +166,7 @@ class VolunteersViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, mixins.
         return Response(serializer.data)
 
 
-class HelpRequestsViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = HelpRequest.objects.all().order_by('-created_date')
     serializer_class = HelpRequestSerializer
     permission_classes = [IsAuthenticated]
