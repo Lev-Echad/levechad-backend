@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from enum import Enum
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.environ.get('ENV', 'DEVELOPMENT')
 
@@ -229,6 +231,13 @@ REST_FRAMEWORK = {
     },
 }
 
+
 # Geocoding settings
-LOCATOR = 'NOMINATIM'
+class LocatorTypes(Enum):
+    nominatim = 1
+    google = 2
+    arcgis = 3
+
+
+LOCATOR = LocatorTypes(LocatorTypes.nominatim)
 GOOGLE_API_SECRET_KEY = os.environ.get('GOOGLE_API_KEY', default=None)
