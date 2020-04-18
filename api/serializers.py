@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from client.validators import parental_consent_validator, minimum_age_validator
+from rest_framework.exceptions import ValidationError
 
+from client.validators import parental_consent_validator, minimum_age_validator, phone_number_validator, \
+                              unique_id_number_validator, id_number_validator
 from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area
 
 
@@ -17,9 +19,12 @@ class ParentalConsentSerializer(serializers.ModelSerializer):
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
+    date_of_birth = serializers.DateField(required=True)
+    gender = serializers.CharField(required=True)
     city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
-    languages = serializers.PrimaryKeyRelatedField(queryset=Language.objects.all(), many=True)
+    languages = serializers.PrimaryKeyRelatedField(queryset=Language.objects.all(), many=True, required=True)
     wanted_assignments = serializers.MultipleChoiceField(choices=Volunteer.WANTED_ASSIGNMENTS)
+    email = serializers.EmailField(required=True)
     parental_consent = ParentalConsentSerializer()
 
     class Meta:
@@ -29,15 +34,25 @@ class RegistrationSerializer(serializers.ModelSerializer):
                   'languages']
 
     def validate_date_of_birth(self, date_of_birth):
-        """
-        Validates the volunteer old enough to volunteer.
-        """
         minimum_age_validator(date_of_birth)
         return date_of_birth
 
+    def validate_phone_number(self, phone_number):
+        phone_number_validator(phone_number)
+        return phone_number
+
+    def validate_tz_number(self, tz_number):
+        id_number_validator(tz_number)
+        unique_id_number_validator(tz_number)
+        return tz_number
+
+    def validate_languages(self, languages):
+        if languages is None or len(languages) == 0:
+            raise ValidationError('No languages specified.')
+        return languages
+
     def validate(self, data):
         parental_consent_validator(data)
-
         return data
 
     def create(self, validated_data):
@@ -90,6 +105,10 @@ class CreateHelpRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = HelpRequest
         fields = ['full_name', 'phone_number', 'city', 'address', 'notes', 'type', 'type_text', 'request_reason']
+
+    def validate_phone_number(self, phone_number):
+        phone_number_validator(phone_number)
+        return phone_number
 
 
 class HelpRequestSerializer(serializers.ModelSerializer):
