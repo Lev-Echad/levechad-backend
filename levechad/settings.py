@@ -228,3 +228,7 @@ REST_FRAMEWORK = {
         'check-sms': '',  # overridden in throttling.py
     },
 }
+
+# Geocoding settings
+LOCATOR = 'NOMINATIM'
+GOOGLE_API_SECRET_KEY = os.environ.get('GOOGLE_API_KEY', default=None)
