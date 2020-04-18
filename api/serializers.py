@@ -20,7 +20,7 @@ class ParentalConsentSerializer(serializers.ModelSerializer):
 
 class RegistrationSerializer(serializers.ModelSerializer):
     date_of_birth = serializers.DateField(required=True)
-    gender = serializers.CharField(required=True)
+    gender = serializers.ChoiceField(required=True, choices=Volunteer.GENDERS)
     city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
     languages = serializers.PrimaryKeyRelatedField(queryset=Language.objects.all(), many=True, required=True)
     wanted_assignments = serializers.MultipleChoiceField(choices=Volunteer.WANTED_ASSIGNMENTS)
@@ -47,7 +47,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return tz_number
 
     def validate_languages(self, languages):
-        if languages is None or len(languages) == 0:
+        if not languages:
             raise ValidationError('No languages specified.')
         return languages
 
