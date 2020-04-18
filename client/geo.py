@@ -31,7 +31,7 @@ def get_coordinates(city_name, address, cache_dict=None):
             built_address,
             coder=coder,
             cache_dict=cache_dict,
-            sleep=(settings.LOCATOR == settings.LOCATOR.nominatim)
+            sleep=(settings.LOCATOR == settings.LOCATOR.NOMINATIM)
         )
 
         if not location:
@@ -52,18 +52,18 @@ def __bulk_geocode(addresses_list: list) -> dict:
     cache_dict = {}
     for address_tuple in addresses_list:
         results_dict[address_tuple] = get_coordinates(address_tuple[0], address_tuple[1], cache_dict=cache_dict)
-        if settings.LOCATOR == settings.LOCATOR.nominatim:
+        if settings.LOCATOR == settings.LOCATOR.NOMINATIM:
             time.sleep(1)
     return results_dict
 
 
 def get_geocoder():
     coder = None
-    if settings.LOCATOR == settings.LOCATOR.nominatim:
+    if settings.LOCATOR == settings.LOCATOR.NOMINATIM:
         # User agent required by Nominatim terms of use.
         coder = geopy.geocoders.Nominatim(user_agent="LevEchad geographic subsystem (beta)")
-    elif settings.LOCATOR == settings.LOCATOR.google:
+    elif settings.LOCATOR == settings.LOCATOR.GOOGLE:
         coder = geopy.geocoders.GoogleV3(api_key=settings.GOOGLE_API_SECRET_KEY)
-    elif settings.LOCATOR == settings.LOCATOR.arcgis:
+    elif settings.LOCATOR == settings.LOCATOR.ARCGIS:
         raise NotImplementedError()
     return coder
