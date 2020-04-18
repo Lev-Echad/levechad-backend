@@ -150,13 +150,8 @@ class VolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             )
         try:
             helprequest_id = int(helprequest_id)
-        except ValueError:
-            return Response(
-                {'helprequest_id': f'No help request with ID {helprequest_id} found.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        helprequest = HelpRequest.objects.filter(pk=helprequest_id).first()
-        if helprequest is None:
+            helprequest = HelpRequest.objects.get(pk=helprequest_id)
+        except (ValueError, HelpRequest.DoesNotExist):
             return Response(
                 {'helprequest_id': f'No help request with ID {helprequest_id} found.'},
                 status=status.HTTP_400_BAD_REQUEST
