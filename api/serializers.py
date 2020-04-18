@@ -140,6 +140,12 @@ class HelpRequestSerializer(serializers.ModelSerializer):
                   'request_reason', 'status', 'status_updater', 'helping_volunteer', 'created_date']
 
 
+class UpdateHelpRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HelpRequest
+        fields = ['notes', 'helping_volunteer', 'status', 'type_text']
+
+
 class AreaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Area

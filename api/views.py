@@ -1,4 +1,3 @@
-from django.db.models import Count
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
@@ -13,7 +12,7 @@ from client.models import Volunteer, HelpRequest, City, Area, Language
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
                             CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
-                            MatchingVolunteerSerializer, MapHelpRequestSerializer
+                            MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer
 
 import api.throttling
 
@@ -125,7 +124,8 @@ class HelpRequestsFilter(filters.FilterSet):
             'city': ['exact', 'in'],
             'city__region': ['exact', 'in'],
             'status': ['exact', 'in'],
-            'type': ['exact', 'in']
+            'type': ['exact', 'in'],
+            'helping_volunteer__id': ['exact'],
         }
 
 
@@ -172,6 +172,15 @@ class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
     filterset_class = HelpRequestsFilter
     throttle_classes = [api.throttling.HamalDataListThrottle]
+
+
+class UpdateHelpRequestViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = HelpRequest.objects.all()
+    serializer_class = UpdateHelpRequestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, *args, partial=False, **kwargs):
+        return super().update(*args, **kwargs, partial=True)
 
 
 class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
