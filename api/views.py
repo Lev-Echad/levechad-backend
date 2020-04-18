@@ -155,14 +155,13 @@ class VolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 {'helprequest_id': f'No help request with ID {helprequest_id} found.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        helprequests = HelpRequest.objects.filter(pk=helprequest_id)
-        if not helprequests.exists():
+        helprequest = HelpRequest.objects.filter(pk=helprequest_id).first()
+        if helprequest is None:
             return Response(
                 {'helprequest_id': f'No help request with ID {helprequest_id} found.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        helprequest = helprequests.first()
         coords = (helprequest.location_latitude, helprequest.location_longitude)
         queryset = Volunteer.objects.all_by_score(coords)[:self.BEST_MATCH_VOLUNTEERS_LIMIT]
         serializer = MatchingVolunteerSerializer(queryset, many=True)
