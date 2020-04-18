@@ -17,5 +17,5 @@ router.register(r'checkverificationcode', api.views.CheckVerificationCodeViewSet
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('authtoken', api.views.CustomAuthToken.as_view()),
+    path('authtoken/', api.views.CustomAuthToken.as_view()),
 ]

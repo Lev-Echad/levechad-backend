@@ -92,7 +92,7 @@ Available scopes:
 
 | Throttle scopes   | Amount of requests allowed | per...    |
 |-------------------|----------------------------|-----------|
-| hamal-data        | 1                          | 1 second  |
+| hamal-data        | 2                          | 1 second  |
 | login             | 1                          | 1 second  |
 | user-choices-list | 2                          | 1 second  |
 | city-autocomplete | 2                          | 1 second  |
@@ -109,6 +109,59 @@ no. of seconds left):
 
 ## API Endpoints
 
+### `/api/volunteers/<id>`
+
+* _This view requires authentication. See "Token Authentication" section for more details._
+
+**Description**: Retrieves specific volunteer by ID, or deletes it (depends on the method).
+
+**Allowed methods**: GET, DELETE
+
+**Throttling**: `hamal-data`, user throttle
+
+**Parameters**: None
+
+##### Response
+
+* An invalid ID returns the response:
+
+    ```json
+    {"detail":"Not found."}
+    ```
+  
+* The ID of a valid volunteer returns this:
+
+    ```json
+    {
+      "id": 0,
+      "first_name": "",
+      "last_name": "",
+      "tz_number": "",
+      "phone_number": "",
+      "date_of_birth": "yyyy-mm-dd",
+      "age": 0,  // may be null
+      "gender": "",  // choices: זכר, נקבה, מגדר אחר
+      "city": {
+        "name": "" // choices: a valid city /api/cityautocomplete
+        "region": null  // choices in /api/areas - region is synonymous to area (Hamal)
+      },
+      "address": "",
+      "location_latitude": 0.0,
+      "location_longitude": 0.0, 
+      "organization": "", // may be null
+      "moving_way": "", // choices: אופניים, קטנוע, מכונית, תחבורה ציבורית, רגלית
+      "week_assignments_capacity": 1,
+      "wanted_assignments": [
+        "" // choices: חלוקת מזון, משלוח תרופות, סיוע לעובדים חיוניים, הסעות, תמיכה טלפונית, עזרה במשפחתונים, אחר
+      ],
+      "email": "",
+      "email_verified": false,
+      "score": 0, // the volunteer score: currently unused
+      "created_date": "yyyy-mm-ddThh:mm:ss.MMMMMM+ZZ:ZZ",  // MMMMMM is microseconds, ZZ:ZZ is timezone
+      "times_volunteered": 0,
+      "languages": []  // choices in /api/languages
+    }
+    ```
 ### `/api/volunteers`
 
 * _This view is pageable. See "Paginating" section for more details. Results described here will be contained in the
@@ -125,43 +178,8 @@ no. of seconds left):
 **Parameters**: None
 
 ##### Response
-```json
-[
-  {
-    "id": 0,
-    "first_name": "",
-    "last_name": "",
-    "tz_number": "",
-    "phone_number": "",
-    "date_of_birth": "yyyy-mm-dd",
-    "age": 0,  // may be null
-    "gender": "",  // choices: זכר, נקבה, מגדר אחר
-    "city": {
-      "name": "" // choices: a valid city (see #262 for city autocomplete)
-      "x": 0,
-      "y": 0            
-    },
-    "address": "",
-    "coordinates": {
-       // TODO - see #272
-    },  
-    "areas": [], // choices: צפון, ירושלים והסביבה, מרכז, יהודה ושומרון, דרום, סיוע טלפוני
-    "organization": "", // may be null
-    "moving_way": "", // choices: אופניים, קטנוע, מכונית, תחבורה ציבורית, רגלית
-    "week_assignments_capacity": 1,
-    "wanted_assignments": [
-      "" // choices: חלוקת מזון, משלוח תרופות, סיוע לעובדים חיוניים, הסעות, תמיכה טלפונית, עזרה במשפחתונים, אחר
-    ],
-    "email": "",
-    "email_verified": false,
-    "score": 0, // the volunteer score: currently unused
-    "created_date": "yyyy-mm-ddThh:mm:ss.MMMMMM+ZZ:ZZ",  // MMMMMM is microseconds, ZZ:ZZ is timezone
-    "times_volunteered": 0,
-    "languages": []  // choices: עברית, אנגלית, רוסית, צרפתית, ערבית, אחר
-  },
-  ...
-]
-```
+Returns an array of dicts, each dict representing a volunteer - see `/api/volunteers/<id>` _(notice: wrapped in
+pagination)_.
 
 #### Available Filters
 ```
@@ -184,6 +202,58 @@ no. of seconds left):
 'organization': ['exact', 'in']
 ```
 
+### `/api/volunteers/best_match`
+* _This view requires authentication. See "Token Authentication" section for more details._
+
+**Description**: Returns a sorted list of 20 volunteers best suited to answer the given help request.
+
+**Allowed methods**: GET
+
+_Notice: The volunteer serialization here is different than `/api/volunteers`, see Response section below._
+
+##### Parameters
+
+This endpoint accepts the following GET parameters:
+
+ * `helprequest_id` - the ID of the HelpRequest to generate best matching volunteers for.
+ 
+##### Response
+
+* On invalid ID, returns status code `400 Bad Request`. Example responses (where <ID> is the ID specified):
+
+    ```json
+    {
+      "helprequest_id": "This field must be specified."
+    }
+    ```
+
+    ```json
+    {
+      "helprequest_id": "No help request with ID <ID> found."
+    }
+    ```
+
+* On a valid ID, returns a list of volunteers:
+
+    ```json
+    [
+      {
+        "id": 0,
+        "full_name": "",
+        "city": "",
+        "address": "",
+        "phone_number": "",
+        "email": "",
+        "location_latitude": 0.0,
+        "location_longitude": 0.0,
+        "moving_way": "" // choices: אופניים, קטנוע, מכונית, תחבורה ציבורית, רגלית
+      },
+      ...
+    ]
+    ```
+
+
+
 ### `/api/helprequests`
 * _This view is pageable. See "Paginating" section for more details. Results described here will be contained in the
 `results` item of the pagination response._
@@ -205,11 +275,9 @@ no. of seconds left):
     "id": 0,
     "full_name": "",
     "phone_number": "",
-    "area": "", // one of: צפון, ירושלים והסביבה, מרכז, יהודה ושומרון, דרום, סיוע טלפוני
     "city": {
         "name": "",
-        "x": 0,
-        "y": 0
+        "region": "" // choices in /api/areas - region is synonymous to area (Hamal)
     },
     "address": "",
     "notes": "",

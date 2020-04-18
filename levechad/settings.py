@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from enum import Enum
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.environ.get('ENV', 'DEVELOPMENT')
 
@@ -219,7 +221,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_THROTTLE_RATES': {
-        'hamal-data': '1/second',
+        'hamal-data': '2/second',
         'login': '1/second',
         'user-choices-list': '2/second',
         'city-autocomplete': '2/second',
@@ -228,3 +230,14 @@ REST_FRAMEWORK = {
         'check-sms': '',  # overridden in throttling.py
     },
 }
+
+
+# Geocoding settings
+class LocatorTypes(Enum):
+    NOMINATIM = 1
+    GOOGLE = 2
+    ARCGIS = 3
+
+
+LOCATOR = LocatorTypes.NOMINATIM
+GOOGLE_API_SECRET_KEY = os.environ.get('GOOGLE_API_KEY', default=None)
