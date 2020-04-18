@@ -127,7 +127,8 @@ class HelpRequestsFilter(filters.FilterSet):
         }
 
 
-class VolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class VolunteersViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, mixins.RetrieveModelMixin,
+                        viewsets.GenericViewSet):
     queryset = Volunteer.objects.all().order_by('-created_date').annotate(time_volunteered=Count('helprequest'))
     serializer_class = VolunteerSerializer
     permission_classes = [IsAuthenticated]

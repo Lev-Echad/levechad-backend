@@ -55,7 +55,7 @@ class CitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = City
-        fields = ['name', 'x', 'y', 'region']
+        fields = ['name', 'region']
 
 
 class ShortCitySerializer(serializers.ModelSerializer):
@@ -73,9 +73,9 @@ class VolunteerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Volunteer
         fields = ['id', 'first_name', 'last_name', 'tz_number', 'phone_number', 'date_of_birth', 'age',
-                  'gender', 'city', 'address', 'areas', 'organization', 'moving_way',
-                  'week_assignments_capacity', 'wanted_assignments', 'email', 'email_verified', 'score',
-                  'created_date', 'times_volunteered', 'languages']
+                  'gender', 'city', 'address', 'organization', 'moving_way', 'week_assignments_capacity',
+                  'wanted_assignments', 'email', 'email_verified', 'score', 'created_date', 'times_volunteered',
+                  'languages', 'location_latitude', 'location_longitude']
 
 
 class ShortVolunteerSerializer(serializers.ModelSerializer):
@@ -102,7 +102,7 @@ class HelpRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HelpRequest
-        fields = ['id', 'full_name', 'phone_number', 'area', 'city', 'address', 'notes', 'type', 'type_text',
+        fields = ['id', 'full_name', 'phone_number', 'city', 'address', 'notes', 'type', 'type_text',
                   'request_reason', 'status', 'status_updater', 'helping_volunteer', 'created_date']
 
 
