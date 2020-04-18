@@ -177,7 +177,7 @@ class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = HelpRequest.objects.all().filter(status__in=['WAITING', 'IN_CARE']).order_by('-created_date')
     serializer_class = MapHelpRequestSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     pagination_class = None
     filterset_class = HelpRequestsFilter
     throttle_classes = [api.throttling.HamalDataListThrottle]
