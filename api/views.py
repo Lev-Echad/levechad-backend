@@ -12,7 +12,8 @@ import django_filters as filters
 from client.models import Volunteer, HelpRequest, City, Area, Language
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
-                            CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, MatchingVolunteerSerializer
+                            CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
+                            MatchingVolunteerSerializer, MapHelpRequestSerializer
 
 import api.throttling
 
@@ -106,7 +107,7 @@ class VolunteerFilter(filters.FilterSet):
             'gender': ['exact'],
             'city': ['exact', 'in'],
             'neighborhood': ['exact', 'icontains'],
-            'areas': ['exact'],
+            'city__region': ['exact'],
             'moving_way': ['exact'],
             'week_assignments_capacity': ['exact', 'range'],
             'wanted_assignments': ['exact'],
@@ -122,7 +123,7 @@ class HelpRequestsFilter(filters.FilterSet):
         fields = {
             'id': ['exact'],
             'city': ['exact', 'in'],
-            'area': ['exact', 'in'],
+            'city__region': ['exact', 'in'],
             'status': ['exact', 'in'],
             'type': ['exact', 'in']
         }
@@ -169,6 +170,15 @@ class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = HelpRequest.objects.all().order_by('-created_date')
     serializer_class = HelpRequestSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = HelpRequestsFilter
+    throttle_classes = [api.throttling.HamalDataListThrottle]
+
+
+class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = HelpRequest.objects.all().filter(status__in=['WAITING', 'IN_CARE']).order_by('-created_date')
+    serializer_class = MapHelpRequestSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
     filterset_class = HelpRequestsFilter
     throttle_classes = [api.throttling.HamalDataListThrottle]
 

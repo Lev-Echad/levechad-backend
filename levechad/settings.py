@@ -221,10 +221,10 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_THROTTLE_RATES': {
-        'hamal-data': '2/second',
+        'hamal-data': '5/second',
         'login': '1/second',
-        'user-choices-list': '2/second',
-        'city-autocomplete': '2/second',
+        'user-choices-list': '5/second',
+        'city-autocomplete': '3/second',
         'register': '',  # overridden in throttling.py
         'send-sms': '',  # overridden in throttling.py
         'check-sms': '',  # overridden in throttling.py
