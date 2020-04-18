@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from enum import Enum
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.environ.get('ENV', 'DEVELOPMENT')
 
@@ -35,6 +37,8 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+
 INSTALLED_APPS = [
     'client.apps.ClientConfig',
     'server.apps.ServerConfig',
@@ -50,17 +54,29 @@ INSTALLED_APPS = [
     'storages',
     'django_extensions',
     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'import_export'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_URLS_REGEX = r'^/api/.*$'
+if ENV == 'DEVELOPMENT':
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    # TODO fill with deployment address when it's created (#267)
+    CORS_ORIGIN_WHITELIST = []
 
 ROOT_URLCONF = 'levechad.urls'
 
@@ -81,7 +97,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'levechad.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -144,7 +159,6 @@ if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
         },
     }
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -160,7 +174,6 @@ USE_TZ = True
 TIME_ZONE = "Asia/Jerusalem"
 
 LOGIN_REDIRECT_URL = '/server'
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -195,7 +208,6 @@ else:
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
 
-
 # Django Rest Framework configuration
 _renderer_classes = ['rest_framework.renderers.JSONRenderer']
 if ENV != 'PRODUCTION':
@@ -204,4 +216,28 @@ if ENV != 'PRODUCTION':
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': _renderer_classes,
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.DefaultPagination',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_THROTTLE_RATES': {
+        'hamal-data': '2/second',
+        'login': '1/second',
+        'user-choices-list': '2/second',
+        'city-autocomplete': '2/second',
+        'register': '',  # overridden in throttling.py
+        'send-sms': '',  # overridden in throttling.py
+        'check-sms': '',  # overridden in throttling.py
+    },
 }
+
+
+# Geocoding settings
+class LocatorTypes(Enum):
+    NOMINATIM = 1
+    GOOGLE = 2
+    ARCGIS = 3
+
+
+LOCATOR = LocatorTypes.NOMINATIM
+GOOGLE_API_SECRET_KEY = os.environ.get('GOOGLE_API_KEY', default=None)

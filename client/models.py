@@ -1,23 +1,27 @@
 # coding=utf-8
 import io
-from datetime import timedelta, date
+from datetime import date
 
 import boto3
 from PIL import Image, ImageDraw, ImageFont
 from bidi.algorithm import get_display
-
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.utils import timezone
-from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.conf import settings
+from django.db.models import F, Count, Q
 from django.urls import reverse
-
+from django.utils import timezone
+from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.db.models.signals import pre_save
+
 from multiselectfield import MultiSelectField
+
+import client.geo
+
 
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
@@ -58,6 +62,7 @@ class City(models.Model):
     name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, primary_key=True)
     x = models.FloatField()
     y = models.FloatField()
+    region = models.ForeignKey(Area, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
         return self.name
@@ -74,7 +79,44 @@ class VolunteerSchedule(Timestampable):
     Saturday = models.CharField(max_length=DAY_NAME_LENGTH, blank=True)
 
 
+class ExtendedVolunteerManager(models.Manager):
+    @staticmethod
+    def _add_distance(qs, helprequest_coordinates, as_int=False):
+        qs = qs.annotate(y_distance=(F('city__y') - helprequest_coordinates[1]) ** 2)
+        qs = qs.annotate(x_distance=(F('city__x') - helprequest_coordinates[0]) ** 2)
+        qs = qs.annotate(distance=models.ExpressionWrapper(((F('x_distance') + F('y_distance')) ** 0.5) / 100,
+                                                           output_field=models.IntegerField() if as_int
+                                                           else models.FloatField()))
+        return qs
+
+    @staticmethod
+    def _add_num_helprequests(qs):
+        qs = qs.annotate(num_helprequests=Count('helprequest'))
+        return qs
+
+    def get_queryset(self):
+        return super().get_queryset().filter(disabled=False)
+
+    def all_by_distance(self, helprequest_coordinates):
+        volunteers_qs = self.get_queryset()
+        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates)
+        return volunteers_qs.order_by('distance')
+
+    def all_by_score(self, helprequest_coordinates):
+        # In the future, add more parameters
+        volunteers_qs = self.get_queryset()
+        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates, as_int=True)
+        volunteers_qs = self._add_num_helprequests(volunteers_qs)
+        return volunteers_qs.order_by('distance', 'num_helprequests')
+
+    def all_with_helprequests_count(self):
+        volunteers_qs = self.get_queryset()
+        volunteers_qs = self._add_num_helprequests(volunteers_qs)
+        return volunteers_qs
+
+
 class Volunteer(Timestampable):
+    objects = ExtendedVolunteerManager()
     MOVING_WAYS = (
         ("BIKE", "אופניים"),
         ("SCOOTER", "קטנוע"),
@@ -186,20 +228,19 @@ class Volunteer(Timestampable):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     neighborhood = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, null=True, blank=True)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
-    location_address_x = models.FloatField(default=0)
-    location_address_y = models.FloatField(default=0)
+    location_latitude = models.FloatField(default=0)
+    location_longitude = models.FloatField(default=0)
+    # Flag used to prevent recurring attempts to resolve broken address and for debugging.
+    location_failed = models.BooleanField(default=False)
     available_saturday = models.BooleanField(default=False)
     keep_mandatory_worker_children = models.BooleanField(default=False, blank=True, null=True)
     guiding = models.BooleanField(default=False, null=True, blank=True)
     notes = models.CharField(max_length=5000, null=True, blank=True)
-    moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS)
+    moving_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=MOVING_WAYS, blank=True, null=True)
     hearing_way = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=HEARING_WAYS, blank=True, null=True)
     schedule = models.OneToOneField(VolunteerSchedule, on_delete=models.CASCADE, blank=True, null=True)
     score = models.IntegerField(default=0)
-
-    @property
-    def times_volunteered(self):
-        return HelpRequest.objects.filter(helping_volunteer=self).count()
+    disabled = models.BooleanField(default=False)
 
     @property
     def full_name(self):
@@ -207,6 +248,13 @@ class Volunteer(Timestampable):
 
     def __str__(self):
         return self.full_name
+
+    def delete(self, using=None, keep_parents=False):
+        requests_qs = HelpRequest.objects.all().filter(Q(helping_volunteer=self) & ~Q(status='DONE'))
+        if requests_qs.exists():
+            raise ValidationError("Volunteer has pending requests and therefor cannot be deleted.")
+        self.disabled = True
+        self.save()
 
 
 class VolunteerCertificate(models.Model):
@@ -311,6 +359,10 @@ class HelpRequest(Timestampable):
     area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
+    location_latitude = models.FloatField(default=0)
+    location_longitude = models.FloatField(default=0)
+    # Flag used to prevent recurring attempts to resolve broken address and for debugging.
+    location_failed = models.BooleanField(default=False)
     notes = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH, blank=True, null=True)
     type = models.CharField(max_length=SHORT_FIELD_LENGTH, choices=TYPES)
     type_text = models.CharField(max_length=5000)
@@ -333,6 +385,20 @@ class ParentalConsent(models.Model):
     parent_id = models.CharField(max_length=9)
     volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE, related_name='parental_consent')
 
+
+@receiver(post_save, sender=Volunteer)
+@receiver(post_save, sender=HelpRequest)
+def add_geocoding_post_save(sender, instance, *args, **kwargs):
+    if not instance.location_failed and instance.location_latitude == 0 and instance.location_longitude == 0:
+        try:
+            location = client.geo.get_coordinates(instance.city.name, instance.address)
+            if location.latitude == 0 and location.longitude == 0:
+                # This is to ensure this can never get stuck in a loop (we're conditionally re-saving the model here)
+                raise LookupError()
+            instance.location_latitude, instance.location_longitude = location.latitude, location.longitude
+        except LookupError:
+            instance.location_failed = True
+        instance.save()
 
 # TODO: models validation is a good practice and should be added in the future - due to some inconsistency about our DB
 # TODO: constraints over the time, the model validation blocks lots of functionality the used to work. in the future,

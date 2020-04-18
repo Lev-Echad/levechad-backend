@@ -1,13 +1,13 @@
 {% if 1 not in pages_before and page != 1 %}
-        <a href="{% url 'show_all_volunteers' %}/{{ 1 }}?{{ request.META.QUERY_STRING }}">&lt;&lt;</a>
+        <a href="{% url 'show_all_volunteers' %}{{ 1 }}?{{ request.META.QUERY_STRING }}">&lt;&lt;</a>
 {% endif %}
 {% for i in pages_before %}
-    <a href="{% url 'show_all_volunteers' %}/{{ i }}?{{ request.META.QUERY_STRING }}">{{ i }}</a>
+    <a href="{% url 'show_all_volunteers' %}{{ i }}?{{ request.META.QUERY_STRING }}">{{ i }}</a>
 {% endfor %}
 &nbsp;עמוד {{ page }} מתוך {{ num_pages }}&nbsp;
 {% for i in pages_after %}
-    <a href="{% url 'show_all_volunteers' %}/{{ i }}?{{ request.META.QUERY_STRING }}">{{ i }}</a>
+    <a href="{% url 'show_all_volunteers' %}{{ i }}?{{ request.META.QUERY_STRING }}">{{ i }}</a>
 {% endfor %}
 {% if num_pages not in pages_after and num_pages != page %}
-    <a href="{% url 'show_all_volunteers' %}/{{ num_pages }}?{{ request.META.QUERY_STRING }}">&gt;&gt;</a>
+    <a href="{% url 'show_all_volunteers' %}{{ num_pages }}?{{ request.META.QUERY_STRING }}">&gt;&gt;</a>
 {% endif %}
