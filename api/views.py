@@ -5,13 +5,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.decorators import action
 
 import django_filters as filters
 
 from client.models import Volunteer, HelpRequest, City, Area, Language
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
-                            CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer
+                            CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, MatchingVolunteerSerializer
 
 import api.throttling
 
@@ -133,6 +134,34 @@ class VolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
     filterset_class = VolunteerFilter
     throttle_classes = [api.throttling.HamalDataListThrottle]
+
+    BEST_MATCH_VOLUNTEERS_LIMIT = 20
+
+    @action(detail=False, methods=['get'], url_path='best_match')
+    def best_matches_for_helprequest(self, request):
+        """
+        Returns the BEST_MATCH_VOLUNTEERS_LIMIT best matched volunteers for the given help request.
+        """
+        helprequest_id = request.query_params.get('helprequest_id', None)
+        if helprequest_id is None:
+            return Response(
+                {'helprequest_id': 'This field must be specified.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            helprequest_id = int(helprequest_id)
+            helprequest = HelpRequest.objects.get(pk=helprequest_id)
+        except (ValueError, HelpRequest.DoesNotExist):
+            return Response(
+                {'helprequest_id': f'No help request with ID {helprequest_id} found.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        coords = (helprequest.location_latitude, helprequest.location_longitude)
+        queryset = Volunteer.objects.all_by_score(coords)[:self.BEST_MATCH_VOLUNTEERS_LIMIT]
+        serializer = MatchingVolunteerSerializer(queryset, many=True)
+
+        return Response(serializer.data)
 
 
 class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
