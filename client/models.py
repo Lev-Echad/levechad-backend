@@ -15,8 +15,13 @@ from django.db import models
 from django.db.models import F, Count, Q
 from django.urls import reverse
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from multiselectfield import MultiSelectField
+
+import client.geo
+
 
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
@@ -379,6 +384,21 @@ class ParentalConsent(models.Model):
     parent_name = models.CharField(max_length=DEFAULT_MAX_FIELD_LENGTH)
     parent_id = models.CharField(max_length=9)
     volunteer = models.OneToOneField(Volunteer, on_delete=models.CASCADE, related_name='parental_consent')
+
+
+@receiver(post_save, sender=Volunteer)
+@receiver(post_save, sender=HelpRequest)
+def add_geocoding_post_save(sender, instance, *args, **kwargs):
+    if not instance.location_failed and instance.location_latitude == 0 and instance.location_longitude == 0:
+        try:
+            location = client.geo.get_coordinates(instance.city.name, instance.address)
+            if location.latitude == 0 and location.longitude == 0:
+                # This is to ensure this can never get stuck in a loop (we're conditionally re-saving the model here)
+                raise LookupError()
+            instance.location_latitude, instance.location_longitude = location.latitude, location.longitude
+        except LookupError:
+            instance.location_failed = True
+        instance.save()
 
 # TODO: models validation is a good practice and should be added in the future - due to some inconsistency about our DB
 # TODO: constraints over the time, the model validation blocks lots of functionality the used to work. in the future,

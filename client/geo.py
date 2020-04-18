@@ -20,6 +20,11 @@ def run_query(address, coder=None, cache_dict=None, sleep=False):
 
 
 def get_coordinates(city_name, address, cache_dict=None):
+    """
+    Returns the coordinates of the given address & city. Retreats to city coordinates if address fails. If geocoding
+    city fails, raises LookupError.
+    :rtype: geopy.location.Location
+    """
     city_name = CITY_CLEANUP_RE.match(city_name).group(1)
     coder = get_geocoder()
     built_address = "%s, %s, ישראל" % (address, city_name)
