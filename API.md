@@ -189,9 +189,9 @@ no. of seconds left):
 
 **Description**: Returns a sorted list of 20 volunteers best suited to answer the given help request.
 
- * _The volunteer serialization here is a bit different than `/api/volunteers`, see Response section below.
-
 **Allowed methods**: GET
+
+_Notice: The volunteer serialization here is different than `/api/volunteers`, see Response section below._
 
 ##### Parameters
 
@@ -217,22 +217,22 @@ This endpoint accepts the following GET parameters:
 
 * On a valid ID, returns a list of volunteers:
 
-```json
-[
-  {
-    "id": 0,
-    "full_name": "",
-    "city": "",
-    "address": "",
-    "phone_number": "",
-    "email": "",
-    "location_latitude": 0.0,
-    "location_longitude": 0.0,
-    "moving_way": "" // choices: אופניים, קטנוע, מכונית, תחבורה ציבורית, רגלית
-  },
-  ...
-]
-```
+    ```json
+    [
+      {
+        "id": 0,
+        "full_name": "",
+        "city": "",
+        "address": "",
+        "phone_number": "",
+        "email": "",
+        "location_latitude": 0.0,
+        "location_longitude": 0.0,
+        "moving_way": "" // choices: אופניים, קטנוע, מכונית, תחבורה ציבורית, רגלית
+      },
+      ...
+    ]
+    ```
 
 
 
