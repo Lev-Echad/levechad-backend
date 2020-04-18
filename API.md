@@ -92,10 +92,10 @@ Available scopes:
 
 | Throttle scopes   | Amount of requests allowed | per...    |
 |-------------------|----------------------------|-----------|
-| hamal-data        | 2                          | 1 second  |
+| hamal-data        | 5                          | 1 second  |
 | login             | 1                          | 1 second  |
-| user-choices-list | 2                          | 1 second  |
-| city-autocomplete | 2                          | 1 second  |
+| user-choices-list | 5                          | 1 second  |
+| city-autocomplete | 3                          | 1 second  |
 | register          | 1                          | 5 seconds |
 | send-sms          | 1                          | 5 minutes |
 | check-sms         | 1                          | 2 seconds | 
@@ -304,6 +304,34 @@ This endpoint accepts the following GET parameters:
 'status': ['exact', 'in'],
 'type': ['exact', 'in']
 ```
+
+### `/api/maphelprequests`
+* _This view requires authentication. See "Token Authentication" section for more details._
+* _This view is filterable. See "Filtering" section above for more details & the filters available here._
+
+**Description**: Returns a list of all unaddressed help requests
+
+**Allowed methods**: GET
+
+**Throttling**: `hamal-data`, user throttle
+
+**Parameters**: None
+
+##### Response
+```json
+[
+  {
+    "id": 0,
+    "full_name": "",
+    "location_latitude": 0.0,
+    "location_longitude": 0.0
+  },
+  ...
+]
+```
+
+#### Available Filters
+See `/api/helprequests` - same filters apply.
 
 ### `/api/register`
 

@@ -109,6 +109,12 @@ class MatchingVolunteerSerializer(serializers.ModelSerializer):
                   'location_longitude', 'moving_way']
 
 
+class MapHelpRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HelpRequest
+        fields = ['id', 'full_name', 'location_latitude', 'location_longitude']
+
+
 class CreateHelpRequestSerializer(serializers.ModelSerializer):
     city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
 
@@ -123,7 +129,6 @@ class CreateHelpRequestSerializer(serializers.ModelSerializer):
 
 class HelpRequestSerializer(serializers.ModelSerializer):
     city = CitySerializer()
-    area = serializers.PrimaryKeyRelatedField(queryset=Area.objects.all())
     type = serializers.CharField(source='get_type_display')
     request_reason = serializers.CharField(source='get_request_reason_display')
     status = serializers.CharField(source='get_status_display')
