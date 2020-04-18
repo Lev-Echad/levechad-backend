@@ -192,8 +192,8 @@ pagination)_.
 'age': ['gt', 'lt', 'exact'],
 'gender': ['exact'],
 'city': ['exact', 'in'],
+'city__region': ['exact'],
 'neighborhood': ['exact', 'icontains'],
-'areas': ['exact'],
 'moving_way': ['exact'],
 'week_assignments_capacity': ['exact', 'range'],
 'wanted_assignments': ['exact'],
@@ -300,7 +300,7 @@ This endpoint accepts the following GET parameters:
 ```
 'id': ['exact'],
 'city': ['exact', 'in'],
-'area': ['exact', 'in'],
+'city__region': ['exact', 'in'],
 'status': ['exact', 'in'],
 'type': ['exact', 'in']
 ```
