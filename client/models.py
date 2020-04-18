@@ -391,11 +391,11 @@ class ParentalConsent(models.Model):
 def add_geocoding_post_save(sender, instance, *args, **kwargs):
     if not instance.location_failed and instance.location_latitude == 0 and instance.location_longitude == 0:
         try:
-            _, (latitude, longitude) = client.geo.get_coordinates(instance.city.name, instance.address)
-            if latitude == 0 and longitude == 0:
+            location = client.geo.get_coordinates(instance.city.name, instance.address)
+            if location.latitude == 0 and location.longitude == 0:
                 # This is to ensure this can never get stuck in a loop (we're conditionally re-saving the model here)
                 raise LookupError()
-            instance.location_latitude, instance.location_longitude = latitude, longitude
+            instance.location_latitude, instance.location_longitude = location.latitude, location.longitude
         except LookupError:
             instance.location_failed = True
         instance.save()

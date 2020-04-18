@@ -23,7 +23,7 @@ def get_coordinates(city_name, address, cache_dict=None):
     """
     Returns the coordinates of the given address & city. Retreats to city coordinates if address fails. If geocoding
     city fails, raises LookupError.
-    :rtype: typing.Tuple(typing.str, typing.Tuple(typing.int, typing.int))
+    :rtype: geopy.location.Location
     """
     city_name = CITY_CLEANUP_RE.match(city_name).group(1)
     coder = get_geocoder()
