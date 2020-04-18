@@ -83,15 +83,15 @@ class CreateHelpRequestViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet)
 # === Authentication required API endpoints ===
 
 class VolunteerFilter(filters.FilterSet):
-    time_volunteered = filters.NumberFilter(lookup_expr='exact')
-    time_volunteered__gt = filters.NumberFilter(method='time_volunteered_gt')
-    time_volunteered__lt = filters.NumberFilter(method='time_volunteered_lt')
+    num_helprequests = filters.NumberFilter(lookup_expr='exact')
+    num_helprequests__gt = filters.NumberFilter(method='num_helprequests_gt')
+    num_helprequests__lt = filters.NumberFilter(method='num_helprequests_lt')
 
-    def time_volunteered_gt(self, queryset, field_name, value):
-        return queryset.filter(time_volunteered__gt=value)
+    def num_helprequests_gt(self, queryset, field_name, value):
+        return queryset.filter(num_helprequests__gt=value)
 
-    def time_volunteered_lt(self, queryset, field_name, value):
-        return queryset.filter(time_volunteered__lt=value)
+    def num_helprequests_lt(self, queryset, field_name, value):
+        return queryset.filter(num_helprequests__lt=value)
 
     class Meta:
         model = Volunteer
@@ -128,8 +128,9 @@ class HelpRequestsFilter(filters.FilterSet):
         }
 
 
-class VolunteersViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Volunteer.objects.all().order_by('-created_date').annotate(time_volunteered=Count('helprequest'))
+class VolunteersViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, mixins.RetrieveModelMixin,
+                        viewsets.GenericViewSet):
+    queryset = Volunteer.objects.all_with_helprequests_count().order_by('-created_date')
     serializer_class = VolunteerSerializer
     permission_classes = [IsAuthenticated]
     filterset_class = VolunteerFilter

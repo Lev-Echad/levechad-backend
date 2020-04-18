@@ -238,10 +238,6 @@ class Volunteer(Timestampable):
     disabled = models.BooleanField(default=False)
 
     @property
-    def times_volunteered(self):
-        return HelpRequest.objects.filter(helping_volunteer=self).count()
-
-    @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 

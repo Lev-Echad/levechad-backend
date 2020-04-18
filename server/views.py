@@ -137,7 +137,7 @@ def show_all_volunteers(request, page=1):
     if len(availability) != 0 and '' not in availability:
         filter_options[schedule_filter] = schedule_id
 
-    match_qs = Volunteer.objects.filter(q_option, **filter_options).annotate(appears_count=Count('helprequest'))
+    match_qs = Volunteer.objects.all_with_helprequests_count().filter(q_option, **filter_options)
     availability_now_id = match_qs.filter(**{schedule_filter: schedule_id}).values_list('id', flat=True)
 
     # ----- orders -----
