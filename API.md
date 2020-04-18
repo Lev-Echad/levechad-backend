@@ -184,6 +184,58 @@ no. of seconds left):
 'organization': ['exact', 'in']
 ```
 
+### `/api/volunteers/best_match`
+* _This view requires authentication. See "Token Authentication" section for more details._
+
+**Description**: Returns a sorted list of 20 volunteers best suited to answer the given help request.
+
+ * _The volunteer serialization here is a bit different than `/api/volunteers`, see Response section below.
+
+**Allowed methods**: GET
+
+##### Parameters
+
+This endpoint accepts the following GET parameters:
+
+ * `helprequest_id` - the ID of the HelpRequest to generate best matching volunteers for.
+ 
+##### Response
+
+* On invalid ID, returns status code `400 Bad Request`. Example responses (where <ID> is the ID specified):
+
+    ```json
+    {
+      "helprequest_id": "This field must be specified."
+    }
+    ```
+
+    ```json
+    {
+      "helprequest_id": "No help request with ID <ID> found."
+    }
+    ```
+
+* On a valid ID, returns a list of volunteers:
+
+```json
+[
+  {
+    "id": 0,
+    "full_name": "",
+    "city": "",
+    "address": "",
+    "phone_number": "",
+    "email": "",
+    "location_latitude": 0.0,
+    "location_longitude": 0.0,
+    "moving_way": "" // choices: אופניים, קטנוע, מכונית, תחבורה ציבורית, רגלית
+  },
+  ...
+]
+```
+
+
+
 ### `/api/helprequests`
 * _This view is pageable. See "Paginating" section for more details. Results described here will be contained in the
 `results` item of the pagination response._
