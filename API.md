@@ -158,7 +158,7 @@ no. of seconds left):
       "email_verified": false,
       "score": 0, // the volunteer score: currently unused
       "created_date": "yyyy-mm-ddThh:mm:ss.MMMMMM+ZZ:ZZ",  // MMMMMM is microseconds, ZZ:ZZ is timezone
-      "times_volunteered": 0,
+      "num_helprequests": 0,
       "languages": []  // choices in /api/languages
     }
     ```
@@ -199,7 +199,8 @@ pagination)_.
 'wanted_assignments': ['exact'],
 'score': ['exact'],
 'created_date': ['gt', 'lt', 'exact'],
-'organization': ['exact', 'in']
+'organization': ['exact', 'in'],
+'num_helprequests': ['exact', 'gt', 'lt']
 ```
 
 ### `/api/volunteers/best_match`
@@ -302,7 +303,8 @@ This endpoint accepts the following GET parameters:
 'city': ['exact', 'in'],
 'city__region': ['exact', 'in'],
 'status': ['exact', 'in'],
-'type': ['exact', 'in']
+'type': ['exact', 'in'],
+'helping_volunteer__id': ['exact']
 ```
 
 ### `/api/maphelprequests`
@@ -333,6 +335,54 @@ This endpoint accepts the following GET parameters:
 #### Available Filters
 See `/api/helprequests` - same filters apply.
 
+### `/api/updatehelprequest/<id>/`
+
+* _This view requires authentication. See "Token Authentication" section for more details._
+
+**Description**: Update a specific help request.
+
+**Allowed methods**: PUT, PATCH (both do the same)
+
+##### Parameters
+In the URL, _<id>_ should be the HelpRequest ID to modify.
+
+The request be a JSON object with one or more of the following fields:
+
+```json
+{
+  "notes": "",
+  "helping_volunteer": 0,  // specify ID
+  "status": "", // choices: WAITING, IN_CARE, TO_VOLUNTER, DONE, NOT_DONE
+  "type_text": ""
+}
+```
+
+Only the fields listed will be updated.
+
+##### Response
+
+ * On invalid input, returns status code `400 Bad Request` with the errors. Example response:
+   ```json
+    {
+      "helping_volunteer": [
+        "Invalid pk \"500000\" - object does not exist."
+      ],
+      "status": [
+        "\"invalid_choice\" is not a valid choice."
+      ]
+    }
+    ```
+
+ * On valid input & successful operation returns status code `200 OK` with the current values. Example:
+    ```json
+    {
+      "notes": "",
+      "helping_volunteer": 123,
+      "status": "WAITING",
+      "type_text": ""
+    }
+    ```
+ 
 ### `/api/register`
 
 **Description**: Registers a volunteer into the system.

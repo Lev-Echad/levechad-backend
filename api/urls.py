@@ -9,6 +9,7 @@ router.register(r'createhelprequest', api.views.CreateHelpRequestViewSet, basena
 router.register(r'volunteers', api.views.VolunteersViewSet, basename='volunteer_list')
 router.register(r'helprequests', api.views.HelpRequestsViewSet, basename='help_request_list')
 router.register(r'maphelprequests', api.views.HelpRequestMapViewSet, basename='map_help_request_list')
+router.register(r'updatehelprequest', api.views.UpdateHelpRequestViewSet, basename='update_help_request_list')
 router.register(r'cityautocomplete', api.views.CityAutocompleteViewSet, basename='city_autocomplete')
 router.register(r'areas', api.views.AreasViewSet, basename='area_list')
 router.register(r'languages', api.views.LanguagesViewSet, basename='language_list')
