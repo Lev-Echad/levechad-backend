@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import F, Count, Q
+from django.db.models import F, Count, Q, OuterRef
 from django.urls import reverse
 from django.utils import timezone
 from django.db.models.signals import post_save
@@ -21,7 +21,6 @@ from django.dispatch import receiver
 from multiselectfield import MultiSelectField
 
 import client.geo
-
 
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
@@ -105,6 +104,9 @@ class ExtendedVolunteerManager(models.Manager):
     def all_by_score(self, helprequest_coordinates):
         # In the future, add more parameters
         volunteers_qs = self.get_queryset()
+        # Remove volunteers on hold.
+        has_freeze = VolunteerFreeze.objects.filter(expiration_date__gte=date.today(), volunteer=OuterRef('pk'))
+        volunteers_qs = volunteers_qs.filter(~Q(has_freeze))
         volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates, as_int=True)
         volunteers_qs = self._add_num_helprequests(volunteers_qs)
         return volunteers_qs.order_by('distance', 'num_helprequests')
@@ -255,6 +257,11 @@ class Volunteer(Timestampable):
             raise ValidationError("Volunteer has pending requests and therefor cannot be deleted.")
         self.disabled = True
         self.save()
+
+
+class VolunteerFreeze(Timestampable):
+    volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='freezes', null=False)
+    expiration_date = models.DateField(db_index=True)
 
 
 class VolunteerCertificate(models.Model):
