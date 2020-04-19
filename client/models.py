@@ -105,8 +105,7 @@ class ExtendedVolunteerManager(models.Manager):
         # In the future, add more parameters
         volunteers_qs = self.get_queryset()
         # Remove volunteers on hold.
-        has_freeze = VolunteerFreeze.objects.filter(expiration_date__gte=date.today(), volunteer=OuterRef('pk'))
-        volunteers_qs = volunteers_qs.filter(~Q(has_freeze))
+        volunteers_qs = volunteers_qs.filter(~Q(freezes__expiration_date__gte=date.today()))
         volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates, as_int=True)
         volunteers_qs = self._add_num_helprequests(volunteers_qs)
         return volunteers_qs.order_by('distance', 'num_helprequests')
