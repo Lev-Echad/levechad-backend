@@ -110,9 +110,11 @@ class MatchingVolunteerSerializer(serializers.ModelSerializer):
 
 
 class MapHelpRequestSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(source='get_status_display')
+
     class Meta:
         model = HelpRequest
-        fields = ['id', 'full_name', 'location_latitude', 'location_longitude']
+        fields = ['id', 'full_name', 'location_latitude', 'location_longitude', 'status', 'helping_volunteer']
 
 
 class CreateHelpRequestSerializer(serializers.ModelSerializer):
