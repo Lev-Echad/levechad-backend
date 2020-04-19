@@ -188,7 +188,8 @@ class UpdateHelpRequestViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet)
 
 
 class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = HelpRequest.objects.all().filter(status__in=['WAITING', 'IN_CARE']).order_by('-created_date')
+    queryset = HelpRequest.objects.all().filter(
+        status__in=['WAITING', 'IN_CARE', 'TO_VOLUNTER']).order_by('-created_date')
     serializer_class = MapHelpRequestSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = None
@@ -199,7 +200,7 @@ class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 class ListByNameViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     pagination_class = None
 
-    def list(self, request):
+    def list(self, request, **kwargs):
         try:
             response = super().list(request)
             response.data = [item['name'] for item in response.data]
