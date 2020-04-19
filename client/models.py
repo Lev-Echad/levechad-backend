@@ -80,12 +80,38 @@ class VolunteerSchedule(Timestampable):
 
 class ExtendedVolunteerManager(models.Manager):
     @staticmethod
-    def _add_distance(qs, helprequest_coordinates, as_int=False):
+    def _add_distance_old(qs, helprequest_coordinates, as_int=False):
+        """
+        This function is DEPRECATED and will be removed in future releases.
+        Kept for compatibility with older system (and to keep new features for the upgraded one)
+        :param qs:
+        :param helprequest_coordinates:
+        :param as_int:
+        :return:
+        """
         qs = qs.annotate(y_distance=(F('city__y') - helprequest_coordinates[1]) ** 2)
         qs = qs.annotate(x_distance=(F('city__x') - helprequest_coordinates[0]) ** 2)
         qs = qs.annotate(distance=models.ExpressionWrapper(((F('x_distance') + F('y_distance')) ** 0.5) / 100,
                                                            output_field=models.IntegerField() if as_int
                                                            else models.FloatField()))
+        return qs
+
+    @staticmethod
+    def _add_distance(qs, helprequest_coordinates, as_int=False):
+        """
+        Uses pithagoras to calculate distance roughly, until an exact algorithm will be implemented.
+        THE EARTH IS NOT FLAT, Israel is simply a small country :)
+        :param qs:
+        :param helprequest_coordinates:
+        :param as_int:
+        :return:
+        """
+        qs = qs.annotate(latitude_distance=(F('location_latitude') - helprequest_coordinates[0]) ** 2)
+        qs = qs.annotate(longitude_distance=(F('location_longitude') - helprequest_coordinates[1]) ** 2)
+        qs = qs.annotate(
+            distance=models.ExpressionWrapper(((F('latitude_distance') + F('longitude_distance')) ** 0.5) / 100,
+                                              output_field=models.IntegerField() if as_int
+                                              else models.FloatField()))
         return qs
 
     @staticmethod
@@ -98,7 +124,7 @@ class ExtendedVolunteerManager(models.Manager):
 
     def all_by_distance(self, helprequest_coordinates):
         volunteers_qs = self.get_queryset()
-        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates)
+        volunteers_qs = self._add_distance_old(volunteers_qs, helprequest_coordinates)
         return volunteers_qs.order_by('distance')
 
     def all_by_score(self, helprequest_coordinates):
@@ -106,7 +132,10 @@ class ExtendedVolunteerManager(models.Manager):
         volunteers_qs = self.get_queryset()
         # Remove volunteers on hold.
         volunteers_qs = volunteers_qs.filter(~Q(freezes__expiration_date__gte=date.today()))
-        volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates, as_int=True)
+        if helprequest_coordinates[0] > 1000:
+            volunteers_qs = self._add_distance_old(volunteers_qs, helprequest_coordinates, as_int=True)
+        else:
+            volunteers_qs = self._add_distance(volunteers_qs, helprequest_coordinates, as_int=True)
         volunteers_qs = self._add_num_helprequests(volunteers_qs)
         return volunteers_qs.order_by('distance', 'num_helprequests')
 
