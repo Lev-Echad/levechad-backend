@@ -14,8 +14,8 @@ import django_filters as filters
 from client.models import Volunteer, HelpRequest, City, Area, Language
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
-                            CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
-                            MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer
+    CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
+    MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer
 
 import api.throttling
 from levechad import settings
