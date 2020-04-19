@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from client.validators import parental_consent_validator, minimum_age_validator, phone_number_validator, \
-                              unique_id_number_validator, id_number_validator
+    unique_id_number_validator, id_number_validator
 from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area
 
 
@@ -141,6 +141,8 @@ class HelpRequestSerializer(serializers.ModelSerializer):
 
 
 class UpdateHelpRequestSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(source='get_status_display')
+
     class Meta:
         model = HelpRequest
         fields = ['notes', 'helping_volunteer', 'status', 'type_text']
