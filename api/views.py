@@ -6,6 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 
+from django.contrib.auth.models import User
+from rest_framework.renderers import JSONRenderer
+from rest_framework.views import APIView
 import django_filters as filters
 
 from client.models import Volunteer, HelpRequest, City, Area, Language
@@ -15,6 +18,7 @@ from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpReq
                             MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer
 
 import api.throttling
+from levechad import settings
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -240,3 +244,15 @@ class LanguagesViewSet(ListByNameViewSet):
     serializer_class = LanguageSerializer
     permission_classes = [IsAuthenticated]
     throttle_classes = [api.throttling.UserChoicesListThrottle]
+
+
+class GetGoogleApiSecret(APIView):
+    """
+    return google maps GOOGLE_API_SECRET_KEY in JSON.
+    """
+    renderer_classes = [JSONRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        content = {'secret_key': settings.GOOGLE_API_SECRET_KEY}
+        return Response(content)
