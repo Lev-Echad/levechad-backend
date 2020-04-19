@@ -132,6 +132,7 @@ class ExtendedVolunteerManager(models.Manager):
         volunteers_qs = self.get_queryset()
         # Remove volunteers on hold.
         volunteers_qs = volunteers_qs.filter(~Q(freezes__expiration_date__gte=date.today()))
+        # Used to catch use of old coordinate system (mainly the legacy website).
         if helprequest_coordinates[0] > 1000:
             volunteers_qs = self._add_distance_old(volunteers_qs, helprequest_coordinates, as_int=True)
         else:
