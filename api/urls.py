@@ -1,6 +1,5 @@
 from django.urls import include, path
 from rest_framework import routers, permissions
-from rest_framework_swagger.views import get_swagger_view
 import api.views
 
 from drf_yasg.views import get_schema_view
