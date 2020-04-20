@@ -57,7 +57,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'django_filters',
-    'import_export'
+    'import_export',
+    'drf_yasg',
+
 ]
 
 MIDDLEWARE = [
@@ -164,7 +166,7 @@ if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -230,6 +232,9 @@ REST_FRAMEWORK = {
         'check-sms': '',  # overridden in throttling.py
     },
 }
+# Add extra authentication option to support swagger. Removed from PROD to keep minimal surface.
+if ENV != "PRODUCTION":
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
 
 
 # Geocoding settings
@@ -241,3 +246,13 @@ class LocatorTypes(Enum):
 
 LOCATOR = LocatorTypes.NOMINATIM
 GOOGLE_API_SECRET_KEY = os.environ.get('GOOGLE_API_KEY', default=None)
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'DRF Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+}
