@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 
 from client.validators import parental_consent_validator, minimum_age_validator, phone_number_validator, \
     unique_id_number_validator, id_number_validator
-from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area
+from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area, VolunteerFreeze
 
 
 class ParentalConsentSerializer(serializers.ModelSerializer):
@@ -92,6 +92,14 @@ class VolunteerSerializer(serializers.ModelSerializer):
                   'gender', 'city', 'address', 'organization', 'moving_way', 'week_assignments_capacity',
                   'wanted_assignments', 'email', 'email_verified', 'score', 'created_date', 'num_helprequests',
                   'languages', 'location_latitude', 'location_longitude']
+
+
+class VolunteerFreezeSerializer(serializers.ModelSerializer):
+    expiration_date = serializers.DateField(required=True)
+
+    class Meta:
+        model = VolunteerFreeze
+        fields = ['volunteer','expiration_date']
 
 
 class ShortVolunteerSerializer(serializers.ModelSerializer):

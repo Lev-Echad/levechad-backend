@@ -23,6 +23,7 @@ schema_view = get_schema_view(
 
 router = routers.DefaultRouter()
 router.register(r'registration', api.views.RegistrationViewSet, basename='registration')
+router.register(r'UpdateVolunteerFreeze', api.views.UpdateVolunteerFreezeViewSet, basename='UpdateVolunteerFreeze')
 router.register(r'createhelprequest', api.views.CreateHelpRequestViewSet, basename='create_help_request')
 router.register(r'volunteers', api.views.VolunteersViewSet, basename='volunteer_list')
 router.register(r'helprequests', api.views.HelpRequestsViewSet, basename='help_request_list')
