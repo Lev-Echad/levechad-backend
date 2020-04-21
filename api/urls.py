@@ -7,7 +7,6 @@ import api.views
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-...
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -24,6 +23,7 @@ schema_view = get_schema_view(
 
 router = routers.DefaultRouter()
 router.register(r'registration', api.views.RegistrationViewSet, basename='registration')
+router.register(r'SetVolunteerFreeze', api.views.VolunteerFreezeViewSet, basename='SetVolunteerFreeze')
 router.register(r'createhelprequest', api.views.CreateHelpRequestViewSet, basename='create_help_request')
 router.register(r'volunteers', api.views.VolunteersViewSet, basename='volunteer_list')
 router.register(r'helprequests', api.views.HelpRequestsViewSet, basename='help_request_list')

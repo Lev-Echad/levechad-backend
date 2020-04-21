@@ -11,11 +11,11 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 import django_filters as filters
 
-from client.models import Volunteer, HelpRequest, City, Area, Language
+from client.models import Volunteer, HelpRequest, City, Area, Language, VolunteerFreeze
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
     CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
-    MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer
+    MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer, VolunteerFreezeSerializer
 
 import api.throttling
 from levechad import settings
@@ -186,6 +186,11 @@ class UpdateHelpRequestViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet)
 
     def update(self, *args, partial=False, **kwargs):
         return super().update(*args, **kwargs, partial=True)
+
+
+class VolunteerFreezeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    serializer_class = VolunteerFreezeSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
