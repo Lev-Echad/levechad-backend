@@ -187,7 +187,7 @@ class UpdateHelpRequestViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet)
         return super().update(*args, **kwargs, partial=True)
 
 
-class UpdateVolunteerFreezeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+class VolunteerFreezeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = VolunteerFreezeSerializer
     permission_classes = [IsAuthenticated]
 
