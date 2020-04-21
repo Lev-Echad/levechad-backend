@@ -17,7 +17,7 @@ from django.dispatch import receiver
 from django.db.models.signals import pre_save
 from multiselectfield import MultiSelectField
 
-from apps.certificate.certificate import create_certificate_image
+from client.certificate import create_certificate_image
 
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
@@ -243,7 +243,7 @@ class VolunteerCertificate(models.Model):
                     'Key': 'media/{}'.format(type(self).IMAGE_PATH.format(id=self.id)),
                     'ResponseContentDisposition': 'attachment;filename={}'.format(f'{self.id}.png'),
                 },
-                ExpiresIn=settings.DOWNLOAD_LINK_EXPIRATION
+                ExpiresIn=settings.CERTIFICATE_DOWNLOAD_LINK_EXPIRATION
             )
         else:
             return reverse('download_certificate', kwargs={'pk': self.id})

@@ -50,8 +50,6 @@ INSTALLED_APPS = [
     'storages',
     'django_extensions',
     'rest_framework',
-
-    'apps.certificate',
 ]
 
 MIDDLEWARE = [
