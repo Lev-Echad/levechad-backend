@@ -305,6 +305,7 @@ This endpoint accepts the following GET parameters:
 'status': ['exact', 'in'],
 'type': ['exact', 'in'],
 'helping_volunteer__id': ['exact']
+'notes': ['icontains']
 ```
 
 ### `/api/maphelprequests`
