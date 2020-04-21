@@ -166,7 +166,7 @@ if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -220,7 +220,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.DefaultPagination',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_THROTTLE_RATES': {
@@ -233,6 +232,9 @@ REST_FRAMEWORK = {
         'check-sms': '',  # overridden in throttling.py
     },
 }
+# Add extra authentication option to support swagger. Removed from PROD to keep minimal surface.
+if ENV != "PRODUCTION":
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
 
 
 # Geocoding settings

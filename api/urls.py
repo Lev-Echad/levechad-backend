@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import include, path
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import routers, permissions
@@ -44,6 +45,7 @@ authTokenView = \
 urlpatterns = [
     path('', include(router.urls)),
     path('getGoogleApiSecret/', api.views.GetGoogleApiSecret.as_view()),
-    path('authtoken/', authTokenView),
-    path('docs/', schema_view.with_ui('swagger', cache_timeout=0)),
+    path('authtoken/', authTokenView if settings.ENV != 'PRODUCTION' else api.views.CustomAuthToken.as_view()),
 ]
+if settings.ENV != 'PRODUCTION':
+    urlpatterns.append(path('docs/', schema_view.with_ui('swagger', cache_timeout=0)))

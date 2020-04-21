@@ -27,7 +27,7 @@ def get_coordinates(city_name, address, cache_dict=None):
     """
     city_name = CITY_CLEANUP_RE.match(city_name).group(1)
     coder = get_geocoder()
-    built_address = "%s, %s, ישראל" % (address, city_name)
+    built_address = "%s, %s" % (address, city_name)
     location = run_query(built_address, coder=coder, cache_dict=cache_dict)
     # If coding fails, attempt to resolve location by city.
     if not location:
