@@ -608,3 +608,52 @@ characters):
   ...
 ]
 ```
+
+### `/api/getGoogleApiSecret/`
+
+* _This view requires authentication. See "Token Authentication" section for more details._
+
+**Description**: Returns GOOGLE_API_SECRET_KEY.
+
+**Allowed methods**: GET
+
+**Throttling**: `user-choices-list`, user throttle
+
+**Parameters**: None
+
+##### Example response
+
+```json
+{
+  "secret_key": secret
+}
+```
+
+### `/api/SetVolunteerFreeze/`
+
+* _This view requires authentication. See "Token Authentication" section for more details._
+
+**Description**: set Volunteer Freeze Date.
+
+**Allowed methods**: POST
+
+**Throttling**: `user-choices-list`, user throttle
+
+**Parameters**: 
+
+```json
+{
+  "volunteer": 0,
+  "expiration_date": "2020-04-21"
+}
+```
+
+##### Example response
+
+```json
+{
+  "volunteer": 0,
+  "expiration_date": "2020-04-21"
+}
+```
+
