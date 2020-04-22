@@ -74,12 +74,11 @@ MIDDLEWARE = [
 ]
 
 CORS_URLS_REGEX = r'^/api/.*$'
-if True or ENV == 'DEVELOPMENT':
+if ENV == 'DEVELOPMENT':
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     # TODO fill with deployment address when it's created (#267)
     CORS_ORIGIN_WHITELIST = ["https://corona.levechad.org"]
-    CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'levechad.urls'
 
@@ -234,7 +233,7 @@ REST_FRAMEWORK = {
     },
 }
 # Add extra authentication option to support swagger. Removed from PROD to keep minimal surface.
-if True or ENV != "PRODUCTION":
+if ENV != "PRODUCTION":
     REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
 
 
