@@ -2,8 +2,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from client.validators import parental_consent_validator, minimum_age_validator, phone_number_validator, \
-                              unique_id_number_validator, id_number_validator
-from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area
+    unique_id_number_validator, id_number_validator
+from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area, VolunteerFreeze
 
 
 class ParentalConsentSerializer(serializers.ModelSerializer):
@@ -94,6 +94,14 @@ class VolunteerSerializer(serializers.ModelSerializer):
                   'languages', 'location_latitude', 'location_longitude']
 
 
+class VolunteerFreezeSerializer(serializers.ModelSerializer):
+    expiration_date = serializers.DateField(required=True)
+
+    class Meta:
+        model = VolunteerFreeze
+        fields = ['volunteer', 'expiration_date']
+
+
 class ShortVolunteerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Volunteer
@@ -107,6 +115,14 @@ class MatchingVolunteerSerializer(serializers.ModelSerializer):
         model = Volunteer
         fields = ['id', 'full_name', 'city', 'address', 'phone_number', 'email', 'location_latitude',
                   'location_longitude', 'moving_way']
+
+
+class MapHelpRequestSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(source='get_status_display')
+
+    class Meta:
+        model = HelpRequest
+        fields = ['id', 'full_name', 'location_latitude', 'location_longitude', 'status', 'helping_volunteer']
 
 
 class CreateHelpRequestSerializer(serializers.ModelSerializer):
@@ -123,7 +139,6 @@ class CreateHelpRequestSerializer(serializers.ModelSerializer):
 
 class HelpRequestSerializer(serializers.ModelSerializer):
     city = CitySerializer()
-    area = serializers.PrimaryKeyRelatedField(queryset=Area.objects.all())
     type = serializers.CharField(source='get_type_display')
     request_reason = serializers.CharField(source='get_request_reason_display')
     status = serializers.CharField(source='get_status_display')
@@ -133,6 +148,14 @@ class HelpRequestSerializer(serializers.ModelSerializer):
         model = HelpRequest
         fields = ['id', 'full_name', 'phone_number', 'city', 'address', 'notes', 'type', 'type_text',
                   'request_reason', 'status', 'status_updater', 'helping_volunteer', 'created_date']
+
+
+class UpdateHelpRequestSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(source='get_status_display')
+
+    class Meta:
+        model = HelpRequest
+        fields = ['notes', 'helping_volunteer', 'status', 'type_text']
 
 
 class AreaSerializer(serializers.ModelSerializer):

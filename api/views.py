@@ -1,4 +1,3 @@
-from django.db.models import Count
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
@@ -7,14 +6,19 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 
+from django.contrib.auth.models import User
+from rest_framework.renderers import JSONRenderer
+from rest_framework.views import APIView
 import django_filters as filters
 
-from client.models import Volunteer, HelpRequest, City, Area, Language
+from client.models import Volunteer, HelpRequest, City, Area, Language, VolunteerFreeze
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
-                            CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, MatchingVolunteerSerializer
+    CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
+    MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer, VolunteerFreezeSerializer
 
 import api.throttling
+from levechad import settings
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -106,7 +110,7 @@ class VolunteerFilter(filters.FilterSet):
             'gender': ['exact'],
             'city': ['exact', 'in'],
             'neighborhood': ['exact', 'icontains'],
-            'areas': ['exact'],
+            'city__region': ['exact'],
             'moving_way': ['exact'],
             'week_assignments_capacity': ['exact', 'range'],
             'wanted_assignments': ['exact'],
@@ -122,9 +126,11 @@ class HelpRequestsFilter(filters.FilterSet):
         fields = {
             'id': ['exact'],
             'city': ['exact', 'in'],
-            'area': ['exact', 'in'],
+            'city__region': ['exact', 'in'],
             'status': ['exact', 'in'],
-            'type': ['exact', 'in']
+            'type': ['exact', 'in'],
+            'helping_volunteer__id': ['exact'],
+            'notes': ['icontains']
         }
 
 
@@ -173,10 +179,34 @@ class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     throttle_classes = [api.throttling.HamalDataListThrottle]
 
 
+class UpdateHelpRequestViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = HelpRequest.objects.all()
+    serializer_class = UpdateHelpRequestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, *args, partial=False, **kwargs):
+        return super().update(*args, **kwargs, partial=True)
+
+
+class VolunteerFreezeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    serializer_class = VolunteerFreezeSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = HelpRequest.objects.all().filter(
+        status__in=['WAITING', 'IN_CARE', 'TO_VOLUNTER']).order_by('-created_date')
+    serializer_class = MapHelpRequestSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+    filterset_class = HelpRequestsFilter
+    throttle_classes = [api.throttling.HamalDataListThrottle]
+
+
 class ListByNameViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     pagination_class = None
 
-    def list(self, request):
+    def list(self, request, **kwargs):
         try:
             response = super().list(request)
             response.data = [item['name'] for item in response.data]
@@ -221,3 +251,15 @@ class LanguagesViewSet(ListByNameViewSet):
     serializer_class = LanguageSerializer
     permission_classes = [IsAuthenticated]
     throttle_classes = [api.throttling.UserChoicesListThrottle]
+
+
+class GetGoogleApiSecret(APIView):
+    """
+    return google maps GOOGLE_API_SECRET_KEY in JSON.
+    """
+    renderer_classes = [JSONRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        content = {'secret_key': settings.GOOGLE_API_SECRET_KEY}
+        return Response(content)
