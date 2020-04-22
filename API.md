@@ -657,3 +657,13 @@ characters):
 }
 ```
 
+### `/api/ValidateToken/`
+
+**Description**: check if the Token is Valid.
+
+**Allowed methods**: GET
+
+
+**Parameters**: 
+
+    /api/ValidateToken/?token=*token*
