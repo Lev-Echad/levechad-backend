@@ -78,7 +78,7 @@ if ENV == 'DEVELOPMENT':
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     # TODO fill with deployment address when it's created (#267)
-    CORS_ORIGIN_WHITELIST = []
+    CORS_ORIGIN_WHITELIST = ["https://corona.levechad.org"]
 
 ROOT_URLCONF = 'levechad.urls'
 
