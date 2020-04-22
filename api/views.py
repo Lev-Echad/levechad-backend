@@ -1,10 +1,13 @@
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
+from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.models import User
 from rest_framework.renderers import JSONRenderer
@@ -263,3 +266,15 @@ class GetGoogleApiSecret(APIView):
     def get(self, request, format=None):
         content = {'secret_key': settings.GOOGLE_API_SECRET_KEY}
         return Response(content)
+
+
+token_f = openapi.Parameter('token', openapi.IN_QUERY, description="Check if Token is valid", type=openapi.TYPE_STRING)
+
+
+@swagger_auto_schema(method='get', manual_parameters=[token_f])
+@api_view(['GET'])
+def ValidateToken(request):
+    token = request.query_params['token']
+    queryset = Token.objects.all()
+    isValid: bool = token in [x.key for x in queryset]
+    return Response(isValid)
