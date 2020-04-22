@@ -65,7 +65,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    #'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -74,7 +74,7 @@ MIDDLEWARE = [
 ]
 
 CORS_URLS_REGEX = r'^/api/.*$'
-if ENV == 'DEVELOPMENT':
+if True or ENV == 'DEVELOPMENT':
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     # TODO fill with deployment address when it's created (#267)
