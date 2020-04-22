@@ -233,7 +233,7 @@ REST_FRAMEWORK = {
     },
 }
 # Add extra authentication option to support swagger. Removed from PROD to keep minimal surface.
-if ENV != "PRODUCTION":
+if True or ENV != "PRODUCTION":
     REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
 
 
