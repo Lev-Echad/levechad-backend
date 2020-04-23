@@ -46,5 +46,5 @@ urlpatterns = [
     path('getGoogleApiSecret/', api.views.GetGoogleApiSecret.as_view()),
     path('authtoken/', authTokenView if True or settings.ENV != 'PRODUCTION' else api.views.CustomAuthToken.as_view()),
 ]
-if True or settings.ENV != 'PRODUCTION':
+if settings.ENV != 'PRODUCTION':
     urlpatterns.append(path('docs/', schema_view.with_ui('swagger', cache_timeout=0)))
