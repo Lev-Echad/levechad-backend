@@ -22,7 +22,7 @@ ENV = os.environ.get('ENV', 'DEVELOPMENT')
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-if ENV == 'PRODUCTION':
+if ENV == 'PRODUCTION' or ENV == 'TESTING':
     SECRET_KEY = os.environ.get('SECRET_KEY')
 else:
     SECRET_KEY = 'MYSECRET'
@@ -74,7 +74,7 @@ MIDDLEWARE = [
 ]
 
 CORS_URLS_REGEX = r'^/api/.*$'
-if ENV == 'DEVELOPMENT':
+if ENV == 'DEVELOPMENT' or ENV == 'TESTING':
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     # TODO fill with deployment address when it's created (#267)
@@ -182,7 +182,7 @@ LOGIN_REDIRECT_URL = '/server'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-if ENV == 'PRODUCTION':
+if ENV == 'PRODUCTION' or ENV == 'TESTING':
     # Redirect http request to https
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
@@ -212,7 +212,7 @@ else:
 
 # Django Rest Framework configuration
 _renderer_classes = ['rest_framework.renderers.JSONRenderer']
-if ENV != 'PRODUCTION':
+if ENV != 'PRODUCTION' or ENV == 'TESTING':
     _renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
 
 REST_FRAMEWORK = {
