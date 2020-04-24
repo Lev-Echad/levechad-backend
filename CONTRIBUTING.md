@@ -7,19 +7,20 @@ require our contributors to follow.
 
 
 ## Getting Started
-See the [README](https://github.com/Lev-Echad/levechad-backend) file for more information on setting up the local
-development environment (and [levechad-frontend's README](https://github.com/Lev-Echad/levechad-frontend) if you need
-to set the frontend server up).
+See the [README](https://github.com/Lev-Echad/levechad-backend) file for more information on setting up the local backend
+development environment.
 
 
 ## Codebase Walkthrough
-We currently have two repositories for this project: [levechad-frontend](https://github.com/Lev-Echad/levechad-frontend/)
-and [levechad-backend](https://github.com/Lev-Echad/levechad-backend).
+We have separated frontend and backend repositories and servers - this means that the backend serves an API that the frontends can interface with. We currently have three repositories for this project:
 
-The backend system is currently going through a refactor, in which the `levechad-frontend` repository was created as
-part of the effort to move the frontend to more modern technologies.
+* **[levechad-backend](https://github.com/Lev-Echad/levechad-backend) - the Django backend.** Serves the old `client` and `server` apps, which contain the models and the soon-to-be obsolete views, and the new `api` app, giving a REST API to the frontends.
+* **[levechad-frontend-vue](https://github.com/Lev-Echad/levechad-frontend-vue/) - a Vue.js-based frontend.** This will serve as the main frontend (until `levechad-frontend` is in production, see below) that contains the Hamal interface and the help request interface. In the meantime it also contains the registration process for volunteers, but this is temporary until `levechad-frontend` is in production - more on this below.
+* **[levechad-frontend](https://github.com/Lev-Echad/levechad-frontend/) - a React-based frontend,** that in the future will become a "volunteer portal" where volunteers can log in, manage their missions, etc. This will live alongside the `levechad-frontend-vue` repository and allows us to extend this feature in the future.
 
-**The old system** consists of the _client_ and _server_ apps (at URLs /client and /server, respectively).
+The plan is to first have `levechad-frontend-vue` in production with the volunteer registration process, and only after that the Volunteer Portal will be in production and the registration process could be removed from `levechad-frontend-vue`. This allows us to achieve a fully functioning system as soon as possible.
+
+**The old system** consists of the _client_ and _server_ apps (at URLs /client and /server, respectively), and has no frontend - Django serves the pages itself.
 
 * The client app is the system for the users, containing help request views, volunteer forms, etc. and all of the models.
 * The server app is only accessible to the LevEchad Hamal and all the view requires login, and is used to manage the
@@ -31,7 +32,7 @@ frontend.
 
 **The new system** starts with the _api_ app, which serves the REST API using Django REST framework that the new
 frontend can interface with. This also has temporary dependencies to the client app (because the models are there) until
-the old system will be phased out completely.
+the old system will be phased out completely. This will only serve an API to future frontends.
 
 Currently we support both systems, as the new system is currently being built and is still not in production.
 
