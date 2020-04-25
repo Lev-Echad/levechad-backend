@@ -22,7 +22,7 @@ ENV = os.environ.get('ENV', 'DEVELOPMENT')
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-if ENV == 'PRODUCTION' or ENV == 'TESTING':
+if ENV == 'PRODUCTION':
     SECRET_KEY = os.environ.get('SECRET_KEY')
 else:
     SECRET_KEY = 'MYSECRET'
@@ -138,7 +138,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
+if ENV in ('DEVELOPMENT', 'TESTING') and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -212,7 +212,7 @@ else:
 
 # Django Rest Framework configuration
 _renderer_classes = ['rest_framework.renderers.JSONRenderer']
-if ENV != 'PRODUCTION' or ENV == 'TESTING':
+if ENV != 'PRODUCTION':
     _renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
 
 REST_FRAMEWORK = {
