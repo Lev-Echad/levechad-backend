@@ -195,7 +195,7 @@ class VolunteerFreezeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = HelpRequest.objects.all().filter(
-        status__in=['WAITING', 'IN_CARE', 'TO_VOLUNTER']).order_by('-created_date')
+        status__in=['WAITING', 'IN_CARE']).order_by('-created_date')
     serializer_class = MapHelpRequestSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = None

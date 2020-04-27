@@ -74,7 +74,7 @@ MIDDLEWARE = [
 ]
 
 CORS_URLS_REGEX = r'^/api/.*$'
-if ENV == 'DEVELOPMENT':
+if ENV == 'DEVELOPMENT' or ENV == 'TESTING':
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     # TODO fill with deployment address when it's created (#267)
@@ -138,7 +138,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
+if ENV in ('DEVELOPMENT', 'TESTING') and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -182,7 +182,7 @@ LOGIN_REDIRECT_URL = '/server'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-if ENV == 'PRODUCTION':
+if ENV == 'PRODUCTION' or ENV == 'TESTING':
     # Redirect http request to https
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
