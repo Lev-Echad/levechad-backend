@@ -76,7 +76,7 @@ class UpdateVolunteerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Volunteer
-        fields = ['first_name', 'last_name', 'city', 'address', 'moving_way',
+        fields = ['first_name', 'last_name', 'city', 'address', 'moving_way', 'volunteer_type',
                   'week_assignments_capacity', 'wanted_assignments', 'phone_number', 'email']
 
 
