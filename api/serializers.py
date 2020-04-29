@@ -65,6 +65,21 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return volunteer
 
 
+class UpdateVolunteerSerializer(serializers.ModelSerializer):
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
+    wanted_assignments = serializers.MultipleChoiceField(choices=Volunteer.WANTED_ASSIGNMENTS)
+    email = serializers.EmailField()
+
+    def validate_phone_number(self, phone_number):
+        phone_number_validator(phone_number)
+        return phone_number
+
+    class Meta:
+        model = Volunteer
+        fields = ['first_name', 'last_name', 'city', 'address', 'moving_way',
+                  'week_assignments_capacity', 'wanted_assignments', 'phone_number', 'email']
+
+
 class CitySerializer(serializers.ModelSerializer):
     region = serializers.PrimaryKeyRelatedField(queryset=Area.objects.all())
 
