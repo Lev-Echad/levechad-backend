@@ -419,6 +419,37 @@ response:
   ```
 * On success, returns status code `201 Created`. Returns the request data.
 
+### `/api/updatevolunteer/<id>/`
+
+* _This view requires authentication. See "Token Authentication" section for more details._
+
+**Description**: Update a specific volunteer details.
+
+**Allowed methods**: PUT, PATCH (both do the same)
+
+##### Parameters
+In the URL, _<id>_ should be the Volunteer ID to modify.
+
+_Access `/api/updatevolunteer` with OPTIONS to see accepted request (in development, click the OPTIONS button 
+in the `/api/updatevolunteer` web view)._
+
+A request does not need to contain all aforementioned fields, and only the fields listed will be updated.
+
+##### Response
+
+ * On invalid input, returns status code `400 Bad Request` with the errors. Example response:
+   ```json
+    {
+      "email": [
+        "Enter a valid email address."
+      ]
+    }
+    ```
+
+ * On valid input & successful operation returns status code `200 OK` with the current values. 
+ _Successful response returns only the current values of fields that can be updated through 
+ this api endpoint, not all the volunteer's fields._
+
 ### `/api/createhelprequest`
 
 **Description**: Creates a help request.
