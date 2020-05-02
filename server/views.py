@@ -324,6 +324,7 @@ def find_closest_people(request, pk):
     return render(request, 'server/closest_volunteer.html', context)
 
 
+@login_required
 def export_users_xls(request):
     current_time = datetime.datetime.now().strftime('%Y_%m_%d-%H%M%S')
     response = HttpResponse(VolunteerResource().export().xls, 'application/vnd.ms-excel')
@@ -342,11 +343,3 @@ def create_volunteer_certificate(request, volunteer_id):
 
     next_page_name = request.GET.get('next', 'index')
     return redirect(next_page_name)
-
-
-def export_help_xls(request):
-    current_time = datetime.datetime.now().strftime('%Y_%m_%d-%H%M%S')
-    response = HttpResponse(HelpRequestResource().export().xls, 'application/vnd.ms-excel')
-    response['Content-Disposition'] = f'attachment; filename="HelpRequests_data-{current_time}.xls"'
-
-    return response
