@@ -15,7 +15,8 @@ from client.models import Volunteer, HelpRequest, City, Area, Language, Voluntee
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
     CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
-    MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer, VolunteerFreezeSerializer
+    MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer, VolunteerFreezeSerializer, \
+    UpdateVolunteerSerializer
 
 import api.throttling
 from levechad import settings
@@ -182,6 +183,15 @@ class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 class UpdateHelpRequestViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = HelpRequest.objects.all()
     serializer_class = UpdateHelpRequestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, *args, partial=False, **kwargs):
+        return super().update(*args, **kwargs, partial=True)
+
+
+class UpdateVolunteerViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = Volunteer.objects.all()
+    serializer_class = UpdateVolunteerSerializer
     permission_classes = [IsAuthenticated]
 
     def update(self, *args, partial=False, **kwargs):
