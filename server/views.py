@@ -323,6 +323,7 @@ def find_closest_people(request, pk):
     context = {'help_request': help_req, 'volunteers': closest}
     return render(request, 'server/closest_volunteer.html', context)
 
+
 @login_required
 def export_users_xls(request):
     current_time = datetime.datetime.now().strftime('%Y_%m_%d-%H%M%S')
