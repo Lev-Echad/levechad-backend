@@ -21,6 +21,4 @@ urlpatterns = [
     ),
     path('delete_volunteer/<int:pk>/', views.delete_volunteer, name='delete_volunteer'),
     path('export/xls/', views.export_users_xls, name='export_users_xls'),
-    path('export/xls1/', views.export_help_xls, name='export_help_xls'),
-
 ]
