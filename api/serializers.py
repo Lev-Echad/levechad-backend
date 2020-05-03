@@ -145,7 +145,7 @@ class CreateHelpRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HelpRequest
-        fields = ['full_name', 'phone_number', 'city', 'address', 'notes', 'type', 'type_text', 'request_reason']
+        fields = ['id', 'full_name', 'phone_number', 'city', 'address', 'notes', 'type', 'type_text', 'request_reason']
 
     def validate_phone_number(self, phone_number):
         phone_number_validator(phone_number)
