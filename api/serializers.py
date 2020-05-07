@@ -66,6 +66,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class UpdateVolunteerSerializer(serializers.ModelSerializer):
+    # TODO: Should this be addressed?
     # city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
     wanted_assignments = serializers.MultipleChoiceField(choices=Volunteer.WANTED_ASSIGNMENTS)
     email = serializers.EmailField()
