@@ -131,7 +131,8 @@ class HelpRequestsFilter(filters.FilterSet):
             'status': ['exact', 'in'],
             'type': ['exact', 'in'],
             'helping_volunteer__id': ['exact'],
-            'notes': ['icontains']
+            'notes': ['icontains'],
+            'phone_number': ['exact'],
         }
 
 
@@ -204,7 +205,7 @@ class VolunteerFreezeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = HelpRequest.objects.all()#.filter(status__in=['WAITING', 'IN_CARE']).order_by('-created_date')
+    queryset = HelpRequest.objects.all()  # .filter(status__in=['WAITING', 'IN_CARE']).order_by('-created_date')
     serializer_class = MapHelpRequestSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = None

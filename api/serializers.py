@@ -137,7 +137,7 @@ class MapHelpRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HelpRequest
-        fields = ['id', 'full_name', 'city', 'location_latitude', 'location_longitude', 'status', 'helping_volunteer']
+        fields = ['id', 'full_name', 'phone_number', 'city', 'location_latitude', 'location_longitude', 'status', 'helping_volunteer']
 
 
 class CreateHelpRequestSerializer(serializers.ModelSerializer):
