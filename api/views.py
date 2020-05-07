@@ -131,7 +131,8 @@ class HelpRequestsFilter(filters.FilterSet):
             'status': ['exact', 'in'],
             'type': ['exact', 'in'],
             'helping_volunteer__id': ['exact'],
-            'notes': ['icontains']
+            'notes': ['icontains'],
+            'phone_number': ['exact'],
         }
 
 
