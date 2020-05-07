@@ -76,6 +76,7 @@ class UpdateVolunteerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Volunteer
+        # TODO: Add moving_way when possible (removed temporarily due to bugs with FE)
         fields = ['first_name', 'last_name', 'city', 'address', 'volunteer_type',
                   'week_assignments_capacity', 'wanted_assignments', 'phone_number', 'email']
 
