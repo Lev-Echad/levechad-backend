@@ -66,7 +66,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class UpdateVolunteerSerializer(serializers.ModelSerializer):
-    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
+    # TODO: Should this be addressed?
+    # city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
     wanted_assignments = serializers.MultipleChoiceField(choices=Volunteer.WANTED_ASSIGNMENTS)
     email = serializers.EmailField()
 
@@ -76,7 +77,8 @@ class UpdateVolunteerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Volunteer
-        fields = ['first_name', 'last_name', 'city', 'address', 'moving_way', 'volunteer_type',
+        # TODO: Add moving_way when possible (removed temporarily due to bugs with FE)
+        fields = ['first_name', 'last_name', 'city', 'address', 'volunteer_type',
                   'week_assignments_capacity', 'wanted_assignments', 'phone_number', 'email']
 
 
@@ -137,7 +139,8 @@ class MapHelpRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HelpRequest
-        fields = ['id', 'full_name', 'location_latitude', 'location_longitude', 'status', 'helping_volunteer']
+        fields = ['id', 'full_name', 'phone_number', 'city', 'location_latitude', 'location_longitude', 'status',
+                  'helping_volunteer']
 
 
 class CreateHelpRequestSerializer(serializers.ModelSerializer):
@@ -145,7 +148,7 @@ class CreateHelpRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HelpRequest
-        fields = ['full_name', 'phone_number', 'city', 'address', 'notes', 'type', 'type_text', 'request_reason']
+        fields = ['id', 'full_name', 'phone_number', 'city', 'address', 'notes', 'type', 'type_text', 'request_reason']
 
     def validate_phone_number(self, phone_number):
         phone_number_validator(phone_number)
@@ -166,7 +169,7 @@ class HelpRequestSerializer(serializers.ModelSerializer):
 
 
 class UpdateHelpRequestSerializer(serializers.ModelSerializer):
-    status = serializers.CharField(source='get_status_display')
+    # status = serializers.CharField(source='get_status_display')
 
     class Meta:
         model = HelpRequest
