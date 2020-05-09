@@ -173,7 +173,7 @@ class UpdateHelpRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HelpRequest
-        fields = ['notes', 'helping_volunteer', 'status', 'type_text']
+        fields = ['notes', 'helping_volunteer', 'status', 'status_updater', 'type_text']
 
 
 class AreaSerializer(serializers.ModelSerializer):
