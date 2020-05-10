@@ -1,13 +1,13 @@
+from urllib.parse import urljoin
+
 from django.conf import settings
-from django.http import HttpResponseRedirect, HttpResponse
+from django.db.models import Value, CharField, F
+from django.db.models.functions import Concat
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from .forms import *
-from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
-from django.db.models.functions import Concat
-from django.db.models import Value, CharField, F
-
-from urllib.parse import urljoin
+from .models import Volunteer, VolunteerCertificate, HelpRequest
 
 
 def thanks(request):
