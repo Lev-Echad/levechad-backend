@@ -301,7 +301,6 @@ class VolunteerCertificate(models.Model):
     expiration_date = models.DateField(default=date.today)
     _image = models.FileField(blank=True, upload_to=settings.CERTIFICATE_IMAGE_PATH)
 
-
     def get_image_path(self):
         return '{}/{}.png'.format(settings.CERTIFICATE_IMAGE_PATH, self.id)
 
