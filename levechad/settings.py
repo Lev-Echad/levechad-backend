@@ -260,3 +260,6 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+CERTIFICATE_IMAGE_PATH = 'certificates'
+CERTIFICATE_DOWNLOAD_LINK_EXPIRATION = 600  # in seconds
