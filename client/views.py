@@ -1,13 +1,13 @@
-import io
-from PIL import Image, ImageDraw, ImageFont
-from bidi.algorithm import get_display
+from urllib.parse import urljoin
 
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render
-from django.contrib.staticfiles import finders
+from django.conf import settings
+from django.db.models import Value, CharField, F
+from django.db.models.functions import Concat
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
 
 from .forms import *
-from .models import Volunteer, City, Language, VolunteerSchedule, VolunteerCertificate, HelpRequest, Area
+from .models import Volunteer, VolunteerCertificate, HelpRequest
 
 
 def thanks(request):
@@ -43,105 +43,43 @@ def thanks_volunteer(request):
 
 
 def homepage(request):
-    context = {
-        "numbers": {
-            "total_volunteers": Volunteer.objects.count() + 1786,
-            "total_help_requests": HelpRequest.objects.count() + 84     #added 1786 and 84 since those are the stats for before this app
-
-        }
-    }
-
-    return render(request, 'index.html', context)
+    return redirect(settings.FRONTEND_BASE_URI)
 
 
 def get_help(request):
-    return render(request, 'get_help.html', {})
+    return redirect(urljoin(settings.FRONTEND_BASE_URI, "citizen/"))
 
 
 def volunteer_view(request):
-    # if this is a POST request we need to process the form data
-    organization = request.GET.get('org', '')
-    if request.method == 'POST':
-        form = VolunteerForm(request.POST)
-        if form.is_valid():
-            answer = form.cleaned_data
-            languages = Language.objects.filter(name__in=answer["languages"])
-            areas = Area.objects.filter(name__in=answer["area"])
-
-            volunteer_new = Volunteer.objects.create(
-                tz_number=answer["id_number"],
-                first_name=answer["first_name"],
-                last_name=answer["last_name"],
-                email=answer["email"],
-                date_of_birth=answer["date_of_birth"],
-                organization=answer['organization'],
-                phone_number=answer["phone_number"],
-                city=City.objects.get(name=answer["city"]),
-                neighborhood=answer['neighborhood'],
-                address=answer["address"],
-                available_saturday=answer["available_on_saturday"],
-                notes=answer["notes"],
-                moving_way=answer["transportation"],
-                hearing_way=answer["hearing_way"],
-                keep_mandatory_worker_children=(answer["childrens"] == "YES"),
-                guiding=False
-            )
-            volunteer_new.languages.set(languages)
-            volunteer_new.areas.set(areas)
-
-            # creating volunteer certificate
-            volunteer_new.get_or_generate_valid_certificate()
-
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            # TODO Don't hardcode URLs, get them by view
-            return HttpResponseRedirect('/client/schedule?vol_id=' + str(volunteer_new.pk))
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = VolunteerForm(initial={'organization': organization})
-
-    return render(request, 'volunteer.html', {'form': form, 'organization': organization})
+    return redirect(urljoin(settings.FRONTEND_BASE_URI, "volunteer/signup"))
 
 
 def schedule(request):
-    if request.method == 'POST':
-        form = ScheduleForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            answer = form.cleaned_data
-            new_schedule = VolunteerSchedule(Sunday="".join(answer["sunday"]), Monday="".join(answer["monday"]),
-                                             Tuesday="".join(answer["tuesday"]), Wednesday="".join(answer["wednesday"]),
-                                             Thursday="".join(answer["thursday"]), Friday="".join(answer["friday"]),
-                                             Saturday="".join(answer["saturday"]))
-            volunteerSchedule = Volunteer.objects.get(id=int(request.POST.get('vol_id', '')))
-            new_schedule.save()
-            volunteerSchedule.schedule = new_schedule
-            volunteerSchedule.save()
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            vol_pk = request.POST['vol_id']
-
-            return HttpResponseRedirect('/client/thanks_volunteer?vol_id=' + str(vol_pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = ScheduleForm()
-
-    return render(request, 'schedule.html', {'form': form, 'id': request.GET.get('vol_id', '')})
+    """
+    View is kept only to redirect people who somehow stayed on this page or were redirected,
+    and should be removed in future versions.
+    :param request:
+    :return:
+    """
+    return redirect(urljoin(settings.FRONTEND_BASE_URI, "volunteer/signup"))
 
 
 def find_certificate_view(request):
-    context = {'form': GetCertificateForm()}
+    context = {}
+    form = GetCertificateForm()
     if request.method == 'POST':
         form = GetCertificateForm(request.POST)
         if form.is_valid():
             # TODO: change to 'get' instead of 'first' after fixing #50
-            volunteer = Volunteer.objects.filter(tz_number=form['id_number'].data).first()
+            volunteers_qs = Volunteer.objects.all()
+            volunteers_qs = volunteers_qs.annotate(calc_full_name=Concat(F('first_name'), Value(' '), F('last_name'),
+                                                                         output_field=CharField()))
+            volunteers_qs = volunteers_qs.filter(tz_number__exact=form['id_number'].data)
+            volunteers_qs = volunteers_qs.filter(calc_full_name__iexact=form['signing'].data)
+            volunteer = volunteers_qs.first()
             if volunteer is not None:
                 '''
-                 TODO: this a hotfix that generate a valid certificate to any user that requests one. 
+                 TODO: this a hotfix that generate a valid certificate to any user that requests one.
                  it should be reverted to the commented part  when #52 is solved
                 '''
                 # active_certificate = volunteer.get_active_certificates().first()
@@ -152,10 +90,10 @@ def find_certificate_view(request):
                 else:
                     context['error'] = 'לא נמצאה תעודה בתוקף!'
             else:
-                context['error'] = 'מתנדב לא נמצא!'
+                context['error'] = 'מתנדב לא נמצא, האם מילאת את הפרטים כמו שצריך?'
         else:
             context['error'] = 'יש למלא את השדות כנדרש!'
-
+    context['form'] = form
     return render(request, 'find_certificate.html', context=context)
 
 
@@ -179,32 +117,7 @@ def help_view(request, template_path, form_class, request_type_name, type_text_g
     :param request_type_name: The string type of the request (keys of HelpRequest.TYPES)
     :param type_text_gen: A function that takes the answer (list, form.cleaned_data) and returns the type_text field
     """
-    if request.method == 'POST':
-        form = form_class(request.POST)
-        if form.is_valid():
-            answer = form.cleaned_data
-            areas = Area.objects.all().get(name=answer['area'])
-
-            new_request = HelpRequest(
-                full_name=answer['full_name'],
-                phone_number=answer['phone_number'],
-                city=City.objects.get(name=answer['city']),
-                address=answer['address'],
-                notes=answer['notes'],
-                type=request_type_name,
-                request_reason=answer['request_reason'],
-                type_text=type_text_gen(answer),
-                area=areas
-            )
-            new_request.save()
-
-            return HttpResponseRedirect('/client/thanks?username=' + answer["full_name"] + "&pk=" + str(new_request.pk))
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = form_class()
-
-    return render(request, template_path, {'form': form})
+    return redirect(urljoin(settings.FRONTEND_BASE_URI, "citizen/"))
 
 
 def shopping_help(request):

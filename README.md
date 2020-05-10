@@ -44,6 +44,10 @@ To add admin user and see the databases:
 
 And then log into the <http://localhost:8000/admin> and you will be able to see the databases.
 
+Contributing
+----------
+See the [CONTRIBUTING](https://github.com/Lev-Echad/levechad-backend/blob/master/CONTRIBUTING.md) file for more information.
+
 Pulling issues
 -----------
 When you pull an issue, you need to make sure your local repository is up to date with the latest changes in the code.
@@ -67,9 +71,3 @@ For this, run the following commands:
 
     python manage.py migrate
 	
-
-Contributing
-------------
-The repository is open source and any contribution is appreciated !
-
-If  any part of this guide seems not to work no your machine, you are welcome to open an issue on the subject to receive help and resolve the problem.

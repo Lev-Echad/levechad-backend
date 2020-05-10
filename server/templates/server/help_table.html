@@ -7,7 +7,6 @@
 {% block body %}
 <p class="font-weight-bold mb-2 m-lg-3 text-center h1">רשימת בקשות עזרה
 <a href="" class="btn btn-outline-primary btn-sm m-2 waves-effect" data-toggle="modal" data-target="#modalLoginForm1">שינוי תצוגה</a></p>
-<a href="{% url 'export_help_xls' %}">ייצוא מידע לאקסל</a>
 
 <div>
     {% include 'snippets/requests_pager.html' %}
@@ -73,7 +72,7 @@
                 {% endif %}
                 <td width="40%">
                     <a href="" class="btn btn-outline-dark waves-effect m-0" data-toggle="modal" data-target="#change_status{{ help_request.id }}">ערוך</a>
-                    <a href="{% url 'find_closes_persons' help_request.id %}" class="btn btn-outline-dark waves-effect m-2">  מצא התאמה</a>
+                    <a href="{% url 'find_closest_people' help_request.id %}" class="btn btn-outline-dark waves-effect m-2">  מצא התאמה</a>
                 </td>
 
 {#                    change status#}

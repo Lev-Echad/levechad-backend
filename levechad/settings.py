@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from enum import Enum
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.environ.get('ENV', 'DEVELOPMENT')
 
@@ -33,7 +35,13 @@ else:
 
 ALLOWED_HOSTS = ['*']
 
+FRONTEND_BASE_URI = os.environ.get('FRONTEND_URI',
+                                   'https://corona.levechad.org' if ENV == 'PRODUCTION'
+                                   else 'https://devfe.levechad.org')
+
 # Application definition
+
+IMPORT_EXPORT_USE_TRANSACTIONS = True
 
 INSTALLED_APPS = [
     'client.apps.ClientConfig',
@@ -50,17 +58,31 @@ INSTALLED_APPS = [
     'storages',
     'django_extensions',
     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'import_export',
+    'drf_yasg',
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_URLS_REGEX = r'^/api/.*$'
+if ENV == 'DEVELOPMENT' or ENV == 'TESTING':
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    # TODO fill with deployment address when it's created (#267)
+    CORS_ORIGIN_WHITELIST = [FRONTEND_BASE_URI]
 
 ROOT_URLCONF = 'levechad.urls'
 
@@ -81,7 +103,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'levechad.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -121,25 +142,20 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
+if ENV in ('DEVELOPMENT', 'TESTING') and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
     LOGGING = {
         'version': 1,
-        # Version of logging
         'disable_existing_loggers': False,
-        #disable logging
-        # Handlers #############################################################
         'handlers': {
             'file': {
                 'level': 'DEBUG',
                 'class': 'logging.FileHandler',
                 'filename': 'lev-debug.log',
             },
-        ########################################################################
             'console': {
                 'class': 'logging.StreamHandler',
             },
         },
-        # Loggers ####################################################################
         'loggers': {
             'django': {
                 'handlers': ['file', 'console'],
@@ -149,13 +165,12 @@ if ENV == 'DEVELOPMENT' and os.environ.get('ENABLE_LOGGING', '') == 'TRUE':
         },
     }
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -166,13 +181,12 @@ TIME_ZONE = "Asia/Jerusalem"
 
 LOGIN_REDIRECT_URL = '/server'
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
-if ENV == 'PRODUCTION':
+if ENV == 'PRODUCTION' or ENV == 'TESTING':
     # Redirect http request to https
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
@@ -200,14 +214,51 @@ else:
     STATIC_URL = '/static/'
     MEDIA_URL = '/media/'
 
-
 # Django Rest Framework configuration
 _renderer_classes = ['rest_framework.renderers.JSONRenderer']
 if ENV != 'PRODUCTION':
     _renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
 
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': _renderer_classes
+    'DEFAULT_RENDERER_CLASSES': _renderer_classes,
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.DefaultPagination',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_THROTTLE_RATES': {
+        'hamal-data': '5/second',
+        'login': '1/second',
+        'user-choices-list': '5/second',
+        'city-autocomplete': '3/second',
+        'register': '',  # overridden in throttling.py
+        'send-sms': '',  # overridden in throttling.py
+        'check-sms': '',  # overridden in throttling.py
+    },
+}
+# Add extra authentication option to support swagger. Removed from PROD to keep minimal surface.
+if ENV != "PRODUCTION":
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
+
+
+# Geocoding settings
+class LocatorTypes(Enum):
+    NOMINATIM = 1
+    GOOGLE = 2
+    ARCGIS = 3
+
+
+LOCATOR = LocatorTypes.NOMINATIM
+GOOGLE_API_SECRET_KEY = os.environ.get('GOOGLE_API_KEY', default=None)
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'DRF Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
 }
 
 CERTIFICATE_IMAGE_PATH = 'certificates'

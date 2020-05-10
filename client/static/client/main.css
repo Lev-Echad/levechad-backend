@@ -44,6 +44,10 @@ form ul {
     list-style: none;
 }
 
+.help-block {
+    color: red;
+}
+
 input[type=submit] {
     text-align:center;
     margin: 0 0 200px 0px;

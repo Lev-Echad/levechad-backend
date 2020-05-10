@@ -1,6 +1,6 @@
 import datetime
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from client.models import Volunteer, HelpRequest, Area, City
 from django.db.models import F, Q, Count, DateTimeField
@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 
 from django.http import HttpResponse, HttpResponseBadRequest
 
-import server.xls_exporter
+from server.resources import VolunteerResource, HelpRequestResource
 
 RESULTS_IN_PAGE = 50
 PAGINATION_SHORTCUT_NUMBER = 7
@@ -72,7 +72,7 @@ def get_close_pages(current_page, pages_count):
     :return: (list of pages to link to before current page, list of pages to link to after current page)
     """
     list_pages_before = range(max(1, current_page - PAGINATION_SHORTCUT_NUMBER), current_page)
-    list_pages_after = range(current_page + 1, min(current_page + PAGINATION_SHORTCUT_NUMBER + 1, pages_count)+1)
+    list_pages_after = range(current_page + 1, min(current_page + PAGINATION_SHORTCUT_NUMBER + 1, pages_count) + 1)
     return list_pages_before, list_pages_after
 
 
@@ -137,7 +137,7 @@ def show_all_volunteers(request, page=1):
     if len(availability) != 0 and '' not in availability:
         filter_options[schedule_filter] = schedule_id
 
-    match_qs = Volunteer.objects.filter(q_option, **filter_options).annotate(appears_count=Count('helprequest'))
+    match_qs = Volunteer.objects.all_with_helprequests_count().filter(q_option, **filter_options)
     availability_now_id = match_qs.filter(**{schedule_filter: schedule_id}).values_list('id', flat=True)
 
     # ----- orders -----
@@ -279,7 +279,8 @@ def volunteer_edit_notes(request, pk):
     to_edit.save()
     return redirect('show_all_volunteers')
 
-@login_required()
+
+@login_required
 def volunteer_edit_tz_num(request, pk):
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('tz_num') is not None:
@@ -287,7 +288,8 @@ def volunteer_edit_tz_num(request, pk):
     to_edit.save()
     return redirect('show_all_volunteers')
 
-@login_required()
+
+@login_required
 def volunteer_edit_city(request, pk):
     to_edit = Volunteer.objects.get(id=pk)
     if request.POST.get('city_name') is not None:
@@ -314,108 +316,21 @@ def delete_volunteer(request, pk):
 
 
 @login_required
-def find_closes_persons(request, pk):
-    request_person = HelpRequest.objects.get(id=pk)
-
-    req_city = request_person.city
-    req_x = req_city.x
-    req_y = req_city.y
-
-    closes_volunteer = Volunteer.objects.all()
-
-    # adding here a function that tell if the volunteer is aviavble
-    # --------- check time now --------
-    now = datetime.datetime.now()
-    now_day = now.strftime("%A")
-
-    yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-    yesterday_day = yesterday.strftime("%A")
-
-    availability_qs = []
-
-    # check option 1
-    if is_time_between(datetime.time(7, 00), datetime.time(15, 00)):
-        filter = "schedule__" + now_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 1})
-
-    # check option 2
-    elif is_time_between(datetime.time(15, 00), datetime.time(23, 00)):
-        filter = "schedule__" + now_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 2})
+def find_closest_people(request, pk):
+    help_req = get_object_or_404(HelpRequest, pk=pk)
+    help_location = (help_req.city.x, help_req.city.y)
+    closest = Volunteer.objects.all_by_score(help_location)[:100]
+    context = {'help_request': help_req, 'volunteers': closest}
+    return render(request, 'server/closest_volunteer.html', context)
 
 
-    # check option 3 before midnight
-    elif is_time_between(datetime.time(23, 00), datetime.time(00, 00)):
-        filter = "schedule__" + now_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 3})
-
-    # check option 3 after midnight
-    elif is_time_between(datetime.time(00, 00), datetime.time(7, 00)):
-        filter = "schedule__" + yesterday_day + "__contains"
-        availability_qs = closes_volunteer.filter(**{filter: 3})
-
-    # check for the persons that good timing if the day is good
-
-    availability_now_id = []
-    if availability_qs != []:
-        for volu in availability_qs:
-            availability_now_id.append(volu.id)
-
-    closes_volunteer = availability_qs
-
-    closes_volunteer = sorted(closes_volunteer,
-                              key=lambda volu: -HelpRequest.objects.filter(helping_volunteer=volu).count())
-    closes_volunteer = sorted(closes_volunteer,
-                              key=lambda volu: (volu.city.x - req_x) ** 2 + (volu.city.y - req_y) ** 2)
-
-    # closes_volunteer = closes_volunteer.order_by((F('city__x')-req_x)**2 + (F('city__y')-req_y)**2)
-
-    if len(closes_volunteer) > 100:
-        closes_volunteer = closes_volunteer[0:100]
-
-    # ----- check for each volunterr how much times he apper
-    appers_list = []
-    for volu in closes_volunteer:
-        appers_list.append(volu.times_volunteered)
-
-    final_data = []
-    for i in range(0, len(closes_volunteer)):
-        tot_x = (closes_volunteer[i].city.x - request_person.city.x) ** 2
-        tot_y = (closes_volunteer[i].city.y - request_person.city.y) ** 2
-        tot_value = int(((tot_x + tot_y) ** 0.5) / 100)
-        final_data.append((closes_volunteer[i], tot_value, appers_list[i]))
-
-    context = {'help_request': request_person, 'closes_volunteer': final_data,
-               'availability_now_id': availability_now_id}
-    return render(request, 'server/closes_volunteer.html', context)
-
-
+@login_required
 def export_users_xls(request):
-    fields_descriptions = {
-        'id': 'מזהה מתנדב',
-        'first_name': 'שם פרטי',
-        'last_name': 'שם משפחה',
-        'tz_number': 'תעודת זהות',
-        'volunteer_type': 'סוג מתנדב',
-        'date_of_birth': 'תאריך לידה',
-        'organization': 'ארגון',
-        'phone_number': 'מספר טלפון',
-        'areas': 'איזור מגורים',
-        'languages': 'שפות',
-        'email': 'אימייל',
-        'city': 'עיר',
-        'neighborhood': 'שכונת מגורים',
-        'address': 'כתובת',
-        'available_saturday': 'זמין בשבת?',
-        'keep_mandatory_worker_children': 'מעוניין לסייע לילדי עובדים חיוניים?',
-        'guiding': 'מדריך',
-        'notes': 'הערות',
-        'moving_way': 'אמצעי תחבורה',
-        'hearing_way': 'איך שמע על לב אחד',
-        'created_date': 'מועד הרשמה',
-    }
+    current_time = datetime.datetime.now().strftime('%Y_%m_%d-%H%M%S')
+    response = HttpResponse(VolunteerResource().export().xls, 'application/vnd.ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="Volunteers_data-{current_time}.xls"'
 
-    return server.xls_exporter.export_model_to_xls(Volunteer, fields_descriptions)
+    return response
 
 
 @login_required
@@ -428,22 +343,3 @@ def create_volunteer_certificate(request, volunteer_id):
 
     next_page_name = request.GET.get('next', 'index')
     return redirect(next_page_name)
-
-
-def export_help_xls(request):
-    fields_descriptions = {
-        'id': 'מזהה בקשה',
-        'created_date': 'תאריך הבקשה',
-        'full_name': 'שם פונה',
-        'phone_number': 'טלפון',
-        'area': 'איזור',
-        'address': 'כתובת',
-        'request_reason': 'סיבת הבקשה',
-        'city': 'עיר',
-        'type': 'סוג פנייה',
-        'notes': 'הערות',
-        'status': 'סטטוס',
-        'helping_volunteer': 'מתנדב שמטפל',
-    }
-
-    return server.xls_exporter.export_model_to_xls(HelpRequest, fields_descriptions, spreadsheet_name='Help Requests')
