@@ -234,6 +234,7 @@ REST_FRAMEWORK = {
         'register': '',  # overridden in throttling.py
         'send-sms': '',  # overridden in throttling.py
         'check-sms': '',  # overridden in throttling.py
+        'export-excel-data': '',  # overridden in throttling.py
     },
 }
 # Add extra authentication option to support swagger. Removed from PROD to keep minimal surface.

@@ -99,6 +99,7 @@ Available scopes:
 | register          | 1                          | 5 seconds |
 | send-sms          | 1                          | 5 minutes |
 | check-sms         | 1                          | 2 seconds | 
+| export-excel-data | 1                          | 5 seconds | 
 
 Requests denied by throttling have the `429 Too Many Requests` status code and the following response (where X is the
 no. of seconds left):
@@ -688,3 +689,39 @@ characters):
 }
 ```
 
+## `/api/exportvolunteers`
+
+* _This view requires authentication. See "Token Authentication" section for more details._
+* _This view is filterable. See "Filtering" section above for more details & the filters available here._
+
+**Description**: Exports volunteers into an `.xls` (Excel) file, according to the specified filters.
+
+**Allowed methods**: GET
+
+**Throttling**: `export-excel-data`, user throttle
+
+#### Response
+_This endpoint is special_ - when accessed, it returns the downloadable resource file as the response directly, and not
+a JSON response.
+
+#### Available Filters
+See `/api/volunteers` available filters.
+
+
+## `/api/exporthelprequests`
+
+* _This view requires authentication. See "Token Authentication" section for more details._
+* _This view is filterable. See "Filtering" section above for more details & the filters available here._
+
+**Description**: Exports help requests into an `.xls` (Excel) file, according to the specified filters.
+
+**Allowed methods**: GET
+
+**Throttling**: `export-excel-data`, user throttle
+
+#### Response
+_This endpoint is special_ - when accessed, it returns the downloadable resource file as the response directly, and not
+a JSON response.
+
+#### Available Filters
+See `/api/helprequests` available filters.

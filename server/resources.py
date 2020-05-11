@@ -1,7 +1,8 @@
 from import_export import resources
 from import_export.fields import Field
+from import_export.widgets import ManyToManyWidget, DateWidget
 
-from client.models import Volunteer, HelpRequest
+from client.models import Volunteer, HelpRequest, Language, Area
 
 
 class VolunteerResource(resources.ModelResource):
@@ -13,8 +14,8 @@ class VolunteerResource(resources.ModelResource):
     date_of_birth = Field(attribute='date_of_birth', column_name='תאריך לידה', default='')
     organization = Field(attribute='organization', column_name='ארגון', default='')
     phone_number = Field(attribute='phone_number', column_name='מספר טלפון', default='')
-    areas = Field(attribute='areas', column_name='איזור מגורים', default='')
-    languages = Field(attribute='languages', column_name='שפות', default='')
+    areas = Field(attribute='areas', column_name='איזור מגורים', default='', widget=ManyToManyWidget(Area))
+    languages = Field(attribute='languages', column_name='שפות', default='', widget=ManyToManyWidget(Language))
     email = Field(attribute='email', column_name='אימייל', default='')
     city = Field(attribute='city', column_name='עיר', default='')
     neighborhood = Field(attribute='neighborhood', column_name='שכונת מגורים', default='')
@@ -29,7 +30,8 @@ class VolunteerResource(resources.ModelResource):
     notes = Field(attribute='notes', column_name='הערות', default='')
     moving_way = Field(attribute='get_moving_way_display', column_name='אמצעי תחבורה', default='')
     hearing_way = Field(attribute='get_hearing_way_display', column_name='איך שמע על לב אחד', default='')
-    created_date = Field(attribute='created_date', column_name='מועד הרשמה', default='')
+    created_date = Field(attribute='created_date', column_name='מועד הרשמה', default='',
+                         widget=DateWidget(format='%d.%m.%Y %H:%M:%S'))
 
     class Meta:
         model = Volunteer
@@ -69,7 +71,8 @@ class VolunteerResource(resources.ModelResource):
 
 class HelpRequestResource(resources.ModelResource):
     id = Field(attribute='id', column_name='מזהה בקשה', default='')
-    created_date = Field(attribute='created_date', column_name='תאריך הבקשה', default='')
+    created_date = Field(attribute='created_date', column_name='תאריך הבקשה', default='',
+                         widget=DateWidget(format='%d.%m.%Y %H:%M:%S'))
     full_name = Field(attribute='full_name', column_name='שם פונה', default='')
     phone_number = Field(attribute='phone_number', column_name='טלפון', default='')
     area = Field(attribute='area', column_name='איזור', default='')

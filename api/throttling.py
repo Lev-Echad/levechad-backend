@@ -3,6 +3,18 @@ from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 # TODO find a way to do this with metaclasses to reduce code duplication
 
 
+class ExportExcelDataThrottle(UserRateThrottle):
+    scope = 'export-excel-data'
+    THROTTLE_SECONDS = 5
+
+    def parse_rate(self, rate):
+        """
+        This function parses the string rate given (e.g 1/second). We ignore it and return a custom answer.
+        :returns: tuple (int, int) (<allowed number of requests>, <period of time in seconds>)
+        """
+        return 1, type(self).THROTTLE_SECONDS
+
+
 class CityAutocompleteThrottle(AnonRateThrottle):
     scope = 'city-autocomplete'
 
