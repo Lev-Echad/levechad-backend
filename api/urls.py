@@ -27,6 +27,7 @@ router.register(r'updatevolunteer', api.views.UpdateVolunteerViewSet, basename='
 router.register(r'SetVolunteerFreeze', api.views.VolunteerFreezeViewSet, basename='SetVolunteerFreeze')
 router.register(r'createhelprequest', api.views.CreateHelpRequestViewSet, basename='create_help_request')
 router.register(r'volunteers', api.views.VolunteersViewSet, basename='volunteer_list')
+router.register(r'certificates', api.views.VolunteerCertificateViewSet, basename='certificates')
 router.register(r'helprequests', api.views.HelpRequestsViewSet, basename='help_request_list')
 router.register(r'maphelprequests', api.views.HelpRequestMapViewSet, basename='map_help_request_list')
 router.register(r'updatehelprequest', api.views.UpdateHelpRequestViewSet, basename='update_help_request_list')

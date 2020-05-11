@@ -1,3 +1,5 @@
+from datetime import date
+
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
@@ -11,12 +13,12 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 import django_filters as filters
 
-from client.models import Volunteer, HelpRequest, City, Area, Language, VolunteerFreeze
+from client.models import Volunteer, HelpRequest, City, Area, Language, VolunteerFreeze, VolunteerCertificate
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
     CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
     MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer, VolunteerFreezeSerializer, \
-    UpdateVolunteerSerializer
+    UpdateVolunteerSerializer, VolunteerCertificateSerializer
 
 import api.throttling
 from levechad import settings
@@ -202,6 +204,28 @@ class UpdateVolunteerViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
 class VolunteerFreezeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = VolunteerFreezeSerializer
     permission_classes = [IsAuthenticated]
+
+
+class VolunteerCertificateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = VolunteerCertificate.objects.all()
+    serializer_class = VolunteerCertificateSerializer
+    throttle_classes = [api.throttling.RegistrationThrottle]
+
+    def get_queryset(self):
+        """
+        Requires the "startswith" parameter to exist & not be below MINIMUM_FILTER_LENGTH
+        """
+        id_number = self.request.query_params.get('ID_NUM', None)
+        birth_date = self.request.query_params.get('DATE_OF_BIRTH', None)
+        # raise ValidationError(''.join([
+        #     f'{type(self).STARTSWITH_QUERY_PARAMETER} parameter must be ',
+        #     f'above {type(self).MINIMUM_FILTER_LENGTH} characters.'
+        # ]))
+
+        return VolunteerCertificate.objects.all().filter(
+            volunteer__tz_number=id_number,
+            expiration_date__lt=date.today()
+        )
 
 
 class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

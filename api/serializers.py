@@ -3,7 +3,8 @@ from rest_framework.exceptions import ValidationError
 
 from client.validators import parental_consent_validator, minimum_age_validator, phone_number_validator, \
     unique_id_number_validator, id_number_validator
-from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area, VolunteerFreeze
+from client.models import Volunteer, ParentalConsent, City, Language, HelpRequest, Area, VolunteerFreeze, \
+    VolunteerCertificate
 
 
 class ParentalConsentSerializer(serializers.ModelSerializer):
@@ -117,6 +118,18 @@ class VolunteerFreezeSerializer(serializers.ModelSerializer):
     class Meta:
         model = VolunteerFreeze
         fields = ['volunteer', 'expiration_date']
+
+
+class VolunteerCertificateSerializer(serializers.ModelSerializer):
+    expiration_date = serializers.DateField(required=True)
+    image_url = serializers.SerializerMethodField('get_certificate_url')
+
+    def get_certificate_url(self, obj):
+        return self.context['request'].build_absolute_uri(obj.image.url)
+
+    class Meta:
+        model = VolunteerCertificate
+        fields = ['volunteer', 'expiration_date', 'image_url']
 
 
 class ShortVolunteerSerializer(serializers.ModelSerializer):
