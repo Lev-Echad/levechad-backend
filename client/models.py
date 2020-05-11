@@ -1,25 +1,20 @@
 # coding=utf-8
-import io
 import os
 from datetime import date
 from uuid import uuid4
 
 import boto3
-from PIL import Image, ImageDraw, ImageFont
-from bidi.algorithm import get_display
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.staticfiles import finders
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import F, Count, Q, OuterRef
-from django.urls import reverse
-from django.utils import timezone
+from django.db.models import F, Count, Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from django.urls import reverse
+from django.utils import timezone
 from multiselectfield import MultiSelectField
 
 import client.geo
