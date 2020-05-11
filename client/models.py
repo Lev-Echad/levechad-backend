@@ -1,26 +1,24 @@
 # coding=utf-8
-import io
+import os
 from datetime import date
+from uuid import uuid4
 
 import boto3
-from PIL import Image, ImageDraw, ImageFont
-from bidi.algorithm import get_display
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.staticfiles import finders
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import F, Count, Q, OuterRef
-from django.urls import reverse
-from django.utils import timezone
+from django.db.models import F, Count, Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from django.urls import reverse
+from django.utils import timezone
 from multiselectfield import MultiSelectField
 
 import client.geo
+from client import certificates
 
 DEFAULT_MAX_FIELD_LENGTH = 200
 SHORT_FIELD_LENGTH = 20
@@ -294,49 +292,18 @@ class VolunteerFreeze(Timestampable):
 
 
 class VolunteerCertificate(models.Model):
-    CERTIFICATE_TEXT_COLOR = (3, 8, 12)  # (R, G, B)
-    CERTIFICATE_TEXT_SIZE = 40
-    CERTIFICATE_TEXT_POSITION = (700, 200)
-    IMAGE_PATH = 'certificates/{id}.png'
-    DOWNLOAD_LINK_EXPIRATION_SECONDS = 600
-
     def _certificate_image_path(self, filename):
-        return type(self).IMAGE_PATH.format(id=self.id)
+        filename = uuid4().hex
+        return settings.CERTIFICATE_IMAGE_PATH.format(filename=filename)
 
     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='certificates', null=False)
     expiration_date = models.DateField(default=date.today)
     _image = models.FileField(blank=True, upload_to=_certificate_image_path)
 
     def create_image(self, save=True):
-        volunteer = self.volunteer
-        tag_filename = finders.find('client/tag.jpeg')
-        font_filename = finders.find('client/fonts/BN Amnesia.ttf')
-        photo = None
-        try:
-            photo = Image.open(tag_filename)
-            drawing = ImageDraw.Draw(photo)
-            font = ImageFont.truetype(font_filename, size=type(self).CERTIFICATE_TEXT_SIZE)
-
-            lines_to_insert = [
-                f'שם מתנדב: {volunteer.first_name} {volunteer.last_name}',
-                f'תעודת זהות: {volunteer.tz_number}',
-                f'תוקף התעודה: {self.expiration_date}',
-                f'מספר תעודה: {self.id}',
-            ]
-
-            drawing.text(
-                type(self).CERTIFICATE_TEXT_POSITION,
-                get_display('\n'.join(lines_to_insert)),
-                fill=type(self).CERTIFICATE_TEXT_COLOR,
-                font=font,
-                align='right'
-            )
-            with io.BytesIO() as output:
-                photo.save(output, format='png')
-                self._image.save(type(self).IMAGE_PATH.format(id=self.id), ContentFile(output.getvalue()), save=save)
-        finally:
-            if photo is not None:
-                photo.close()
+        image_data = certificates.create_image(self)
+        filename = uuid4().hex
+        self._image.save(settings.CERTIFICATE_IMAGE_PATH.format(filename=filename), ContentFile(image_data), save=save)
 
     def update_image_if_nonexistent(self, save=True):
         if not self._image.name:
@@ -356,10 +323,10 @@ class VolunteerCertificate(models.Model):
                 'get_object',
                 Params={
                     'Bucket': 'levechad-media-bucket',
-                    'Key': 'media/{}'.format(type(self).IMAGE_PATH.format(id=self.id)),
-                    'ResponseContentDisposition': 'attachment;filename={}'.format(f'{self.id}.png'),
+                    'Key': 'media/{}'.format(self._image.url),
+                    'ResponseContentDisposition': 'attachment;filename={}'.format(os.path.basename(self._image.url)),
                 },
-                ExpiresIn=type(self).DOWNLOAD_LINK_EXPIRATION_SECONDS
+                ExpiresIn=settings.CERTIFICATE_DOWNLOAD_LINK_EXPIRATION_SECONDS
             )
         else:
             return reverse('download_certificate', kwargs={'pk': self.id})
