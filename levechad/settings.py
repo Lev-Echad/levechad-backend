@@ -35,6 +35,10 @@ else:
 
 ALLOWED_HOSTS = ['*']
 
+FRONTEND_BASE_URI = os.environ.get('FRONTEND_URI',
+                                   'https://corona.levechad.org' if ENV == 'PRODUCTION'
+                                   else 'https://devfe.levechad.org')
+
 # Application definition
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
@@ -78,7 +82,7 @@ if ENV == 'DEVELOPMENT' or ENV == 'TESTING':
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     # TODO fill with deployment address when it's created (#267)
-    CORS_ORIGIN_WHITELIST = ["https://corona.levechad.org"]
+    CORS_ORIGIN_WHITELIST = [FRONTEND_BASE_URI]
 
 ROOT_URLCONF = 'levechad.urls'
 
@@ -256,3 +260,10 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+# Volunteer certificate settings
+CERTIFICATE_TEXT_COLOR = (3, 8, 12)  # (R, G, B)
+CERTIFICATE_TEXT_SIZE = 40
+CERTIFICATE_TEXT_POSITION = (700, 200)
+CERTIFICATE_IMAGE_PATH = 'certificates/{filename}.png'
+CERTIFICATE_DOWNLOAD_LINK_EXPIRATION_SECONDS = 600
