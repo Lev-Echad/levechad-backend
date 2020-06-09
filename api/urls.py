@@ -35,6 +35,8 @@ router.register(r'areas', api.views.AreasViewSet, basename='area_list')
 router.register(r'languages', api.views.LanguagesViewSet, basename='language_list')
 router.register(r'sendverificationcode', api.views.SendVerificationCodeViewSet, basename='send_verification_code')
 router.register(r'checkverificationcode', api.views.CheckVerificationCodeViewSet, basename='check_verification_code')
+router.register(r'exportvolunteers', api.views.ExportVolunteersViewSet, basename='export_volunteers_xls')
+router.register(r'exporthelprequests', api.views.ExportHelpRequestsViewSet, basename='export_helprequests_xls')
 
 authTokenView = \
     swagger_auto_schema(

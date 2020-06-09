@@ -1,3 +1,7 @@
+from datetime import datetime
+
+from django.http import HttpResponse
+
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
@@ -6,20 +10,22 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 
-from django.contrib.auth.models import User
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
-import django_filters as filters
 
-from client.models import Volunteer, HelpRequest, City, Area, Language, VolunteerFreeze
+from levechad import settings
+
+from client.models import Volunteer, HelpRequest, City, Area, Language
 from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
     CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
     MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer, VolunteerFreezeSerializer, \
     UpdateVolunteerSerializer
 
+from server.resources import VolunteerResource, HelpRequestResource
+
 import api.throttling
-from levechad import settings
+import api.filters
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -87,61 +93,13 @@ class CreateHelpRequestViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet)
 
 # === Authentication required API endpoints ===
 
-class VolunteerFilter(filters.FilterSet):
-    num_helprequests = filters.NumberFilter(lookup_expr='exact')
-    num_helprequests__gt = filters.NumberFilter(method='num_helprequests_gt')
-    num_helprequests__lt = filters.NumberFilter(method='num_helprequests_lt')
-
-    def num_helprequests_gt(self, queryset, field_name, value):
-        return queryset.filter(num_helprequests__gt=value)
-
-    def num_helprequests_lt(self, queryset, field_name, value):
-        return queryset.filter(num_helprequests__lt=value)
-
-    class Meta:
-        model = Volunteer
-        fields = {
-            'id': ['exact'],
-            'first_name': ['exact', 'icontains'],
-            'last_name': ['exact', 'icontains'],
-            'tz_number': ['exact', 'icontains'],
-            'phone_number': ['exact', 'icontains'],
-            'date_of_birth': ['gt', 'lt', 'exact'],
-            'age': ['gt', 'lt', 'exact'],
-            'gender': ['exact'],
-            'city': ['exact', 'in'],
-            'neighborhood': ['exact', 'icontains'],
-            'city__region': ['exact'],
-            'moving_way': ['exact'],
-            'week_assignments_capacity': ['exact', 'range'],
-            'wanted_assignments': ['exact'],
-            'score': ['exact'],
-            'created_date': ['gt', 'lt', 'exact'],
-            'organization': ['exact', 'in']
-        }
-
-
-class HelpRequestsFilter(filters.FilterSet):
-    class Meta:
-        model = HelpRequest
-        fields = {
-            'id': ['exact'],
-            'city': ['exact', 'in'],
-            'city__region': ['exact', 'in'],
-            'status': ['exact', 'in'],
-            'type': ['exact', 'in'],
-            'helping_volunteer__id': ['exact'],
-            'notes': ['icontains'],
-            'phone_number': ['exact'],
-        }
-
 
 class VolunteersViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, mixins.RetrieveModelMixin,
                         viewsets.GenericViewSet):
     queryset = Volunteer.objects.all_with_helprequests_count().order_by('-created_date')
     serializer_class = VolunteerSerializer
     permission_classes = [IsAuthenticated]
-    filterset_class = VolunteerFilter
+    filterset_class = api.filters.VolunteerFilter
     throttle_classes = [api.throttling.HamalDataListThrottle]
 
     BEST_MATCH_VOLUNTEERS_LIMIT = 20
@@ -177,7 +135,7 @@ class HelpRequestsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = HelpRequest.objects.all().order_by('-created_date')
     serializer_class = HelpRequestSerializer
     permission_classes = [IsAuthenticated]
-    filterset_class = HelpRequestsFilter
+    filterset_class = api.filters.HelpRequestsFilter
     throttle_classes = [api.throttling.HamalDataListThrottle]
 
 
@@ -209,7 +167,7 @@ class HelpRequestMapViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = MapHelpRequestSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = None
-    filterset_class = HelpRequestsFilter
+    filterset_class = api.filters.HelpRequestsFilter
     throttle_classes = [api.throttling.HamalDataListThrottle]
 
 
@@ -263,6 +221,32 @@ class LanguagesViewSet(ListByNameViewSet):
     throttle_classes = [api.throttling.UserChoicesListThrottle]
 
 
+class ExportVolunteersViewSet(viewsets.ViewSet):
+    throttle_classes = [api.throttling.ExportExcelDataThrottle]
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        volunteers = api.filters.VolunteerFilter(request.GET, queryset=Volunteer.objects.all()).qs
+        current_time = datetime.now().strftime('%Y_%m_%d-%H%M%S')
+        response = HttpResponse(VolunteerResource().export(volunteers).xls, 'application/vnd.ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="Volunteers_data-{current_time}.xls"'
+
+        return response
+
+
+class ExportHelpRequestsViewSet(viewsets.ViewSet):
+    throttle_classes = [api.throttling.ExportExcelDataThrottle]
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        helprequests = api.filters.HelpRequestsFilter(request.GET, queryset=HelpRequest.objects.all()).qs
+        current_time = datetime.now().strftime('%Y_%m_%d-%H%M%S')
+        response = HttpResponse(HelpRequestResource().export(helprequests).xls, 'application/vnd.ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="HelpRequests_data-{current_time}.xls"'
+
+        return response
+
+
 class GetGoogleApiSecret(APIView):
     """
     return google maps GOOGLE_API_SECRET_KEY in JSON.
@@ -273,3 +257,4 @@ class GetGoogleApiSecret(APIView):
     def get(self, request, format=None):
         content = {'secret_key': settings.GOOGLE_API_SECRET_KEY}
         return Response(content)
+
