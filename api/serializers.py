@@ -122,7 +122,7 @@ class VolunteerFreezeSerializer(serializers.ModelSerializer):
 class ShortVolunteerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Volunteer
-        fields = ['id', 'full_name']
+        fields = ['id', 'full_name', 'phone_number']
 
 
 class MatchingVolunteerSerializer(serializers.ModelSerializer):
