@@ -289,6 +289,7 @@ class Volunteer(Timestampable):
 class VolunteerFreeze(Timestampable):
     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='freezes', null=False)
     expiration_date = models.DateField(db_index=True)
+    freeze_disabled = models.BooleanField(default=False)
 
 
 class VolunteerCertificate(models.Model):
