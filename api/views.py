@@ -1,5 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, mixins, status
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -16,7 +17,7 @@ from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
     CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
     MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer, VolunteerFreezeSerializer, \
-    UpdateVolunteerSerializer
+    UpdateVolunteerSerializer, DisableVolunteerFreezeSerializer
 
 import api.throttling
 from levechad import settings
@@ -261,6 +262,14 @@ class LanguagesViewSet(ListByNameViewSet):
     serializer_class = LanguageSerializer
     permission_classes = [IsAuthenticated]
     throttle_classes = [api.throttling.UserChoicesListThrottle]
+
+
+class DisableFreezesViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DisableVolunteerFreezeSerializer
+    throttle_classes = [api.throttling.HamalDataListThrottle]
+    lookup_field = "volunteer__id"
+    queryset = VolunteerFreeze.objects.all()
 
 
 class GetGoogleApiSecret(APIView):
