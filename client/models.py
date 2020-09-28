@@ -129,7 +129,10 @@ class ExtendedVolunteerManager(models.Manager):
         # In the future, add more parameters
         volunteers_qs = self.get_queryset()
         # Remove volunteers on hold.
-        volunteers_qs = volunteers_qs.filter(~Q(freezes__expiration_date__gte=date.today()))
+        volunteers_qs = volunteers_qs.filter(
+            ~Q(freezes__expiration_date__gte=date.today(),
+               freezes__freeze_disabled=False)
+        )
         # Used to catch use of old coordinate system (mainly the legacy website).
         if helprequest_coordinates[0] > 1000:
             volunteers_qs = self._add_distance_old(volunteers_qs, helprequest_coordinates, as_int=True)
@@ -290,6 +293,10 @@ class VolunteerFreeze(Timestampable):
     volunteer = models.ForeignKey(Volunteer, on_delete=models.CASCADE, related_name='freezes', null=False)
     expiration_date = models.DateField(db_index=True)
     freeze_disabled = models.BooleanField(default=False)
+
+    def delete(self, using=None, keep_parents=False):
+        self.freeze_disabled = True
+        self.save()
 
 
 class VolunteerCertificate(models.Model):
