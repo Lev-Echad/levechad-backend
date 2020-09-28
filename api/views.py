@@ -293,8 +293,7 @@ class DisableFreezesViewSet(viewsets.GenericViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instances = self.get_multiple_objects()
-        for freeze in instances:
-            freeze.delete()
+        instances.update(freeze_disabled=True)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
