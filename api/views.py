@@ -1,5 +1,7 @@
+from django.http import Http404
 from rest_framework.exceptions import ValidationError
 from rest_framework import viewsets, mixins, status
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -16,7 +18,7 @@ from client.validators import PHONE_NUMBER_REGEX
 from api.serializers import VolunteerSerializer, RegistrationSerializer, HelpRequestSerializer, ShortCitySerializer, \
     CreateHelpRequestSerializer, AreaSerializer, LanguageSerializer, \
     MatchingVolunteerSerializer, MapHelpRequestSerializer, UpdateHelpRequestSerializer, VolunteerFreezeSerializer, \
-    UpdateVolunteerSerializer
+    UpdateVolunteerSerializer, DisableVolunteerFreezeSerializer
 
 import api.throttling
 from levechad import settings
@@ -261,6 +263,38 @@ class LanguagesViewSet(ListByNameViewSet):
     serializer_class = LanguageSerializer
     permission_classes = [IsAuthenticated]
     throttle_classes = [api.throttling.UserChoicesListThrottle]
+
+
+class DisableFreezesViewSet(viewsets.GenericViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DisableVolunteerFreezeSerializer
+    throttle_classes = [api.throttling.HamalDataListThrottle]
+    lookup_field = "volunteer__id"
+    queryset = VolunteerFreeze.objects.filter(freeze_disabled=False)
+
+    def get_multiple_objects(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Perform the lookup filtering.
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+
+        assert lookup_url_kwarg in self.kwargs, (
+                'Expected view %s to be called with a URL keyword argument '
+                'named "%s". Fix your URL conf, or set the `.lookup_field` '
+                'attribute on the view correctly.' %
+                (self.__class__.__name__, lookup_url_kwarg)
+        )
+
+        filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
+        queryset = queryset.filter(**filter_kwargs)
+        if not queryset.exists():
+            raise Http404
+        return queryset
+
+    def destroy(self, request, *args, **kwargs):
+        instances = self.get_multiple_objects()
+        instances.update(freeze_disabled=True)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GetGoogleApiSecret(APIView):

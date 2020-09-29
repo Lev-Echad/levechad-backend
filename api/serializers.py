@@ -119,6 +119,12 @@ class VolunteerFreezeSerializer(serializers.ModelSerializer):
         fields = ['volunteer', 'expiration_date']
 
 
+class DisableVolunteerFreezeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VolunteerFreeze
+        fields = ['volunteer']
+
+
 class ShortVolunteerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Volunteer
