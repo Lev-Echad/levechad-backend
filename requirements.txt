@@ -1,5 +1,5 @@
 geopy==1.21.0
-asgiref==3.2.7
+asgiref==3.3.4
 backcall==0.1.0
 boto3==1.12.33
 botocore==1.15.33
