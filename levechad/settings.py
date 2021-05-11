@@ -39,6 +39,8 @@ FRONTEND_BASE_URI = os.environ.get('FRONTEND_URI',
                                    'https://corona.levechad.org' if ENV == 'PRODUCTION'
                                    else 'https://devfe.levechad.org')
 
+FRONTEND_SECONDARY_URI = os.environ.get("FRONTEND_URI_SECONDARY", None)
+
 # Application definition
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
@@ -83,6 +85,8 @@ if ENV == 'DEVELOPMENT' or ENV == 'TESTING':
 else:
     # TODO fill with deployment address when it's created (#267)
     CORS_ORIGIN_WHITELIST = [FRONTEND_BASE_URI]
+    if FRONTEND_SECONDARY_URI is not None:
+        CORS_ORIGIN_WHITELIST.append(FRONTEND_SECONDARY_URI)
 
 ROOT_URLCONF = 'levechad.urls'
 

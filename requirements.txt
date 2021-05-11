@@ -6,7 +6,7 @@ botocore==1.15.33
 colorama==0.4.3
 decorator==4.4.2
 dj-database-url==0.5.0
-Django==3.1.8
+Django==3.0.7
 django-bootstrap-form==3.4
 django-cors-headers==3.2.1
 django-extensions==2.2.9
@@ -15,7 +15,7 @@ django-mathfilters==1.0.0
 django-multiselectfield==0.1.12
 django-storages==1.9.1
 django-import-export==2.0.2
-djangorestframework==3.11.2
+djangorestframework==3.11.0
 docutils==0.15.2
 gunicorn==20.0.4
 ipython==7.13.0
@@ -26,10 +26,10 @@ numpy==1.18.2
 pandas==1.0.3
 parso==0.6.2
 pickleshare==0.7.5
-Pillow==8.1.1
+Pillow==7.0.0
 prompt-toolkit==3.0.5
 psycopg2-binary==2.8.4
-Pygments==2.7.4
+Pygments==2.6.1
 python-bidi==0.4.2
 python-dateutil==2.8.1
 pytz==2019.3
